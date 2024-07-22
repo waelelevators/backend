@@ -1,0 +1,143 @@
+models:
+  City:
+      id: id
+      name: string
+      region_id: bigInteger
+
+  Region:
+      id: id
+      name: string
+
+  Client:
+      id: id
+      type: string
+      data: json
+
+
+  Stage:
+      id: id foreign:contract_stages.stage_id
+      name: string
+      description: text
+
+  RoomsType:
+      id: id
+      name: string
+      relationships:
+        hasMany: Contract
+
+  ContractStage:
+      id: id
+      contract_id: bigInteger foreign:contracts.id
+      stage_id: bigInteger
+      amount: bigInteger
+      tax: bigInteger
+      relationships:
+        belongsTo: Contract, Stage
+
+  User:
+      id: id
+      name: string
+      email: string
+      password: string
+      level: string
+
+  ElevatorType:
+      name: string:255
+
+  Elevator:
+      name: string:255
+
+  Contract:
+      cost: decimal:8,2
+      client_id: id foreign:clients
+      project_name: string:255
+      region_id: id foreign:regions
+      city_id: id foreign:cities
+      district: string:255 #الحي
+      street: string:255 #الشارع
+      elevator_type_id: id foreign:elevator_types
+      elevator_rail_id: id foreign:elevator_rails
+      number_of_stops: integer
+      elevator_journey: integer between:1,10 #مشوار المصعد
+      elevator_room_id: id foreign:elevator_rooms
+      elevator_weight_id: id foreign:elevator_weights
+      machine_type_id: id foreign:machine_types
+      machine_warranty: integer
+      machine_load_id: id foreign:machine_loads
+      machine_speed: string
+      people_load: integer
+      control_card: string
+      number_of_stages: integer between:1,10
+      door_opening_direction_id: id foreign:door_opening_directions
+      door_opening_size_id: id foreign:door_opening_sizes
+      elevator_warranty: integer
+      free_maintenance: integer default:0
+      total_number_of_visits: integer
+      how_did_you_get_to_us: text
+      contract_status: enum:Draft,Completed,Other
+      user_id: id foreign:users
+
+      relationships:
+        belongsTo: City, Region, ElevatorType, ElevatorRail, ElevatorRoom, ElevatorWeight, MachineType, MachineLoad, DoorOpeningDirection, DoorOpeningSize, User, Client
+
+  MachineType:
+      name: string:255
+      relationships:
+        hasMany: Contract
+
+  ElevatorWeight:
+      name: string:255
+      relationships:
+        hasMany: Contract
+
+
+  ElevatorRail:
+      name: string:255
+      relationships:
+        hasMany: Contract
+
+  ContractTechnician:
+      technician_id: integer
+      contract_id: integer
+      relationships:
+        hasMany: Contract, Technician
+
+  Technician:
+      name: string:255
+      type: string:255
+      relationships:
+        hasMany: ContractTechnician
+
+  ElevatorRoom:
+      name: string:255
+      relationships:
+        hasMany: Contract
+
+  OuterDoorSpecification:
+      contract_id: integer
+      floor: string:255
+      number_of_doors: integer
+      out_door_specification: string:255
+      door_opening_direction: string:255
+      out_door_specification_tow: string:255
+      door_opening_direction_tow: string:255
+      relationships:
+        hasMany: Contract
+
+
+
+  MachineLoad:
+      name: string:255
+      relationships:
+        hasMany: Contract
+
+
+
+
+# controllers:
+#   Contract:
+#     resource: api
+#   User:
+#     resource: api
+#   ElevatorRoomType:
+#     resource: api

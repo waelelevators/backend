@@ -1,0 +1,8 @@
+{
+    "Stock": true,
+    "Technician": true,
+    "Installation": true,
+    "Maintenance": true,
+    "Migration": true,
+    "Purchase": true
+}

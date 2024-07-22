@@ -1,0 +1,37 @@
+models:
+  ElevatorType:
+    name: string
+  CabinRailsSize:
+    name: string
+  CounterweightRailsSize:
+    name: string
+  StopNumber:
+    name: string
+  ElevatorTrip:
+    name: string
+  ElevatorRoom:
+    name: string
+  MachineType:
+    name: string
+  MachineWarranty:
+    name: string
+  MachineLoad:
+    name: string
+  MachineSpeed:
+    name: string
+  PeopleLoad:
+    name: string
+  ControlCard:
+    name: string
+  EntrancesNumber:
+    name: string
+  OuterDoorDirection:
+    name: string
+  InnerDoorType:
+    name: string
+  DoorSize:
+    name: string
+  FreeMaintenance:
+    name: string
+  ElevatorWarranty:
+    name: string
