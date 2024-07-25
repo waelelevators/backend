@@ -6,7 +6,7 @@ use App\Models\Template;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-
+use Illuminate\Support\Facades\Validator;
 class TemplateController extends Controller
 {
     /**
@@ -24,6 +24,33 @@ class TemplateController extends Controller
     {
         return Template::findOrFail($id);
     }
+    public function store(Request $request)
+    {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'templateName' => 'required|string|unique:templates,name',
+            'content' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'please Try other name the name already exists',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Create and save the template
+        $temp = new Template();
+        $temp->name = $request->templateName;
+        $temp->data = $request->content;
+        $temp->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم الاضافة بنجاح',
+        ]);
+    }
 
     function update($type, Request $request)
     {
@@ -35,8 +62,6 @@ class TemplateController extends Controller
 
         return $Setting;
     }
-
-
     function updateTemplate(Request $request)
     {
         return $request;

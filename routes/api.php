@@ -20,10 +20,7 @@ use App\Http\Controllers\SignedContractsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\contractQuotationsController;
 use App\Http\Controllers\SettingsController;
-use App\Models\City;
 use App\Models\Client;
-use App\Models\Contract;
-use App\Models\ContractProductQuantity;
 use App\Models\Employee;
 use App\Models\Industry;
 use App\Models\Invoice;
@@ -38,6 +35,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -123,9 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // معمولة في المودل
     Route::post('contracts/products/{contract_id}', [ContractController::class, 'createQuotation']);
 
-    Route::get('products', function () {
-        return Product::all();
-    });
+    Route::get('products', function () {return Product::all();});
 
     Route::post('products/create', function (Request $request) {
 
@@ -485,13 +482,48 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('update_elevator_data', function (Request $request) {
-
-
-        return DB::table($request->currentType)->where('id', $request->updatedItem['id'])->update([
-            'name' => $request->updatedItem['name'],
-            'need_to_internal_door' => $request->updatedItem['need_to_internal_door'],
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'currentType' => 'required|string',
+            'updatedItem.id' => 'required|integer',
+            'updatedItem.name' => 'required|string',
+            'updatedItem.need_to_internal_door' => 'nullable|string',
         ]);
-        return $request;
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        try {
+            // Assign internalDoor value
+            $internalDoor = $request->updatedItem['need_to_internal_door'] ?? null;
+
+            // Update database record
+            $updateData = [
+                'name' => $request->updatedItem['name'],
+            ];
+
+            if ($request->currentType == 'elevator_types') {
+                $updateData['need_to_internal_door'] = $internalDoor;
+            }
+
+            $affectedRows = DB::table($request->currentType)
+                ->where('id', $request->updatedItem['id'])
+                ->update($updateData);
+
+            return response()->json([
+                'success' => true,
+                'affectedRows' => $affectedRows,
+                'message' => 'Data updated successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error updating elevator data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     });
 
 

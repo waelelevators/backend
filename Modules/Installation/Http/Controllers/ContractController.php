@@ -6,6 +6,7 @@ use App\Helpers\ApiHelper;
 use App\Helpers\MyHelper;
 use App\Models\Branch;
 use App\Models\Contract;
+use App\Models\ElevatorType;
 use App\Models\Installment;
 use App\Models\Payment;
 use App\Models\User;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OuterDoorSpecification;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
@@ -37,6 +39,242 @@ class ContractController extends Controller
         return  ContractResource::collection($contracts);
     }
 
+    public function monthlyReport()
+    {
+        // $currentYear = Carbon::now()->year;
+        // $contracts = Contract::selectRaw("YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as total_contracts")
+        //     ->groupBy(DB::raw("YEAR(created_at), MONTH(created_at)"))
+        //     ->orderBy('year')
+        //     ->orderBy('month')
+        //     ->get()->map(function ($item) {
+        //         $monthNames = [
+        //             1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
+        //             5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug',
+        //             9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'
+        //         ];
+        //         return [
+        //             'year' => $item->year,
+        //             'month' => $monthNames[$item->month],
+        //             'total_contracts' => $item->total_contracts
+        //         ];
+        //     })
+        // return response()->json($contracts);
+
+
+        $currentYear = date('Y');
+        $currentMonth = date('n'); // Get current month as a number
+        $lastYear = $currentYear - 1;
+
+        $currentYearContracts = Contract::selectRaw("MONTH(created_at) as month, COUNT(*) as total_contracts")
+            ->whereYear('created_at', $currentYear)
+            ->whereMonth('created_at', '<=', $currentMonth)
+            ->where('contract_status', '!=', 'Draft')
+            ->groupBy(DB::raw("MONTH(created_at)"))
+            ->pluck('total_contracts', 'month')
+            ->toArray();
+
+        $lastYearContracts = Contract::selectRaw("MONTH(created_at) as month, COUNT(*) as total_contracts")
+            ->whereYear('created_at', $lastYear)
+            ->whereMonth('created_at', '<=', $currentMonth)
+            ->where('contract_status', '!=', 'Draft')
+            ->groupBy(DB::raw("MONTH(created_at)"))
+            ->pluck('total_contracts', 'month')
+            ->toArray();
+
+        $monthNames = [
+            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+        ];
+
+        $result = [];
+
+        foreach ($monthNames as $monthNumber => $monthName) {
+            if ($monthNumber <= $currentMonth) {
+                $result[] = [
+                    'month' => $monthName,
+                    'salesLastYear' => $lastYearContracts[$monthNumber] ?? 0,
+                    'salesThisYear' => $currentYearContracts[$monthNumber] ?? 0
+                ];
+            }
+        }
+
+        return response()->json($result);
+    }
+    public function typeReport($type)
+    {
+        $currentYear = date('Y');
+        $currentMonth = date('n'); // Get current month as a number
+
+        // Array to map month number to month name
+        $months = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
+
+        // Initialize the result array
+        $result = [];
+
+
+        if ($type == 'elevator_types') {
+
+            //$ElevatorTypeModel = ElevatorType::get(['id', 'name']);
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+                        MONTH(created_at) as month,
+                        elevator_type_id,
+                        COUNT(*) as total_contracts")
+                ->whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', '<=', $currentMonth)
+                ->where('contract_status', '!=', 'Draft')
+                ->groupBy('elevator_type_id', 'month')
+                ->orderBy('month')
+                ->get();
+
+            // Map the query results to the desired structure
+            foreach ($contracts as $contract) {
+                $monthName = $months[$contract->month];
+                $elevatorType = $contract->elevator_type_id;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                switch ($elevatorType) {
+                    case 1:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['Normal'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 2:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['Auto'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 3:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['Food'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 4:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['Freight'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 5:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['AutoGirls'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 6:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['NormalGirls'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 7:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['Panorama'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 8:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['HomeLift'] = $contract->total_contracts;
+                        }
+                }
+            }
+            $finalResult = array_values($result);
+
+            return response()->json($finalResult);
+        }
+        if ($type == 'stops_numbers') {
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+            MONTH(created_at) as month,
+            stop_number_id,
+            COUNT(*) as total_contracts")
+                ->whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', '<=', $currentMonth)
+                ->where('contract_status', '!=', 'Draft')
+                ->groupBy('stop_number_id', 'month')
+                ->orderBy('month')
+                ->get();
+
+
+            // Map the query results to the desired structure
+            foreach ($contracts as $contract) {
+                $monthName = $months[$contract->month];
+                $stopNumber = $contract->stop_number_id;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                switch ($stopNumber) {
+                    case 2:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['TwoStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 3:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['ThreeStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 4:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['FourStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 5:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['FiveStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 6:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['SixStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 7:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['SevenStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 8:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['EightStops'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 9:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['NineStops'] = $contract->total_contracts;
+                        }
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json($finalResult);
+        }
+    }
     public function status(Request $request)
     {
 

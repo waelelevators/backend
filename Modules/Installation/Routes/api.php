@@ -100,7 +100,8 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::delete('contracts/{id?}', [ContractController::class, 'destroy']);
     Route::get('contracts/status/{status?}', [ContractController::class, 'status']);
     Route::get('contracts/to/cover', [ContractController::class, 'toCover']);
-
+    Route::get('contracts/reports/monthly', [ContractController::class, 'monthlyReport']);
+    Route::get('contracts/reports/{type?}', [ContractController::class, 'typeReport']);
     Route::get('contract-representatives', [ContractController::class, 'representatives']);
 
     // طلب تلبيس الباب الداخلي
@@ -131,6 +132,7 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::get('contracts/{contract_id}/installments', [ContractController::class, 'installments']);
 
     Route::get('templates', [TemplateController::class, 'index']);
+    Route::post('templates', [TemplateController::class, 'store']);
     Route::put('templates/{type?}', [TemplateController::class, 'update']);
     Route::get('templates/{type?}', [TemplateController::class, 'show']);
 
