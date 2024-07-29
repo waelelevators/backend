@@ -24,6 +24,7 @@ use Modules\Installation\Http\Controllers\LocationDetectionController;
 use Modules\Installation\Http\Controllers\LocationDetectionTechController;
 use Modules\Installation\Http\Controllers\LocationStatusController;
 use Modules\Installation\Http\Controllers\MyWorkOrdersController;
+use Modules\Installation\Http\Controllers\PaymentController;
 use Modules\Installation\Http\Controllers\QuotationController;
 use Modules\Installation\Http\Controllers\ReportController;
 use Modules\Installation\Http\Controllers\TemplateController;
@@ -89,6 +90,9 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::put('quotations/{id}', [QuotationController::class, 'update']);
     Route::get('quotations/{id?}', [QuotationController::class, 'show']);
     Route::delete('quotations/{id?}', [QuotationController::class, 'destroy']);
+
+
+    Route::get('payments', [PaymentController::class, 'index']);
 
 
     // توزيع العمليات على الفنيين

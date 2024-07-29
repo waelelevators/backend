@@ -9,6 +9,7 @@ class Payment extends Model
 {
     use HasFactory;
 
+    protected $with = ['createdBy'];
 
     // has many contract
     public function contract()
@@ -26,4 +27,8 @@ class Payment extends Model
         'attachments' => 'array',
         'amount' => 'float'
     ];
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

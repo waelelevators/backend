@@ -14,14 +14,14 @@ class AddUserIdToPaymentsTable extends Migration
     public function up()
     {
         Schema::table('payments', function (Blueprint $table) {
-            //
-            //   $table->unsignedBigInteger('stage_id');
+
 
             $table->unsignedBigInteger('contract_id');
-
-            //     $table->foreign('stage_id')->references('id')->on('stages')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->after('attachments');
 
             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
+            // Assuming you have a users table and you want to set up a foreign key constraint
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

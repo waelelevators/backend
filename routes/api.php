@@ -10,7 +10,6 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NeighborhoodController;
 use App\Http\Controllers\NotificationstController;
-use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\RFQController;
@@ -215,7 +214,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return Representative::where(['id' => $request->id, 'contract_id' => $request->contract_id])->delete();
     });
 
-    Route::get('payments', [PaymentsController::class, 'index']);
 
     // suppliers
     Route::get('suppliers', [SupplierController::class, 'index']);

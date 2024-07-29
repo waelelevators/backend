@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Modules\Installation\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,8 +16,6 @@ class PaymentResource extends JsonResource
     {
         $client = $this?->contract?->locationDetection?->client;
 
-        $client_name = '';
-
         // if ($client->type == 1) {
         //     $client_name .= $client->data['first_name'] . ' ';
         //     $client_name .= $client->data['second_name'] . ' ';
@@ -27,12 +25,16 @@ class PaymentResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'client' => $client,
+            'contract_number' => $this->contract->contract_number,
+            'stage' => $this->contract->stage,
+            'ElevatorType' => $this->contract->elevatorType,
+            'StopsNumber' => $this->contract->stopsNumbers,
             'amount' => $this->amount,
-            'attachments' => $this->attachments,
-            'client_name' => $client_name,
-            'contract' => $this->contract,
+            'residual' => $this->contract->remaining_cost,
             'created_at' => $this->created_at,
-
+            'created_by' => $this->user->createdBy ?? '',
+            'attachments' => $this->attachments,
         ];
     }
 }

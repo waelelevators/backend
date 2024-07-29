@@ -18,6 +18,7 @@ class ContractResource extends JsonResource
         return [
 
             'id' => $this->id,
+            'is_complete_stage' => $this->is_complete_stage,
             'contract_number' => $this->contract_number,
             'client' => $this->locationDetection->client,
             'elevatorType' => $this->elevatorType,

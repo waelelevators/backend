@@ -19,7 +19,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
+
 use Illuminate\Support\Facades\Cache;
+
 use Modules\Installation\Http\Requests\ContractStoreRequest;
 use Modules\Installation\Http\Resources\ContractResource;
 use Modules\Installation\Http\Resources\CoveringResource;
@@ -377,6 +379,7 @@ class ContractController extends Controller
         $contract->tax                                         = $request['taxValue'];
         $contract->discount                                    = $request['discountValue'] ?? 0;
         $contract->elevator_type_id                            = $request['elevatorType'];
+        $contract->doors_number                                = $request['doorsNumbers'];
         $contract->cabin_rails_size_id                         = $request['cabinRailsSize'];
         $contract->stop_number_id                              = $request['stopsNumber'];
         $contract->elevator_trip_id                            = $request['elevatorTrip'];
@@ -392,14 +395,16 @@ class ContractController extends Controller
         $contract->door_size_id                                = $request['doorSize'];
         $contract->control_card_id                             = $request['controlCard'];
         $contract->stage_id                                    = $request['stage'];
+        $contract->is_complete_stage                                    = $request['stage'] == 1 ? 0 : 1;
         $contract->elevator_room_id                            = $request['elevatorRoom'];
         $contract->machine_warranty_id                         = $request['machineWarranty'];
         $contract->other_additions                             = collect($request['otherAdditions']);
         $contract->machine_type_id                             = $request['machineType'];
         $contract->counterweight_rails_size_id                 = $request['counterweightRailsSize'];
         $contract->user_id                                     = Auth::guard('sanctum')->user()->id;
-        // $contract->location_id                                 = $request['locationId'];
-        // $contract->status                                      = 1;
+        $contract->location_id                                 = $request['locationId'];
+        $contract->status                                      = 1;
+        $contract->template_id                                 = $request['template']; // قالب التصميم
         $contract->branch_id                                   = $request['branch']; // الفرع
         $contract->note                                        = $request['notes'];
         $contract->save();
@@ -480,6 +485,7 @@ class ContractController extends Controller
             $contract->door_size_id                                = $request['doorSize'];
             $contract->control_card_id                             = $request['controlCard'];
             $contract->stage_id                                    = $request['stage'];
+            $contract->is_complete_stage                           = $request['stage'] == 1 ? 0 : 1;
             $contract->elevator_room_id                            = $request['elevatorRoom'];
             $contract->machine_warranty_id                         = $request['machineWarranty'];
             $contract->other_additions                             = collect($request['otherAdditions']);
@@ -542,94 +548,6 @@ class ContractController extends Controller
             'message' => 'تم اضافة العقد بنجاح'
         ]);
     }
-
-    public function payment(Request $request)
-    {
-
-        $data = [
-            'amount' => $request->amount,
-            'contract_id' => $request->contract_id,
-            'files' => $request->files,
-            'stage_id' => $request->stage,
-        ];
-
-        $validator = Validator::make($data, [
-            'contract_id' => 'required',
-            'stage_id' => 'required|integer|between:1,3',
-            'amount' => [
-                'required', 'numeric', 'gt:0',
-                function ($attribute, $value, $fail) use ($request) {
-                    $contract = Contract::find($request->contract_id);
-                    $remainingAmount =  $contract->getRemainingAmountInStage($request->stage);
-                    $isPreviousStagePaid =  $contract->isPreviousStagePaid($request->stage);
-
-                    if ($value === null) {
-                        $fail('المبلغ اجباري');
-                    } elseif ($remainingAmount == 0) {
-                        $fail('لقد تم دفع قسط المرحلة كاملأ');
-                    } elseif (!$isPreviousStagePaid) {
-                        $fail('الرجاء قم بدفع قسط المرحلة السابقة اولا');
-                    } elseif ($value > $remainingAmount) {
-                        $fail('المبلغ المراد دفعه لايمكن ان يكون اكبر من متبقي الدفعة ' . $remainingAmount);
-                    }
-                }
-            ],
-
-        ], [
-
-            'amount.required' => 'المبلغ اجبارى',
-            'amount.gt' => 'يجب ان يكون المبلغ  اكبر من صفر',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            return response([
-                'errors' => $errors
-            ], 422);
-        }
-
-
-        DB::transaction(function () use ($request, $data) {
-
-            $contract = Contract::find($request->contract_id);
-
-            $filePath = $this->uploadBase64Pdf(
-                $request['files'],
-                'contract/payments'
-            );
-
-            $payment = new Payment;
-            $payment->contract_id = $request->contract_id;
-            $payment->stage_id = $request->stage;
-            $payment->amount = $request->amount;
-            $payment->attachments = $filePath ?? null;
-            $payment->save();
-
-
-            ApiHelper::LocationAssignment($contract, $contract->id);
-
-            if ($contract->getIsReadyToStart($request->stage)) {
-
-                // Queue notifications for performance improvement
-                $emails = Cache::remember('installation_and_purchase_emails', 60, function () {
-                    return User::whereIn('level', ['installations', 'purchases'])->pluck('email');
-                });
-
-                MyHelper::pushNotification($emails, [
-                    'title' => 'تم دفع مرحله للعقد رقم #' . $contract->id,
-                    'body' => 'تم دفع المرحله ' . $contract->stage_id
-                ]);
-            }
-        });
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم اضافة الدفعية بنجاح'
-        ]);
-    }
-
-
     private function uploadBase64Pdf($base64Pdf, $path)
     {
         $pdfData = base64_decode(preg_replace('#^data:application/pdf;base64,#i', '', $base64Pdf));

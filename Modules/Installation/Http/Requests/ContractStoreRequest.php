@@ -60,6 +60,7 @@ class ContractStoreRequest extends FormRequest
             'innerDoorType' => 'required|integer',
             'machineLoad' => 'required|integer',
             'machineSpeed' => 'required|integer',
+            'doorsNumbers' => 'required|integer',
             'outerDoorDirection' => 'required|integer',
             'peopleLoad' => 'required|integer',
             'totalFreeVisit' => 'required|integer',
