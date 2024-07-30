@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Contract;
 use App\Models\ElevatorType;
 use App\Models\Installment;
+use App\Models\MachineType;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -269,6 +270,47 @@ class ContractController extends Controller
                         if ($contract->total_contracts > 0) {
                             $result[$monthName]['NineStops'] = $contract->total_contracts;
                         }
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json($finalResult);
+        } else if ($type === 'machine_types') {
+
+
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+            MONTH(created_at) as month,
+            machine_type_id,
+            COUNT(*) as total_contracts")
+                ->whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', '<=', $currentMonth)
+                ->where('contract_status', '!=', 'Draft')
+                ->groupBy('machine_type_id', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $machineModel = MachineType::get();
+            // Map the query results to the desired structure
+            foreach ($contracts as $contract) {
+                $monthName = $months[$contract->month];
+                $machineType = $contract->machine_type_id;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                switch ($machineType) {
+                    case 1:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['TwoStops'] = $contract->total_contracts;
+                        }
+                        break;
                 }
             }
 
