@@ -78,14 +78,25 @@ class PermissionsController extends Controller
     function updateRule(Request $request)
     {
 
-
         foreach ($request->rules as $rule) {
 
             $ruleItem = RuleItems::where('rule_id', $rule['id'])->where(
                 'category_id',
                 $request->ruleCategoryId
             )->first();
+
+
+
+
             if ($rule['selected'] == true) {
+
+                if ($ruleItem == null) {
+                    $ruleItem = new RuleItems();
+                    $ruleItem->rule_id = $rule['id'];
+                    $ruleItem->category_id = $request->ruleCategoryId;
+                    $ruleItem->save();
+                }
+            } else if ($rule['selected'] == false) {
 
                 if ($ruleItem == null) {
                     $ruleItem = new RuleItems();
@@ -99,8 +110,7 @@ class PermissionsController extends Controller
                     $ruleItem->delete();
                 }
             }
-        }
-
+        };
 
         $rules = Rule::all();
 

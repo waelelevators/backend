@@ -93,7 +93,7 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
 
 
     Route::get('payments', [PaymentController::class, 'index']);
-
+    Route::post('payments', [PaymentController::class, 'store']);
 
     // توزيع العمليات على الفنيين
     Route::post('payment', [ContractController::class, 'payment']);
@@ -104,9 +104,11 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::delete('contracts/{id?}', [ContractController::class, 'destroy']);
     Route::get('contracts/status/{status?}', [ContractController::class, 'status']);
     Route::get('contracts/to/cover', [ContractController::class, 'toCover']);
+    Route::get('contract-representatives', [ContractController::class, 'representatives']);
+
+    Route::get('reports/regions', [ReportController::class, 'regions']);
     Route::get('contracts/reports/monthly', [ContractController::class, 'monthlyReport']);
     Route::get('contracts/reports/{type?}', [ContractController::class, 'typeReport']);
-    Route::get('contract-representatives', [ContractController::class, 'representatives']);
 
     // طلب تلبيس الباب الداخلي
     Route::get('i_door_manufacturers', [InternalDoorManufactureController::class, 'index']);

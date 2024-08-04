@@ -6,9 +6,15 @@ use App\Helpers\ApiHelper;
 use App\Helpers\MyHelper;
 use App\Models\Branch;
 use App\Models\Contract;
+use App\Models\ControlCard;
+use App\Models\DoorSize;
 use App\Models\ElevatorType;
+use App\Models\ElevatorWarranty;
+use App\Models\InnerDoorType;
 use App\Models\Installment;
+use App\Models\MachineLoad;
 use App\Models\MachineType;
+use App\Models\OuterDoorDirection;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,12 +22,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OuterDoorSpecification;
+use App\Models\StopNumber;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
-
-use Illuminate\Support\Facades\Cache;
 
 use Modules\Installation\Http\Requests\ContractStoreRequest;
 use Modules\Installation\Http\Resources\ContractResource;
@@ -85,9 +90,9 @@ class ContractController extends Controller
             ->toArray();
 
         $monthNames = [
-            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
-            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
-            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+            1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'ابريل',
+            5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
+            9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
         ];
 
         $result = [];
@@ -111,18 +116,11 @@ class ContractController extends Controller
 
         // Array to map month number to month name
         $months = [
-            1 => 'January',
-            2 => 'February',
-            3 => 'March',
-            4 => 'April',
-            5 => 'May',
-            6 => 'June',
-            7 => 'July',
-            8 => 'August',
-            9 => 'September',
-            10 => 'October',
-            11 => 'November',
-            12 => 'December'
+
+            1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'ابريل',
+            5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
+            9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+
         ];
 
         // Initialize the result array
@@ -131,24 +129,25 @@ class ContractController extends Controller
 
         if ($type == 'elevator_types') {
 
-            //$ElevatorTypeModel = ElevatorType::get(['id', 'name']);
+            $elevatorTypes = ElevatorType::get(['name', 'id']);
 
             // Query to get contracts data
             $contracts = Contract::selectRaw("
-                        MONTH(created_at) as month,
-                        elevator_type_id,
-                        COUNT(*) as total_contracts")
-                ->whereYear('created_at', $currentYear)
-                ->whereMonth('created_at', '<=', $currentMonth)
+                        MONTH(contracts.created_at) as month,
+            elevator_types.name as elevator_name,
+            COUNT(*) as total_contracts")
+                ->join('elevator_types', 'contracts.elevator_type_id', '=', 'elevator_types.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
                 ->where('contract_status', '!=', 'Draft')
-                ->groupBy('elevator_type_id', 'month')
+                ->groupBy('elevator_name', 'month')
                 ->orderBy('month')
                 ->get();
 
             // Map the query results to the desired structure
             foreach ($contracts as $contract) {
                 $monthName = $months[$contract->month];
-                $elevatorType = $contract->elevator_type_id;
+                $elevatorName = $contract->elevator_name;
 
                 // Initialize the month if it doesn't exist
                 if (!isset($result[$monthName])) {
@@ -157,146 +156,93 @@ class ContractController extends Controller
                     ];
                 }
 
-                switch ($elevatorType) {
-                    case 1:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['Normal'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 2:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['Auto'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 3:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['Food'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 4:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['Freight'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 5:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['AutoGirls'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 6:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['NormalGirls'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 7:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['Panorama'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 8:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['HomeLift'] = $contract->total_contracts;
-                        }
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$elevatorName] = $contract->total_contracts;
                 }
             }
             $finalResult = array_values($result);
 
-            return response()->json($finalResult);
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'elevatorTypes' => $elevatorTypes
+                ]
+            );
         }
         if ($type == 'stops_numbers') {
 
             // Query to get contracts data
             $contracts = Contract::selectRaw("
-            MONTH(created_at) as month,
-            stop_number_id,
+            MONTH(contracts.created_at) as month,
+            stops_numbers.name as stops_name,
             COUNT(*) as total_contracts")
-                ->whereYear('created_at', $currentYear)
-                ->whereMonth('created_at', '<=', $currentMonth)
+                ->join('stops_numbers', 'contracts.stop_number_id', '=', 'stops_numbers.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
                 ->where('contract_status', '!=', 'Draft')
-                ->groupBy('stop_number_id', 'month')
+                ->groupBy('stops_name', 'month')
                 ->orderBy('month')
                 ->get();
 
+            $stopsNumber = StopNumber::get();
 
             // Map the query results to the desired structure
             foreach ($contracts as $contract) {
                 $monthName = $months[$contract->month];
-                $stopNumber = $contract->stop_number_id;
+                $stopNumber = $contract->stops_name;
 
                 // Initialize the month if it doesn't exist
                 if (!isset($result[$monthName])) {
                     $result[$monthName] = [
                         'month' => $monthName
+
                     ];
                 }
-
-                switch ($stopNumber) {
-                    case 2:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['TwoStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 3:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['ThreeStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 4:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['FourStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 5:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['FiveStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 6:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['SixStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 7:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['SevenStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 8:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['EightStops'] = $contract->total_contracts;
-                        }
-                        break;
-                    case 9:
-                        if ($contract->total_contracts > 0) {
-                            $result[$monthName]['NineStops'] = $contract->total_contracts;
-                        }
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$stopNumber] = $contract->total_contracts;
                 }
             }
 
             $finalResult = array_values($result);
 
-            return response()->json($finalResult);
-        } else if ($type === 'machine_types') {
-
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'stopsNumber' => $stopsNumber
+                ]
+            );
+        } else if ($type === 'machine_speeds') {
 
 
             // Query to get contracts data
             $contracts = Contract::selectRaw("
-            MONTH(created_at) as month,
-            machine_type_id,
-            COUNT(*) as total_contracts")
+             MONTH(created_at) as month,
+             machine_speed_id,
+             COUNT(*) as total_contracts")
                 ->whereYear('created_at', $currentYear)
                 ->whereMonth('created_at', '<=', $currentMonth)
                 ->where('contract_status', '!=', 'Draft')
-                ->groupBy('machine_type_id', 'month')
+                ->groupBy('machine_speed_id', 'month')
                 ->orderBy('month')
                 ->get();
 
-            $machineModel = MachineType::get();
-            // Map the query results to the desired structure
+            $machineSpeed = [
+                [
+                    "id" => 1,
+                    "name" => "سرعة",
+                ],
+                [
+                    "id" => 2,
+                    "name" => "سرعتين",
+                ],
+            ];
+
             foreach ($contracts as $contract) {
+
                 $monthName = $months[$contract->month];
-                $machineType = $contract->machine_type_id;
+                $machineSpeedName = $contract->machine_speed_id;
 
                 // Initialize the month if it doesn't exist
                 if (!isset($result[$monthName])) {
@@ -305,10 +251,16 @@ class ContractController extends Controller
                     ];
                 }
 
-                switch ($machineType) {
+
+                switch ($machineSpeedName) {
                     case 1:
                         if ($contract->total_contracts > 0) {
-                            $result[$monthName]['TwoStops'] = $contract->total_contracts;
+                            $result[$monthName]['سرعة'] = $contract->total_contracts;
+                        }
+                        break;
+                    case 2:
+                        if ($contract->total_contracts > 0) {
+                            $result[$monthName]['سرعتين'] = $contract->total_contracts;
                         }
                         break;
                 }
@@ -316,7 +268,313 @@ class ContractController extends Controller
 
             $finalResult = array_values($result);
 
-            return response()->json($finalResult);
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'machineSpeed' => $machineSpeed
+                ]
+            );
+        } else if ($type === 'machine_loads') {
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+             MONTH(contracts.created_at) as month,
+             machine_loads.name as machine_name,
+             COUNT(*) as total_contracts")
+                ->join('machine_loads', 'contracts.machine_load_id', '=', 'machine_loads.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('machine_loads.name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $machineLoads = MachineLoad::get();
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $machineName = $contract->machine_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$machineName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'machineLoads' => $machineLoads
+                ]
+            );
+        } else if ($type === 'outer_door_directions') {
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+                MONTH(contracts.created_at) as month,
+                outer_door_directions.name as outer_door_name,
+                COUNT(*) as total_contracts")
+                ->join('outer_door_directions', 'contracts.outer_door_direction_id', '=', 'outer_door_directions.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('outer_door_name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $outerDoors = OuterDoorDirection::get(['id', 'name']);
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $outerDoorName = $contract->outer_door_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$outerDoorName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'outerDoors' => $outerDoors
+                ]
+            );
+        } else if ($type === 'inner_door_types') {
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+             MONTH(contracts.created_at) as month,
+             inner_door_types.name as inner_door_name,
+             COUNT(*) as total_contracts")
+                ->join('inner_door_types', 'contracts.inner_door_type_id', '=', 'inner_door_types.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('inner_door_name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $InnerDoorType = InnerDoorType::get(['id', 'name']);
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $InnerDoorTypeName = $contract->inner_door_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$InnerDoorTypeName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'InnerDoorType' => $InnerDoorType
+                ]
+            );
+        } else if ($type === 'control_cards') {
+
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+                    MONTH(contracts.created_at) as month,
+                    control_cards.name as control_cards_name,
+                    COUNT(*) as total_contracts")
+                ->join('control_cards', 'contracts.control_card_id', '=', 'control_cards.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('control_cards_name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $ControlCard = ControlCard::get(['id', 'name']);
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $ControlCardName = $contract->control_cards_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$ControlCardName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'ControlCard' => $ControlCard
+                ]
+            );
+        } else if ($type === 'elevator_warranties') {
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+                    MONTH(contracts.created_at) as month,
+                    elevator_warranties.name as elevator_warranties_name,
+                    COUNT(*) as total_contracts")
+                ->join('elevator_warranties', 'contracts.elevator_warranty_id', '=', 'elevator_warranties.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('elevator_warranties_name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $ElevatorWarranty = ElevatorWarranty::get(['id', 'name']);
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $elevatorWarrantiesName = $contract->elevator_warranties_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$elevatorWarrantiesName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'ElevatorWarranty' => $ElevatorWarranty
+                ]
+            );
+        } else if ($type === 'door_sizes') {
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+              MONTH(contracts.created_at) as month,
+              door_sizes.name as door_size_name,
+              COUNT(*) as total_contracts")
+                ->join('door_sizes', 'contracts.door_size_id', '=', 'door_sizes.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('door_size_name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $doorSizes = DoorSize::get(['id', 'name']);
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $doorSizeName = $contract->door_size_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$doorSizeName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'doorSizes' => $doorSizes
+                ]
+            );
+        } else if ($type === 'machine_types') {
+
+            // Query to get contracts data
+            $contracts = Contract::selectRaw("
+            MONTH(contracts.created_at) as month,
+            machine_types.name as machine_name,
+            COUNT(*) as total_contracts")
+                ->join('machine_types', 'contracts.machine_type_id', '=', 'machine_types.id')
+                ->whereYear('contracts.created_at', $currentYear)
+                ->whereMonth('contracts.created_at', '<=', $currentMonth)
+                ->where('contracts.contract_status', '!=', 'Draft')
+                ->groupBy('machine_types.name', 'month')
+                ->orderBy('month')
+                ->get();
+
+            $machineTypes = MachineType::get();
+
+            foreach ($contracts as $contract) {
+
+                $monthName = $months[$contract->month];
+                $machineName = $contract->machine_name;
+
+                // Initialize the month if it doesn't exist
+                if (!isset($result[$monthName])) {
+                    $result[$monthName] = [
+                        'month' => $monthName
+                    ];
+                }
+
+                // Assign the total contracts to the corresponding machine name
+                if ($contract->total_contracts > 0) {
+                    $result[$monthName][$machineName] = $contract->total_contracts;
+                }
+            }
+
+            $finalResult = array_values($result);
+
+            return response()->json(
+                [
+                    'kpi' => $finalResult,
+                    'machineTypes' => $machineTypes
+                ]
+            );
         }
     }
     public function status(Request $request)
@@ -437,7 +695,7 @@ class ContractController extends Controller
         $contract->door_size_id                                = $request['doorSize'];
         $contract->control_card_id                             = $request['controlCard'];
         $contract->stage_id                                    = $request['stage'];
-        $contract->is_complete_stage                                    = $request['stage'] == 1 ? 0 : 1;
+        $contract->is_complete_stage                           = $request['stage'] == 1 ? 0 : 1;
         $contract->elevator_room_id                            = $request['elevatorRoom'];
         $contract->machine_warranty_id                         = $request['machineWarranty'];
         $contract->other_additions                             = collect($request['otherAdditions']);
@@ -675,7 +933,7 @@ class ContractController extends Controller
         try {
             DB::transaction(function () use ($id) {
                 // Find the contract
-                $contract = Contract::findOrFail($id);
+                $contract = Contract::where('contract_status', 'Draft')->findOrFail($id);
 
                 // Delete related outer door specifications
                 OuterDoorSpecification::where('contract_id', $contract->id)->delete();

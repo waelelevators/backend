@@ -16,8 +16,8 @@ class LocationStatusController extends Controller
 
     public function index($filterNoWorkOrder = false)
     {
-        $locations = LocationStatus::orderByDesc('created_at')
-            ->get();
+        $locations = LocationStatus::orderBy('created_at', 'asc')->get();
+
 
         if ($filterNoWorkOrder) {
 

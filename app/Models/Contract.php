@@ -70,7 +70,7 @@ class Contract extends Model
         'paid_amount',
         'more_additions',
         'is_ready_to_start'
-       
+
     ];
 
     public function representatives()
@@ -203,13 +203,17 @@ class Contract extends Model
 
     public function getMoreAdditionsAttribute()
     {
-        $Additions = json_decode($this->other_additions, true);
+        $additionIds = json_decode($this->other_additions, true);
 
-        foreach ($Additions as $value) {
-            // # code...
-            $model = Addition::find($value)->get();
+        if (is_array($additionIds)) {
+            // Find all additions by their IDs
+            $additions = Addition::whereIn('id', $additionIds)->get();
+
+            return $additions;
         }
-        return $model ?? '';
+
+        // Return an empty collection if no IDs or invalid data
+        return collect();
     }
     public function getIsReadyToFirstStageAttribute()
     {

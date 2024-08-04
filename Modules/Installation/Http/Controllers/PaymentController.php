@@ -12,6 +12,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Modules\Installation\Http\Resources\PaymentResource;
 
@@ -29,7 +30,22 @@ class PaymentController extends Controller
         return PaymentResource::collection($payments);
     }
 
-    public function payment(Request $request)
+    private function uploadBase64Pdf($base64Pdf, $path)
+    {
+        $pdfData = base64_decode(preg_replace('#^data:application/pdf;base64,#i', '', $base64Pdf));
+
+        // Generate a unique filename
+        $filename = uniqid() . '.pdf'; // You can adjust the extension based on the image format
+
+        // Save the image to the storage directory
+        Storage::disk('public')->put($path . '/' . $filename, $pdfData);
+
+        $fullPath = 'storage/' . $path . '/' . $filename;
+
+        return $fullPath;
+    }
+
+    public function store(Request $request)
     {
 
         $data = [
@@ -47,15 +63,19 @@ class PaymentController extends Controller
                 function ($attribute, $value, $fail) use ($request) {
                     $contract = Contract::find($request->contract_id);
                     $remainingAmount =  $contract->getRemainingAmountInStage($request->stage);
-                    $isPreviousStagePaid =  $contract->isPreviousStagePaid($request->stage);
+                    //   $isPreviousStagePaid =  $contract->isPreviousStagePaid($request->stage);
 
                     if ($value === null) {
                         $fail('المبلغ اجباري');
                     } elseif ($remainingAmount == 0) {
                         $fail('لقد تم دفع قسط المرحلة كاملأ');
-                    } elseif (!$isPreviousStagePaid) {
-                        $fail('الرجاء قم بدفع قسط المرحلة السابقة اولا');
-                    } elseif ($value > $remainingAmount) {
+                    }
+
+                    // elseif (!$isPreviousStagePaid) {
+                    //     $fail('الرجاء قم بدفع قسط المرحلة السابقة اولا');
+                    // } 
+
+                    elseif ($value > $remainingAmount) {
                         $fail('المبلغ المراد دفعه لايمكن ان يكون اكبر من متبقي الدفعة ' . $remainingAmount);
                     }
                 }
@@ -92,7 +112,6 @@ class PaymentController extends Controller
             $payment->attachments = $filePath ?? null;
             $payment->user_id = Auth::guard('sanctum')->user()->id;
             $payment->save();
-
 
             ApiHelper::LocationAssignment($contract, $contract->id);
 
