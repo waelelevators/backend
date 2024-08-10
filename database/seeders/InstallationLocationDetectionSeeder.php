@@ -15,6 +15,6 @@ class InstallationLocationDetectionSeeder extends Seeder
     public function run()
     {
         // Create 50 InstallationLocationDetection records
-        InstallationLocationDetection::factory()->count(1500)->create();
+        InstallationLocationDetection::factory()->count(2500)->create();
     }
 }

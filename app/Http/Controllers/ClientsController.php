@@ -21,49 +21,63 @@ class ClientsController extends Controller
     {
         $clientType = $request['clientType'];
 
-
-        if (isset($request['image'])) $image = ApiHelper::uploadBase64Image($request['image'], 'client');
-        else $image = '';
-
-        $client =  new Client();
+        $client =  new Client;
         $client->type = $clientType;
 
-        if ($clientType == 1) {
-            $client->data = [
-                'first_name' => $request['firstName'],
-                'second_name' => $request['secondName'],
-                'third_name' => $request['thirdName'],
-                'last_name' => $request['forthName'],
-                'id_number' => $request['idNumber'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'image' => $image
-            ];
-        } elseif ($clientType == 2) {
-            $client->data = [
-                'name' => $request['companyName'],
-                'owner_name' => $request['represents'],
-                'id_number' => $request['idNumber'],
-                'commercial_register' => $request['commercialRegistrationNo'],
-                'tax_number' => $request['taxNo'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'image' => $image,
-            ];
-        } else {
-            $client->data = [
-                'name' => $request['entityName'],
-                'id_number' => $request['idNumber'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'image' => $image,
-            ];
+        switch ($clientType) {
+            case 1:
+
+                if (
+                    !empty($request['firstName']) &&
+                    !empty($request['secondName']) &&
+                    !empty($request['thirdName']) &&
+                    !empty($request['forthName'])
+                ) {
+                    $client->name = "{$request['firstName']}
+                    {$request['secondName']}
+                    {$request['thirdName']}
+                    {$request['forthName']}";
+                } elseif (!empty($request['firstName']) && !empty($request['forthName'])) {
+                    $client->name = "{$request['firstName']} {$request['forthName']}";
+                }
+
+                if (!empty($request['idNumber'])) {
+                    $client->id_number = $request['idNumber'];
+                }
+
+                $client->first_name = $request['firstName'];
+                $client->second_name = $request['secondName'] ?? '';
+                $client->third_name = $request['thirdName'] ?? '';
+                $client->last_name = $request['forthName'];
+
+                break;
+            case 2:
+                $client->name = $request['companyName'];
+                $client->owner_name = $request['represents'];
+
+                if (!empty($request['commercialRegistrationNo'])) {
+                    $client->id_number = $request['commercialRegistrationNo'];
+                }
+                if (!empty($request['taxNo'])) {
+                    $client->tax_number = $request['taxNo'];
+                }
+
+                break;
+            case 3:
+                $client->name = $request['entityName']; // اسم الجهة
+
+                if (!empty($request['idNumber'])) {
+                    $client->id_number = $request['idNumber'];
+                }
+                $client->owner_name = $request['represents']; // يمثلها
+                break;
         }
 
+        $client->phone = $request['phone'];
+        $client->phone2 = $request['phone2'];
+        $client->whatsapp = $request['whatsapp'];
         $client->save();
+
 
         return response()->json([
             'status' => 'success',
@@ -151,7 +165,7 @@ class ClientsController extends Controller
 
     public function SearchPhone($type, $phone)
     {
-        return Client::whereJsonContains('data->phone', $phone)
+        return Client::where('phone', $phone)
             ->where('type', $type)
             ->first();
     }

@@ -31,31 +31,31 @@ class InstallationController extends Controller
 
 
 
-        $entityList = $clients->map(function ($entity) {
-            if ($entity['type'] == '1')
-                return [
-                    'id' => $entity->id,
-                    'name' => $entity['data']['first_name'] . ' ' . $entity['data']['last_name'],
-                ];
+        // $entityList = $clients->map(function ($entity) {
+        //     if ($entity['type'] == '1')
+        //         return [
+        //             'id' => $entity->id,
+        //             'name' => $entity['data']['first_name'] . ' ' . $entity['data']['last_name'],
+        //         ];
 
 
-            if (in_array($entity['type'], ['2', '3']))
-                return [
-                    'id' => $entity->id,
-                    'name' => $entity['data']['name'] ?? '',
-                ];
+        //     if (in_array($entity['type'], ['2', '3']))
+        //         return [
+        //             'id' => $entity->id,
+        //             'name' => $entity['data']['name'] ?? '',
+        //         ];
 
 
-            return null; // If the type is not 1, 2, or 3, return null to filter out later.
+        //     return null; // If the type is not 1, 2, or 3, return null to filter out later.
 
-        })->filter()->values(); // Filter out null values and re-index the array.
+        // })->filter()->values(); // Filter out null values and re-index the array.
 
         foreach ($tables as $table) {
             // get name and id for each table
-            $data[$table] = DB::table($table)->get();
+            $data[$table] = DB::table($table)->get(['id', 'name']);
         }
 
-        return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity, 'clients' => $entityList]);
+        return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
     }
 
     public function quotation()

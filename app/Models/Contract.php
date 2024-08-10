@@ -55,23 +55,23 @@ class Contract extends Model
     ];
 
     // with client
-    protected $with = [
-        'locationDetection', 'stage', 'stage', 'elevatorRoom', 'template', 'representatives',
-        'DoorSize', 'CabinRailsSize', 'PeopleLoad', 'CounterWeightRailsSize', 'innerDoorType', 'elevatorWarranty',
-        'outerDoorSpecifications', 'MachineSpeed', 'MachineWarranty', 'installments', 'EntrancesNumber', 'branch',
-        'elevatorType', 'elevatorTrip', 'elevatorRail', 'elevatorRoom', 'elevatorWeight', 'machineType',
-        'machineLoad', 'controlCard', 'outerDoorDirections', 'stopsNumbers', 'freeMaintenance', 'createdBy'
-    ];
+    // protected $with = [
+    //     'locationDetection', 'stage', 'stage', 'elevatorRoom', 'template', 'representatives',
+    //     'DoorSize', 'CabinRailsSize', 'PeopleLoad', 'CounterWeightRailsSize', 'innerDoorType', 'elevatorWarranty',
+    //     'outerDoorSpecifications', 'MachineSpeed', 'MachineWarranty', 'installments', 'EntrancesNumber', 'branch',
+    //     'elevatorType', 'elevatorTrip', 'elevatorRail', 'elevatorRoom', 'elevatorWeight', 'machineType',
+    //     'machineLoad', 'controlCard', 'outerDoorDirections', 'stopsNumbers', 'freeMaintenance', 'createdBy'
+    // ];
 
-    protected $appends = [
-        'city', 'region',
-        'is_invoice_created',
-        'remaining_cost',
-        'paid_amount',
-        'more_additions',
-        'is_ready_to_start'
+    // protected $appends = [
+    //     'city', 'region',
+    //     'is_invoice_created',
+    //     'remaining_cost',
+    //     'paid_amount',
+    //     'more_additions',
+    //     'is_ready_to_start'
 
-    ];
+    // ];
 
     public function representatives()
     {

@@ -17,7 +17,7 @@ class InstallationLocationDetection extends Model
         'door_sizes' => 'array',
         'user_id' => 'integer',
     ];
-    protected $with = ['client', 'representatives', 'detectionBy', 'user'];
+    // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
 
     protected $appends = [
         'city', 'region', 'neighborhood',  'elevatorType',
@@ -99,19 +99,28 @@ class InstallationLocationDetection extends Model
 
     public function getFloorDataAttribute($value)
     {
-
-        // return $value;
-
+        // Decode the JSON string into an associative array
         $decodedValue = json_decode($value, true);
 
+        // Check if the decoded value is an array
         if (is_array($decodedValue)) {
-            // Assuming your array has a key 'floor_number' for sorting
-            $floorNumbers = array_column($decodedValue, 'floor_id');
+            // Filter out elements that don't have a 'floor_id'
+            $decodedValue = array_filter($decodedValue, function ($item) {
+                return isset($item['floor_id']);
+            });
 
-            // Sort the decoded array by 'floor_number'
-            array_multisort($floorNumbers, SORT_ASC, $decodedValue);
+            // Check again to ensure that we still have elements to sort
+            if (!empty($decodedValue)) {
+                // Sort the array by 'floor_id'
+                $floorNumbers = array_column($decodedValue, 'floor_id');
+                array_multisort($floorNumbers, SORT_ASC, $decodedValue);
+            }
+
+            // Return the sorted (or possibly filtered) array
+            return $decodedValue;
         }
 
-        return $decodedValue;
+        // If not an array, return the original value (likely null or an empty string)
+        return $value;
     }
 }

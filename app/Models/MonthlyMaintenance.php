@@ -10,7 +10,7 @@ class MonthlyMaintenance extends Model
 {
     use HasFactory;
 
-    protected $with = ['visitStatus', 'maintenance'];
+    // protected $with = ['visitStatus', 'maintenance'];
 
     protected $casts = [
         'visit_data' => 'array',
@@ -18,10 +18,10 @@ class MonthlyMaintenance extends Model
     ];
 
     //protected $with = ['tech','visitStatus'];
-    // public function tech()
-    // {
-    //     return $this->belongsTo(User::class, 'tech_id', 'id');
-    // }
+    public function tech()
+    {
+        return $this->belongsTo(User::class, 'tech_id', 'id');
+    }
 
     public function maintenance()
     {

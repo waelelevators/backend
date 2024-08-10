@@ -32,6 +32,7 @@ class AddRepresentativeIdToInstallationQuotationsTable extends Migration
             Schema::table('installation_quotations', function (Blueprint $table) {
                 $table->dropForeign(['representative_id']); // Adjust the column name as needed
                 $table->dropColumn('representative_id'); // Adjust the column name as needed
+          
             });
         });
     }

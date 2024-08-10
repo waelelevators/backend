@@ -26,15 +26,15 @@ class MaintenanceInfo extends Model
         'machineType', 'doorSize', 'machineSpeed', 'buildingType'
     ];
 
-    public function representatives()
-    {
-        // if ($this->how_did_you_get_to_us == 5)
-        //     return Representative::where('contract_id', $this->id ?? 0)->get();
-        // else return  Representative::where('contract_id', $this->id ?? 0)->first();
+    // public function representatives()
+    // {
+    //     // if ($this->how_did_you_get_to_us == 5)
+    //     //     return Representative::where('contract_id', $this->id ?? 0)->get();
+    //     // else return  Representative::where('contract_id', $this->id ?? 0)->first();
 
-        return $this->hasMany(Representative::class, 'contract_id', 'id')
-            ->where('contract_type', 'maintenances');
-    }
+    //     return $this->hasMany(Representative::class, 'contract_id', 'id')
+    //         ->where('contract_type', 'maintenances');
+    // }
     public function getBuildingTypeAttribute()
     {
         return BuildingType::where('id', $this->elevator_data['building_type_id'] ?? 0)->first();

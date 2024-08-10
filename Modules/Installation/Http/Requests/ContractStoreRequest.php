@@ -28,13 +28,17 @@ class ContractStoreRequest extends FormRequest
             'secondName' => 'nullable|required_if:clientType,1|string',
             'thirdName' => 'nullable|required_if:clientType,1|string',
             'forthName' => 'nullable|required_if:clientType,1|string',
-            'phone' => 'nullable|required|integer|digits:9',
+
+            'phone' => 'required|integer|digits:9|unique:clients,phone',
+
             'anotherPhone' => 'nullable|required|integer|digits:9',
             'whatsappPhone' => 'nullable|required|integer|digits:9',
             'companyName' => 'required_if:clientType,2|string',
             'entityName' => 'required_if:clientType,3|string',
             'represents' => 'nullable|required_if:clientType,2|string',
-            'idNumber' => 'nullable|required_if:clientType,1|integer',
+
+            'idNumber' => 'nullable|required_if:clientType,1|integer|unique:clients,id_number',
+
             'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|digits:10',
             'taxNo' => 'nullable|required_if:clientType,2|integer|digits:10',
             'building_image' => 'nullable|string',

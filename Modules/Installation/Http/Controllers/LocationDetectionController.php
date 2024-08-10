@@ -59,8 +59,10 @@ class LocationDetectionController extends Controller
 
             else $location_image = '';
 
-            $client =  ApiHelper::handleLocationClientData($request);
             // بحث عن العميل موجود ام لا
+            //$client =  ApiHelper::handleLocationClientData($request);
+            $client =  ApiHelper::handleAddClient($request);
+
 
             $representative_id =  ApiHelper::handleGetUsData(
                 $request,
@@ -139,7 +141,8 @@ class LocationDetectionController extends Controller
      */
     public function show($id)
     {
-        $model = InstallationLocationDetection::findOrFail($id);
+        $model = InstallationLocationDetection::with(['client', 'representatives', 'detectionBy', 'user'])
+            ->findOrFail($id);
         return $model;
     }
     /**

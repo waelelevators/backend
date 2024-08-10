@@ -3,11 +3,9 @@
 namespace Modules\Maintenance\Http\Controllers;
 
 use App\Models\Region;
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Support\Renderable;
 
 class MaintenanceController extends Controller
 {
@@ -26,11 +24,11 @@ class MaintenanceController extends Controller
             "stops_numbers", 'users'
         ];
 
-        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
+        $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
 
         foreach ($tables as $table) {
             // get name and id for each table
-            $data[$table] = \DB::table($table)->get(['id', 'name']);
+            $data[$table] = DB::table($table)->get(['id', 'name']);
         }
 
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);

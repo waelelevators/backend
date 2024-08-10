@@ -79,7 +79,10 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::put('location_statuses/{id}', [LocationStatusController::class, 'update']);
 
     Route::get('location_statuses', [LocationStatusController::class, 'index']);
-    Route::get('location_statuses/no-work-orders', [LocationStatusController::class, 'index'])->defaults('filterNoWorkOrder', true);
+    Route::get('location_statuses/no-work-orders', [
+        LocationStatusController::class,
+        'index'
+    ])->defaults('filterNoWorkOrder', true);
     Route::get('location_statuses/{id?}', [LocationStatusController::class, 'show']);
     Route::delete('location_statuses', [LocationStatusController::class, 'destroy']);
 
@@ -143,7 +146,7 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::get('templates/{type?}', [TemplateController::class, 'show']);
 
     Route::get('count-contracts', [ReportController::class, 'countContracts']);
-
+    Route::get('reports/payment/{date?}', [ReportController::class, 'payment']);
 
     // Route::apiResource('contract', ContractController::class);
     // Route::post('contract/{contract}/assign', [ContractController::class, 'assign']);

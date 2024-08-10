@@ -1,12 +1,10 @@
 <?php
 
 
-use App\Models\MaintenanceStatus;
-use App\Models\MonthlyMaintenance;
-use App\Models\Region;
-use Illuminate\Http\Request;
 
+use App\Models\Region;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use Modules\Maintenance\Http\Controllers\AreaController;
 use Modules\Maintenance\Http\Controllers\CurrentMaintenanceController;
 use Modules\Maintenance\Http\Controllers\LocationDetectionController;
@@ -119,14 +117,14 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
         $tables = [
             "elevator_types", "machine_types", "machine_speeds", "door_sizes",
             "stops_numbers", "control_cards",
-            "drive_types", "maintenance_types", "building_types"
+            "drive_types", "maintenance_types", "building_types", "maintenance_statuses"
         ];
 
-        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
+        $regionsWithCity =   Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
 
         foreach ($tables as $table) {
             // get name and id for each table
-            $data[$table] = \DB::table($table)->get();
+            $data[$table] = DB::table($table)->get();
         }
 
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
@@ -134,6 +132,6 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
     //   نوع العطل
     Route::get('{type}', function ($type) {
-        return \DB::table($type)->get(['id', 'name']);
+        return DB::table($type)->get(['id', 'name']);
     });
 });

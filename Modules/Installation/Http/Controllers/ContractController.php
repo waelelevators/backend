@@ -5,6 +5,7 @@ namespace Modules\Installation\Http\Controllers;
 use App\Helpers\ApiHelper;
 use App\Helpers\MyHelper;
 use App\Models\Branch;
+use App\Models\Client;
 use App\Models\Contract;
 use App\Models\ControlCard;
 use App\Models\DoorSize;
@@ -23,12 +24,11 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OuterDoorSpecification;
 use App\Models\StopNumber;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
 
 use Modules\Installation\Http\Requests\ContractStoreRequest;
+use Modules\Installation\Http\Requests\ContractUpdateRequest;
 use Modules\Installation\Http\Resources\ContractResource;
 use Modules\Installation\Http\Resources\CoveringResource;
 use Modules\Installation\Http\Resources\InstallmentsResource;
@@ -727,8 +727,46 @@ class ContractController extends Controller
      * @param Request $request
      * @return Renderable
      */
-    public function store(ContractStoreRequest $request)
+    public function store(ContractUpdateRequest $request)
     {
+
+        // Check if idNumber exists for a different client
+        if (!empty($request['idNumber'])) {
+            $idNumberExists = Client::where('id_number', $request['idNumber'])
+                ->where('id', '!=', $request['clientId'])
+                ->exists();
+
+            if ($idNumberExists) {
+                // Handle the scenario where idNumber already exists
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'The ID number already exists for another client.',
+                ], 422);
+            }
+        }
+
+        // Check if idNumber exists for a different client
+        if (!empty($request['phone'])) {
+            $PhoneExists = Client::where('phone', $request['phone'])
+                ->where('id', '!=', $request['clientId'])
+                ->exists();
+
+            if ($PhoneExists) {
+                // Handle the scenario where idNumber already exists
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'The Phone already exists for another client.',
+                ], 422);
+            }
+        }
+
+        // throw new HttpResponseException(response()->json([
+        //     'status' => 'failed',
+        //     'message' => 'unprocessable entity',
+        //     'errors' => $validator->errors()
+        // ], 422));
+
+
         DB::transaction(function () use ($request) {
 
             ApiHelper::updateClientData($request); // تحديت بيانات العميل
@@ -871,7 +909,11 @@ class ContractController extends Controller
     public function show($id)
     {
 
-        $model = Contract::findOrFail($id);
+        $model = Contract::with([
+            'locationDetection.client',
+            'outerDoorSpecifications',
+            'installments'
+        ])->findOrFail($id);
 
         return $model;
     }

@@ -2,6 +2,7 @@
 
 namespace Modules\Maintenance\Http\Controllers;
 
+use App\Helpers\ApiHelper;
 use App\Models\Client;
 use App\Models\Maintenance;
 use App\Models\MaintenanceInfo;
@@ -25,7 +26,7 @@ class MaintenanceInfoController extends Controller
     public function index($id)
     {
         if ($id === 'all')
-            $maintenances =  MaintenanceLog::with('mInfo.contracts', 'mInfo.representatives')
+            $maintenances =  MaintenanceLog::with('mInfo.contracts')
                 ->orderByDesc('created_at')->get();
 
         else $maintenances = MaintenanceLog::join('maintenances', 'maintenances.id', '=', 'maintenance_logs.m_id')
@@ -43,12 +44,12 @@ class MaintenanceInfoController extends Controller
      * @param MaintenanceInfoStoreResquest $request
      * @return Renderable
      */
-    public function store(MaintenanceInfoStoreResquest $request)
+    public function store(Request $request)
     {
 
         DB::transaction(function () use ($request) {
 
-            $client =  $this->handleClientData($request);
+            $client =  ApiHelper::handleAddClient($request);
 
             if (isset($request['buildingImage'])) $building_image = $this->uploadBase64Image(
                 $request['buildingImage'],
@@ -57,10 +58,13 @@ class MaintenanceInfoController extends Controller
 
             else $building_image = '';
 
+            // $this->handleGetUsData($request, $mInfo->id, 'maintenances'); // كيف وصلت لنا
+            $representative  =  ApiHelper::handleGetUsData($request, 'maintenances');
+
             $mInfo = new MaintenanceInfo();
 
             $mInfo->client_id = $client->id;
-            $mInfo->contract_id = $request['contract_id'] ?? 1;
+            $mInfo->contract_id = $request['contract_id'] ?? null;
             $mInfo->project_name = $request['projectName'];
             $mInfo->location_data = [
                 'region'         => intval($request['region']),
@@ -84,11 +88,9 @@ class MaintenanceInfoController extends Controller
                 'is_there_window'        =>  intval($request['isHaveDoor'] ?? ''),
                 'is_there_stair'         =>  intval($request['isLadder'] ?? ''),
             ];
-            $mInfo->how_did_you_get_to_us =  intval($request['reachUs']);
+            $mInfo->representative_id = $representative;
             $mInfo->user_id = Auth::guard('sanctum')->user()->id;
             $mInfo->save();
-
-            $this->handleGetUsData($request, $mInfo->id, 'maintenances'); // كيف وصلت لنا
 
             $maintenance = new Maintenance();
 
@@ -97,6 +99,7 @@ class MaintenanceInfoController extends Controller
             $maintenance->ended_date = $request['endDate'];
             $maintenance->visits_number = $request['totalVisit'];
             $maintenance->m_type_id = $request['maintenanceType'];
+            $maintenance->m_status_id = $request['maintenanceStatus'];
             $maintenance->cost = $request['amount'];
             $maintenance->user_id = Auth::guard('sanctum')->user()->id;
             $maintenance->save();
@@ -104,6 +107,7 @@ class MaintenanceInfoController extends Controller
             $mLog = new MaintenanceLog();
             $mLog->m_info_id = $mInfo->id;
             $mLog->m_id = $maintenance->id;
+            $mLog->area_id = $request['area_id'] ?? 1;
             $mLog->user_id = Auth::guard('sanctum')->user()->id;
             $mLog->save();
         });
@@ -114,67 +118,6 @@ class MaintenanceInfoController extends Controller
         ]);
     }
 
-    private function handleGetUsData(request $request, $contract_id, $contract_type)
-    {
-        if ($request->reachUs == 1) { // موقع الكتروني
-
-            $r = new Representative();
-            $r->name = $request['website_name'] ?? '';
-            $r->representativeable_id = 0;
-            $r->contract_type = $contract_type;
-            $r->contract_id = $contract_id;
-            $r->save();
-        }
-        if ($request->reachUs == 2) { // وسائل التواصل
-
-            $r = new Representative();
-            $r->name = $request['social_name'] ?? '';
-            $r->representativeable_id = 0;
-            $r->contract_type = $contract_type;
-            $r->contract_id = $contract_id;
-            $r->save();
-        }
-
-        if ($request->reachUs == 3) { // عميل لدى المؤسسة
-            //  $representatives = $request['clients'];
-            //  foreach ($representatives as $index => $value) {
-
-            $r = new Representative();
-            $r->representativeable_type = 'App\Models\Client';
-            $r->representativeable_id = collect($request['clients']);
-            $r->contract_type = $contract_type;
-            $r->contract_id = $contract_id;
-            $r->save();
-            //   }
-        } elseif ($request->reachUs == 4) { // مندوب داخلي
-            //$representatives = $request['employees'];
-            //   foreach ($representatives as $index => $value) {
-
-            $r = new Representative();
-            $r->representativeable_type = 'App\Models\Employee';
-            $r->representativeable_id = collect($request['employees']);
-            $r->contract_type = $contract_type;
-            $r->contract_id = $contract_id;
-            $r->save();
-            //   }
-        } elseif ($request->reachUs == 5) { //  مندوب خارجي
-
-            $representatives = is_array($request['representatives']) ?
-                $request['representatives'] :
-                array($request['representatives']);
-
-            foreach ($representatives as $representative) {
-                $r = new Representative();
-                // $r->representativeable_type = 'null';
-                $r->representativeable_id = 0;
-                $r->contract_type = $contract_type;
-                $r->contract_id = $contract_id;
-                $r->name = $representative['representative_name'];
-                $r->phone = $representative['representative_phone'];
-                $r->save();
-            }
-        }
-    }
 
     /**
      * Show the specified resource.
@@ -183,7 +126,9 @@ class MaintenanceInfoController extends Controller
      */
     public function show($id)
     {
-        return MaintenanceLog::with('mInfo.contracts', 'mInfo.representatives')
+        return MaintenanceLog::with(
+            'mInfo.contracts'
+        )
             ->findOrFail($id);
     }
     /**
@@ -272,83 +217,5 @@ class MaintenanceInfoController extends Controller
         $fullPath = asset('storage/app/public/' . $path . '/' . $filename);
 
         return $fullPath;
-    }
-
-    private  function handleClientData($request)
-    {
-
-        $clientType = $request['clientType'];
-
-        if ($clientType == 1) { // فرد
-            $findClient = Client::whereJsonContains('data->id_number', $request['idNumber'])
-                ->where('type', $clientType)
-                ->first();
-
-            if ($findClient) {
-                return $findClient;
-            }
-        } elseif ($clientType == 2) { // قطاع خاص
-            $findClient = Client::whereJsonContains('data->id_number', $request['idNumber'])
-                ->where('type', $clientType)
-                ->first();
-
-            if ($findClient) {
-                return $findClient;
-            }
-        } elseif ($clientType == 3) { // مؤسسة حكومية
-            $findClient = Client::whereJsonContains('data->id_number', $request['idNumber'])
-                ->where('type', $clientType)
-                ->first();
-            if ($findClient) {
-                return $findClient;
-            }
-        }
-
-        if (isset($request['image'])) $image = $this->uploadBase64Image($request['image'], 'client');
-        else $image = '';
-
-        $client =  new Client;
-
-        $client->type = $clientType;
-
-        if ($clientType == 1) {
-            $client->data = [
-                'first_name' => $request['firstName'],
-                'second_name' => $request['secondName'],
-                'third_name' => $request['thirdName'],
-                'last_name' => $request['forthName'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'id_number' => $request['idNumber'],
-                'image' => $image,
-            ];
-        } elseif ($clientType == 2) {
-
-
-            $client->data = [
-                'name' => $request['companyName'],
-                'owner_name' => $request['represents'],
-                'commercial_register' => $request['commercial_register'],
-                'tax_number' => $request['taxNo'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'id_number' => $request['idNumber'],
-                'image' => $image,
-            ];
-        } else {
-            $client->data = [
-                'name' => $request['entityName'],
-                'id_number' => $request['idNumber'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'image' => $image,
-            ];
-        }
-
-        $client->save();
-        return $client;
     }
 }

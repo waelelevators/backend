@@ -21,7 +21,7 @@ class MonthlyMaintenanceController extends Controller
     public function index()
     {
 
-        $model =  MonthlyMaintenance::with('visitStatus')
+        $model =  MonthlyMaintenance::with(['visitStatus', 'maintenance', 'tech'])
             ->orderByDesc('created_at')->get();
 
         return MonthlyResource::collection($model);
@@ -151,7 +151,7 @@ class MonthlyMaintenanceController extends Controller
         ]);
     }
 
-   
+
 
     /**
      * Show the specified resource.

@@ -22,9 +22,9 @@ class MonthlyResource extends JsonResource
             'visit_date' => $this->visit_date,
             'started_date' => $this->started_date,
             'ended_date' => $this->ended_date,
-            'visitStatus' => $this->visitStatus,
+            'visitStatus' => $this->visitStatus->name,
+            'tech' => $this->tech->name,
             'notes' => $this->notes,
-            'tech_id' => $this->tech_id
         ];
     }
 }

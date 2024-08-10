@@ -121,7 +121,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // معمولة في المودل
     Route::post('contracts/products/{contract_id}', [ContractController::class, 'createQuotation']);
 
-    Route::get('products', function () {return Product::all();});
+    Route::get('products', function () {
+        return Product::all();
+    });
 
     Route::post('products/create', function (Request $request) {
 
@@ -339,35 +341,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // عرض العملاء
     Route::get('cliens', function () {
-        $clients =  Client::all();
-        $entities = [
-            // Your data goes here...
-        ];
-
-        $entityList = [];
-
-        foreach ($clients as $entity) {
-
-
-            if ($entity['type'] == '1') {
-                $entityList[] = [
-                    'id' => $entity->id,
-                    'name' => $entity['data']['first_name'] . ' ' . $entity['data']['last_name']
-                ];
-            }
-
-            if (
-                $entity['type'] == '2' ||
-                $entity['type'] == '3'
-            ) {
-                $entityList[] = [
-                    'id' => $entity->id,
-                    'name' => $entity['data']['name'] ?? '',
-                ];
-            }
-        }
-
-        return $entityList;
+        $clients =  Client::get(['id','name']);
+        return $clients;
     });
     // معمولة في المودل
     Route::post('serach_products', function (Request $request) {

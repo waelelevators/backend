@@ -5,6 +5,8 @@ namespace Modules\Installation\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
+
 class ContractUpdateRequest extends FormRequest
 {
     /**
@@ -17,6 +19,7 @@ class ContractUpdateRequest extends FormRequest
         return true;
     }
 
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,35 +27,77 @@ class ContractUpdateRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'cost' => ['required', 'numeric', 'between:-999999.99,999999.99'],
-            'client_id' => ['required', 'integer', 'exists:clients,id'],
-            'project_name' => ['required', 'string', 'max:255'],
-            'region_id' => ['required', 'integer', 'exists:regions,id'],
-            'city_id' => ['required', 'integer', 'exists:cities,id'],
-            'district' => ['required', 'string', 'max:255'],
-            'street' => ['required', 'string', 'max:255'],
-            'elevator_type_id' => ['required', 'integer', 'exists:elevator_types,id'],
-            'elevator_rail_id' => ['required', 'integer', 'exists:elevator_rails,id'],
-            'number_of_stops' => ['required', 'integer'],
-            'elevator_journey' => ['required', 'integer'],
-            'elevator_room_id' => ['required', 'integer', 'exists:elevator_rooms,id'],
-            'elevator_weight_id' => ['required', 'integer', 'exists:elevator_weights,id'],
-            'machine_type_id' => ['required', 'integer', 'exists:machine_types,id'],
-            'machine_warranty' => ['required', 'integer'],
-            'machine_load_id' => ['required', 'integer', 'exists:machine_loads,id'],
-            'machine_speed' => ['required', 'string'],
-            'people_load' => ['required', 'integer'],
-            'control_card' => ['required', 'string'],
-            'number_of_stages' => ['required', 'integer'],
-            'door_opening_direction_id' => ['required', 'integer', 'exists:door_opening_directions,id'],
-            'door_opening_size_id' => ['required', 'integer', 'exists:door_opening_sizes,id'],
-            'elevator_warranty' => ['required', 'integer'],
-            'free_maintenance' => ['required', 'integer'],
-            'total_number_of_visits' => ['required', 'integer'],
-            'how_did_you_get_to_us' => ['required', 'string'],
-            'contract_status' => ['required', 'in:Draft,Completed,Other'],
-            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'clientType' => 'required|integer',
+            'firstName' => 'nullable|required_if:clientType,1|string',
+            'secondName' => 'nullable|required_if:clientType,1|string',
+            'thirdName' => 'nullable|required_if:clientType,1|string',
+            'forthName' => 'nullable|required_if:clientType,1|string',
+            'anotherPhone' => 'nullable|integer|digits:9',
+            'whatsappPhone' => 'nullable|integer|digits:9',
+            'companyName' => 'required_if:clientType,2|string',
+            'entityName' => 'required_if:clientType,3|string',
+            'represents' => 'nullable|required_if:clientType,2|string',
+
+            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|digits:10',
+            'taxNo' => 'nullable|required_if:clientType,2|integer|digits:10',
+            'building_image' => 'nullable|string',
+            'region' => 'required|integer|exists:regions,id',
+            'city' => 'required|integer|exists:cities,id',
+            'neighborhood' => 'required|string',
+            'image' => 'nullable|string',
+            'locationBuilding' => 'nullable|string',
+            'lat' => 'nullable|numeric',
+            'long' => 'nullable|numeric',
+            'taxValue' => 'required|numeric',
+            'priceIncludeTax' => 'required|numeric',
+            'discountValue' => 'nullable|numeric',
+            'elevatorType' => 'required|integer',
+            'cabinRailsSize' => 'required|integer',
+            'stopsNumber' => 'required|integer',
+            'elevatorTrip' => 'required|integer',
+            'elevatorWarranty' => 'required|string',
+            'entrancesNumber' => 'required|integer',
+            'freeMaintenance' => 'required|integer',
+            'innerDoorType' => 'required|integer',
+            'machineLoad' => 'required|integer',
+            'machineSpeed' => 'required|integer',
+            'doorsNumbers' => 'required|integer',
+            'outerDoorDirection' => 'required|integer',
+            'peopleLoad' => 'required|integer',
+            'totalFreeVisit' => 'required|integer',
+            'projectName' => 'nullable|string',
+            'doorSize' => 'required|integer',
+            'controlCard' => 'required|integer',
+            'stage' => 'required|integer',
+            'elevatorRoom' => 'required|integer',
+            'machineWarranty' => 'required|integer',
+            'otherAdditions' => 'nullable|array',
+            'machineType' => 'required|integer',
+            'counterweightRailsSize' => 'required|integer',
+            'reachUs' => 'required|integer',
+            'webSiteName' => 'nullable|required_if:reachUs,1|string',
+            'socialName' => 'nullable|required_if:reachUs,2|string',
+            'clients' => 'nullable|required_if:reachUs,3|integer',
+            'employees' => 'nullable|required_if:reachUs,4|integer',
+            'others' => 'nullable|required_if:reachUs,5|string',
+
+
+            'externalDoorSpecifications' => 'required|array',
+
+            'externalDoorSpecifications.*.floor' => 'required|integer',
+            'externalDoorSpecifications.*.door_number' => 'required|integer',
+
+            'externalDoorSpecifications.*.external_door_specifications' => 'required|integer',
+            'externalDoorSpecifications.*.door_opening_direction' => 'required|integer',
+
+            'externalDoorSpecifications.*.external_door_specifications2' => 'nullable|required_if:externalDoorSpecifications.*.door_number,2|integer',
+            'externalDoorSpecifications.*.door_opening_direction2' => 'nullable|required_if:externalDoorSpecifications.*.door_number,2|integer',
+
+            'paymentStages' => 'required|array',
+            'paymentStages.*.amount' => 'required|numeric',
+            'paymentStages.*.amountWithTaxed' => 'required|numeric',
         ];
     }
 

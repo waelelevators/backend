@@ -21,15 +21,15 @@ class MaintenanceInfoStoreResquest extends FormRequest
             'secondName' => 'nullable|required_if:clientType,1|string',
             'thirdName' => 'nullable|required_if:clientType,1|string',
             'forthName' => 'nullable|required_if:clientType,1|string',
-            'phone' => 'nullable|required|integer|digits:10',
-            'anotherPhone' => 'nullable|required|integer|digits:10',
-            'whatsappPhone' => 'nullable|required|integer|digits:10',
-            'idNumber' => 'required|integer|digits:10',
+            'phone' => 'nullable|required|integer|digits:9',
+            'anotherPhone' => 'nullable|required|integer|digits:9',
+            'whatsappPhone' => 'nullable|required|integer|digits:9',
+            'idNumber' => 'required|integer|digits:9',
             'companyName' => 'required_if:clientType,2|string',
             'entityName' => 'required_if:clientType,3|string',
             'represents' => 'nullable|required_if:clientType,2|string',
-            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|digits:10',
-            'taxNo'          => 'nullable|required_if:clientType,2|integer|digits:10',
+            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|digits:9',
+            'taxNo'          => 'nullable|required_if:clientType,2|integer|digits:9',
             'image' => 'nullable|string',
             'region' => 'required|integer|exists:regions,id',
             'city' => 'required|integer|exists:cities,id',
@@ -39,7 +39,7 @@ class MaintenanceInfoStoreResquest extends FormRequest
             'long' => 'nullable|numeric',
 
 
-            
+
             'contract_id' => 'nullable|integer|exists:contracts,id', // رقم العقد
             'elevatorType' => 'required|integer|exists:elevator_types,id',
             'buildingType' => 'required|integer|exists:building_types,id',

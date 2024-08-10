@@ -7,6 +7,7 @@ use App\Models\Contract;
 use App\Models\InstallationLocationDetection;
 use App\Models\InstallationQuotation;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -31,7 +32,8 @@ class ReportController extends Controller
         installation_location_detections.city as city_name,
         COUNT(*) as total_contracts")
             ->join(
-                'installation_location_detections','contracts.elevator_type_id',
+                'installation_location_detections',
+                'contracts.elevator_type_id',
                 '=',
                 'installation_location_detections.id'
             )
@@ -79,6 +81,50 @@ class ReportController extends Controller
         return response()->json([
             'installationLocationDetections' => $installationLocationDetections,
             'Quotations' => $Quotations,
+            'SignedContracts' => $SignedContracts,
+            'NotSignedContracts' => $NotSignedContracts
+        ]);
+    }
+
+    function payment($date)
+    {
+        $currentDate = date('Y-m-d');
+
+        $Quotations = InstallationQuotation::where('created_at', '<=', $currentDate)
+            ->where('created_at', '>=', $date)->count();
+
+        $installationLocationDetections = InstallationLocationDetection::where('created_at', '<=', $currentDate)
+            ->where('created_at', '>=', $date)->count();
+
+        $SignedContracts = Contract::where('contract_status', 'assigned')->where('created_at', '<=', $currentDate)
+            ->where('created_at', '>=', $date)->count();
+
+        $NotSignedContracts = Contract::where('contract_status', 'Draft')->where('created_at', '<=', $currentDate)
+            ->where('created_at', '>=', $date)->count();
+
+        // $models = Contract::select('id', 'created_at')
+        //     ->where('contract_status', 'assigned')
+        //     ->where('created_at', '<=', $currentDate)
+        //     ->where('created_at', '>=', $date)
+        //     ->groupBy(DB::raw("MONTH(created_at)"))
+        //     ->get();
+
+
+
+
+        $payments = Contract::selectRaw("DATE(created_at) as label, COUNT(*) as total_contracts")
+
+            ->where('created_at', '<=', $currentDate)
+            ->where('created_at', '>=', $date)
+            ->where('contract_status', '!=', 'Draft')
+            ->groupBy(DB::raw("DATE(created_at)"))
+            ->get();
+
+
+        return response()->json([
+            'InstallationLocationDetections' => $installationLocationDetections,
+            'Quotations' => $Quotations,
+            'Payments' => $payments,
             'SignedContracts' => $SignedContracts,
             'NotSignedContracts' => $NotSignedContracts
         ]);

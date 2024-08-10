@@ -34,16 +34,16 @@ class ClientStoreRequest extends FormRequest
             'secondName' => 'nullable|required_if:clientType,1|string',
             'thirdName' => 'nullable|required_if:clientType,1|string',
             'forthName' => 'nullable|required_if:clientType,1|string',
-            'phone' => 'nullable|required|digits:10',
-            'anotherPhone' => 'nullable|required|digits:10',
-            'whatsappPhone' => 'nullable|required|digits:10',
-            'idNumber' => ['required', 'digits:10', 'unique:clients,data->id_number'],
+            'phone' => 'nullable|digits:9|unique:clients,phone',
+            'idNumber' => ['nullable:required_if:clientsType,1', 'digits:10', 'unique:clients,id_number'],
+            'taxNo' => 'nullable|required_if:clientType,2|integer|digits:10',
+            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|unique:clients,id_number',
+            'anotherPhone' => 'nullable|required|digits:9',
+            'whatsappPhone' => 'nullable|required|digits:9',
             'companyName' => 'required_if:clientType,2|string',
             'entityName' => 'required_if:clientType,3|string',
             'represents' => 'nullable|required_if:clientType,2|string',
-            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|unique:clients,data->commercial_register',
-            'taxNo' => 'nullable|required_if:clientType,2|integer|digits:10',
-            'image' => 'nullable|string',
+
         ];
     }
 
@@ -64,15 +64,15 @@ class ClientStoreRequest extends FormRequest
 
             'phone.required' => 'رقم الهاتف مطلوب .',
 
-            'phone.digits' => 'رقم الهاتف يجب أن يحتوي على 10 أرقام.',
+            'phone.digits' => 'رقم الهاتف يجب أن يحتوي على 9 أرقام.',
 
             'anotherPhone.required' => 'حقل الهاتف الثاني مطلوب .',
 
-            'anotherPhone.digits' => 'حقل الهاتف الثاني يجب أن يحتوي على 10 أرقام.',
+            'anotherPhone.digits' => 'حقل الهاتف الثاني يجب أن يحتوي على 9 أرقام.',
 
             'whatsappPhone.required' => 'رقم الواتس مطلوب .',
 
-            'whatsappPhone.digits' => 'رقم الواتس يجب أن يحتوي على 10 أرقام.',
+            'whatsappPhone.digits' => 'رقم الواتس يجب أن يحتوي على 9 أرقام.',
 
             'companyName.required_if' => 'اسم المؤسسة مطلوب',
             'entityName.required_if' => 'اسم الجهة مطلوب',
