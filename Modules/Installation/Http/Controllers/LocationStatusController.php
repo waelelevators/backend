@@ -35,7 +35,13 @@ class LocationStatusController extends Controller
 
     public function show($id)
     {
-        return LocationStatus::findOrFail($id);
+        $locationStatus  = LocationStatus::findOrFail($id);
+
+        $resource =  new LocationStatusResource($locationStatus);
+
+        $transformedData = $resource->transformData();
+
+        return response()->json($transformedData);
     }
     /**
      * Display a listing of the resource.

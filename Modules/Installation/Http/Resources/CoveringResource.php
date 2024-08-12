@@ -18,7 +18,7 @@ class CoveringResource extends JsonResource
         return [
 
             'id' => $this->id,
-            'contract_number' => $this->contract_number,
+            'contractNumber' => $this->contract_number,
             'client' => $this->locationDetection->client,
             'elevatorType' => $this->elevatorType,
             'stopsNumber' => $this->stopsNumbers,
@@ -29,8 +29,9 @@ class CoveringResource extends JsonResource
             'openingDirection' => $this->outerDoorDirections,
             'doorSize' => $this->doorSize,
             'doorNumbers' => $this->doors_number,
-            'remaining_stage' => $this->getRemainingAmountInStage($this->stage_id),
-            'created_at' => $this->created_at,
+            'stageAmount' => $this->stageToPay($this->stage_id),
+            'remainingStage' => $this->getRemainingAmountInStage($this->stage_id),
+            'createdAt' => $this->created_at,
 
 
             // 'locationDetection' => $this->locationDetection,

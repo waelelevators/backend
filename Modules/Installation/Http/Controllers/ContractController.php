@@ -90,9 +90,18 @@ class ContractController extends Controller
             ->toArray();
 
         $monthNames = [
-            1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'ابريل',
-            5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-            9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+            1 => 'يناير',
+            2 => 'فبراير',
+            3 => 'مارس',
+            4 => 'ابريل',
+            5 => 'مايو',
+            6 => 'يونيو',
+            7 => 'يوليو',
+            8 => 'أغسطس',
+            9 => 'سبتمبر',
+            10 => 'أكتوبر',
+            11 => 'نوفمبر',
+            12 => 'ديسمبر'
         ];
 
         $result = [];
@@ -117,9 +126,18 @@ class ContractController extends Controller
         // Array to map month number to month name
         $months = [
 
-            1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'ابريل',
-            5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-            9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+            1 => 'يناير',
+            2 => 'فبراير',
+            3 => 'مارس',
+            4 => 'ابريل',
+            5 => 'مايو',
+            6 => 'يونيو',
+            7 => 'يوليو',
+            8 => 'أغسطس',
+            9 => 'سبتمبر',
+            10 => 'أكتوبر',
+            11 => 'نوفمبر',
+            12 => 'ديسمبر'
 
         ];
 
@@ -587,11 +605,11 @@ class ContractController extends Controller
     public function toCover()
     {
 
-        $contracts = Contract::where('contract_status', 'assigned')
-            ->get();
+        $contracts = Contract::where('contract_status', 'assigned')->get();
 
         $contracts = $contracts->filter(function ($contract) {
-            return $contract->stage_id == 1 && $contract->externalStatus == 0 && $contract->door_number > 0 ||
+
+            return $contract->stage_id == 1 && $contract->externalStatus == 0 && $contract->doors_number > 0 ||
                 $contract->stage_id == 2 && $contract->cabinStatus == 0 ||
                 $contract->stage_id == 3 && $contract->internalStatus == 0 && $contract->elevatorType->need_to_internal_door == 1;
         });
@@ -740,7 +758,7 @@ class ContractController extends Controller
                 // Handle the scenario where idNumber already exists
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'The ID number already exists for another client.',
+                    'message' => 'رقم الهوية مستخدم مسبقا من قبل عميل اخر الرجاء استخدام رقم هوية اخر'
                 ], 422);
             }
         }
@@ -755,7 +773,7 @@ class ContractController extends Controller
                 // Handle the scenario where idNumber already exists
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'The Phone already exists for another client.',
+                    'message' => 'رقم الجوال مستخدم مسبقا من قبل عميل اخر الرجاء استخدام رقم جوال اخر ',
                 ], 422);
             }
         }
@@ -910,9 +928,38 @@ class ContractController extends Controller
     {
 
         $model = Contract::with([
-            'locationDetection.client',
+
+
+            'stage',
+            'stage',
+            'elevatorRoom',
+            'template',
+            'representatives',
+            'DoorSize',
+            'CabinRailsSize',
+            'PeopleLoad',
+            'CounterWeightRailsSize',
+            'innerDoorType',
+            'elevatorWarranty',
             'outerDoorSpecifications',
-            'installments'
+            'MachineSpeed',
+            'MachineWarranty',
+            'installments',
+            'EntrancesNumber',
+            'branch',
+            'elevatorType',
+            'elevatorTrip',
+            'elevatorRail',
+            'elevatorRoom',
+            'elevatorWeight',
+            'machineType',
+            'machineLoad',
+            'controlCard',
+            'outerDoorDirections',
+            'stopsNumbers',
+            'freeMaintenance',
+            'createdBy',
+            'locationDetection.client'
         ])->findOrFail($id);
 
         return $model;

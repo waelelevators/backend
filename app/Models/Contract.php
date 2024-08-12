@@ -53,6 +53,7 @@ class Contract extends Model
         // 'contract_number',
         // 'other_additions',
     ];
+    protected $with = ['locationDetection'];
 
     // with client
     // protected $with = [

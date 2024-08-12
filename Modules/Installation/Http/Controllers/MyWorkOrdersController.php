@@ -8,6 +8,7 @@ use App\Models\WorkOrder;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Installation\Http\Resources\WorkOrderResource;
 
 class MyWorkOrdersController extends Controller
 {
@@ -18,17 +19,21 @@ class MyWorkOrdersController extends Controller
     public function index()
     {
 
-        return WorkOrder::with('locationStatus', 'stage')
+        $model = WorkOrder::with('locationStatus', 'stage')
             ->orderByDesc('created_at')->get();
+
+        return WorkOrderResource::collection($model);
     }
     public function myWorkOrder()
     {
-        $employeeId = auth('sanctum')->user()->employee->id;
+        $employeeId = auth('sanctum')->user()->id;
 
-        return WorkOrder::with('locationStatus', 'stage')
+        $model = WorkOrder::with('locationStatus', 'stage')
             ->whereHas('technicians', function ($q) use ($employeeId) {
                 $q->where('technician_id', $employeeId);
             })->orderByDesc('created_at')->get();
+
+        return WorkOrderResource::collection($model);
     }
 
     function store(Request $request)
