@@ -83,16 +83,16 @@ class QuotationController extends Controller
             ], 400);
         }
 
-        $payed = $contract->payments->sum('amount'); //اجمالي المبلغ المدفوع 
-        $total = $contract->total;
-        $required_percentage = Stage::find($stage)->required_percentage;
+        // $payed = $contract->payments->sum('amount'); //اجمالي المبلغ المدفوع 
+        // $total = $contract->total;
+        // $required_percentage = Stage::find($stage)->required_percentage;
 
-        if ($payed >= ($total * $required_percentage / 100)) {
-        } else {
-            return response([
-                'message' => 'يجب عليك دفع المرحله لتتمكن من انشاء عرض سعر',
-            ], 400);
-        }
+        // if ($payed >= ($total * $required_percentage / 100)) {
+        // } else {
+        //     return response([
+        //         'message' => 'يجب عليك دفع المرحله لتتمكن من انشاء عرض سعر',
+        //     ], 400);
+        // }
 
         $quotation = new Quotation();
         $quotation->contract_id = $contract_id;

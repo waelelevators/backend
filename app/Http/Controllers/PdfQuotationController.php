@@ -98,16 +98,16 @@ class PdfQuotationController extends Controller
         $phone = '';
 
         ($client->type == 2 || $client->type == 3) ?
-            $client_name = $client->data['name'] :
-            $client_name = $client->data['first_name'] . ' ' .
-            $client->data['second_name'] . ' ' .
-            $client->data['third_name'] . ' ' .
-            $client->data['last_name'];
+            $client_name = $client->name :
+            $client_name = $client->first_name . ' ' .
+            $client->second_nam . ' ' .
+            $client->third_name . ' ' .
+            $client->last_name;
 
-        $id_number  = $client->type == 2 ? $client->data['commercial_register'] :
-            $client->data['id_number'];
+        $id_number  = $client->type == 2 ? $client->commercial_register :
+            $client->id_number;
 
-        $phone  = $client->data['phone'];
+        $phone  = $client->phone;
         $template =  $Setting->data['contract'];
         $elevatorType = $quotation->elevator_type->name ?? 'غير معروف';
         $machineType = $quotation->machine_type->name ?? 'غير معروف';

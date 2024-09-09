@@ -24,7 +24,6 @@ class ExternalDoorManufactureController extends Controller
     {
         $models = ExternalDoorManufacturer::orderByDesc('created_at')->get();
 
-
         return ExternalDoorManufacturerResource::collection($models);
     }
     public function changeStatus(Request $request)
@@ -52,9 +51,9 @@ class ExternalDoorManufactureController extends Controller
             DB::transaction(function () use ($request) {
 
                 if (isset($request['order_attached'])) // مرفقات 
-                    $order_attached = ApiHelper::uploadBase64Image(
+                    $order_attached = ApiHelper::uploadBase64Pdf(
                         $request['order_attached'],
-                        'manufacture'
+                        'manufacture/door'
                     );
 
                 $externalDoorSpecifications = is_array($request['externalDoorSpecifications']) ?

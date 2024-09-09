@@ -55,9 +55,7 @@ class InstallationLocationDetectionStoreRequest extends FormRequest
             'socialName' => 'nullable|required_if:reachUs,2|string',
 
             'clients' => 'required_if:reachUs,3|integer',
-
             'employees' => 'required_if:reachUs,4|integer',
-
             'others' => 'required_if:reachUs,5|string',
 
             /* كيف وصلت لنا */
@@ -70,7 +68,7 @@ class InstallationLocationDetectionStoreRequest extends FormRequest
             'stopsNumber' => 'required|string',
             'elevatorType' => 'required|string',
             'entrancesNumber' => 'required|string',
-            'doorOpenDirection' => 'required|integer',
+          
             'wellType' => 'required|integer',
             'elevatorWeightLocation' => 'required|string',
             'weightCantileverSizeGuide' => 'required|string',
@@ -96,6 +94,7 @@ class InstallationLocationDetectionStoreRequest extends FormRequest
             'doorSizes.*.well_width' => 'required|string',
             'doorSizes.*.floor_height' => 'required|string',
             'doorSizes.*.floor_id' => 'required|integer',
+            'doorSizes.*.outer_door_directions' => 'required|integer',
 
         ];
     }

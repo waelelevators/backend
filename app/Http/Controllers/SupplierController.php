@@ -44,12 +44,13 @@ class SupplierController extends Controller
         $user->address = $request->address;
         $user->level = 'supplier';
         $user->rule_category_id = 0;
-        $user->password = bcrypt('supplier');
+        $user->area_id = 1;
+        $user->password = bcrypt('password');
         $user->save();
 
         $supplier = new Supplier();
         $supplier->user_id = $user->id;
-        $supplier->name = $user->name;
+        $supplier->supplier_name = $user->name;
         $supplier->contact_name = $user->name;
         $supplier->email = $user->email;
         $supplier->phone = $user->phone;

@@ -117,9 +117,27 @@ class ContractController extends Controller
         // $stage = $contract->stage_id;
         $stage = $stage_id;
 
-        $productsQyt = ContractProductQuantity::where('stage', $stage)
+
+        $FilterContract = [
+            'contract_number' => $contract?->contract_number,
+            'name' => $contract?->locationDetection?->client->name,
+            'project_name' => $contract?->project_name,
+            'door_size' => $contract?->doorSize->name,
+            'elevator_type' => $contract?->elevatorType->name,
+            'outer_door_directions' => $contract?->outerDoorDirections?->name,
+            'inner_door_type' => $contract?->innerDoorType->name,
+            'machine_speed' => $contract?->machineSpeed->name,
+            'machine_type' => $contract?->machineType->name,
+            'stops_numbers' => $contract?->stopsNumbers->name,
+            'elevator_trip' => $contract?->elevatorTrip->name,
+            'stage' => $contract?->stage->name,
+            'total' => $contract?->total,
+        ];
+
+        $productsQyt = ContractProductQuantity::where('stage_id', $stage)
             ->where('elevator_type_id', $contract->elevator_type_id)
-            ->where('floor', $contract->stop_number_id)
+            ->where('floor_id', $contract->stop_number_id)
+            ->with('product')
             ->get();
 
         $quotation =  Quotation::where('contract_id', $contract_id)
@@ -138,7 +156,7 @@ class ContractController extends Controller
 
         $products =  Product::where('stage', $stage)->get(); // في حالة الرغبة في اضافة منتج اضافي
         return [
-            'contract' => $contract,
+            'contract' => $FilterContract,
             'products' => $products,
             'products_qyt' => $productsQyt
         ];
@@ -171,16 +189,17 @@ class ContractController extends Controller
                 'message' => 'هذة المرحله لديها عرض سعر مسبقا'
             ], 400);
         }
-        $payed = $contract->payments->sum('amount');
-        $total = $contract->total;
-        $required_percentage = Stage::find($stage)->required_percentage;
 
-        if ($payed >= ($total * $required_percentage / 100)) {
-        } else {
-            return response([
-                'message' => 'يجب عليك دفع المرحله لتتمكن من انشاء عرض سعر',
-            ], 400);
-        }
+        // $payed = $contract->payments->sum('amount');
+        // $total = $contract->total;
+        // $required_percentage = Stage::find($stage)->required_percentage;
+
+        // if ($payed >= ($total * $required_percentage / 100)) {
+        // } else {
+        //     return response([
+        //         'message' => 'يجب عليك دفع المرحله لتتمكن من انشاء عرض سعر',
+        //     ], 400);
+        // }
 
         $quotation = new Quotation();
         $quotation->contract_id = $contract_id;

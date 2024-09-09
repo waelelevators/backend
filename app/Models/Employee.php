@@ -19,12 +19,12 @@ class Employee extends Model
         'technician_info' => 'array',
 
     ];
-
+    // protected $hidden = [
+    //     'created_at',
+    // ];
     protected $appends = [
         'email'
     ];
-
-
     public function getEmailAttribute()
     {
         return User::find($this->user_id)->email ?? '';

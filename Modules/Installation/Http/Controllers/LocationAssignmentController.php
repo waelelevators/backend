@@ -69,7 +69,6 @@ class LocationAssignmentController extends Controller
         //     1=>'غير مسند'
         //     2=>'مسند'
         // ]
-
         // $contracts = Contract::whereHas('representatives', function ($query) use ($id) {
         //     $query->where('representativeable_id', $id);
         // })->get();

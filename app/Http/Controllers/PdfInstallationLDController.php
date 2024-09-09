@@ -31,12 +31,12 @@ class PdfInstallationLDController extends Controller
         $elevatorTrip = $model->elevatorTrip->name; // مشوار المصعد
         $dbgLocation = $well['elevator_weight_location_id']; // موقع الثقل 1 خلفي 2 يمين 3 يسار
         $date  = date('d-m-Y', strtotime($model->created_at));
-        $phone  = $client->data['phone']; // رقم الجوال
+        $phone  = $client->phone; // رقم الجوال
         $city = $model->city->name; // الحي 
         $neighborhood = $model->neighborhood->name; // الحي 
         $notes = $model->notes;
 
-        $client_name = $this->getClientName($client);
+        $client_name = $client->name; // اسم العميل
 
         $imageHtml = $this->generateImageHtml($well['elevator_trips_id']); // صورة لابعاد كشف المصعد 
 
@@ -67,19 +67,6 @@ class PdfInstallationLDController extends Controller
         )->render());
 
         return $mpdf->Output();
-    }
-    private function getClientName($client)
-    {
-        if ($client->type == 2 || $client->type == 3) {
-            return $client->data['name'];
-        }
-
-        return implode(' ', [
-            $client->data['first_name'],
-            $client->data['second_name'],
-            $client->data['third_name'],
-            $client->data['last_name']
-        ]);
     }
 
     private function generateImageHtml($elevatorTripsId)
@@ -201,15 +188,31 @@ class PdfInstallationLDController extends Controller
     private function generateDoorSpecificationHtml($floorData)
     {
         $floors = [
-            'كل الطوابق', 'الطابق الاولى', 'الطابق الثاني', 'الطابق الثالث', 'الطابق الرابع',
-            'الطابق الخامس', 'الطابق السادس', 'الطابق السابع', 'الطابق الثامن', 'الطابق التاسع',
-            'الطابق العاشر', 'الطابق الحادي عشر', 'الطابق الثاني عشر'
+            'كل الطوابق',
+            'الطابق الاولى',
+            'الطابق الثاني',
+            'الطابق الثالث',
+            'الطابق الرابع',
+            'الطابق الخامس',
+            'الطابق السادس',
+            'الطابق السابع',
+            'الطابق الثامن',
+            'الطابق التاسع',
+            'الطابق العاشر',
+            'الطابق الحادي عشر',
+            'الطابق الثاني عشر'
         ];
 
         $headerColumns = [
-            '#', __('pdf.Floor'), __('pdf.Floor Well Width'), __('pdf.Floor Well Depth'),
-            __('pdf.Right Shoulder'), __('pdf.Door Height'), __('pdf.Door Size'),
-            __('pdf.Left Shoulder'), __('pdf.Floor Height')
+            '#',
+            __('pdf.Floor'),
+            __('pdf.Floor Well Width'),
+            __('pdf.Floor Well Depth'),
+            __('pdf.Right Shoulder'),
+            __('pdf.Door Height'),
+            __('pdf.Door Size'),
+            __('pdf.Left Shoulder'),
+            __('pdf.Floor Height')
         ];
 
         $rowsHtml = $this->generateDoorSpecificationRows($floorData, $floors);

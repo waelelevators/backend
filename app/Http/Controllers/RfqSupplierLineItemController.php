@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\RFQLineItem;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RfqSupplierLineItemController extends Controller
 {
@@ -72,11 +73,13 @@ class RfqSupplierLineItemController extends Controller
             return response(['message' => $productNamesString], 400);
         }
 
+        $user_id =  Auth::guard('sanctum')->user()->id;
 
         $rfqSupplierLineItem = new RfqSupplierLineItem();
         $rfqSupplierLineItem->rfq_id = $request->rfq_id;
         $rfqSupplierLineItem->supplier_id = $request->supplier_id;
         $rfqSupplierLineItem->rfq_line_items = $rfqLineItems;
+        $rfqSupplierLineItem->user_id = $user_id;
         $rfqSupplierLineItem->save();
 
         $user = User::find($supplierId);

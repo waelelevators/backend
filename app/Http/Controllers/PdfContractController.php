@@ -299,11 +299,27 @@ class PdfContractController extends Controller
     {
         // Retrieve the contract and related entities efficiently
         $contract = Contract::with([
-            'installments', 'createdBy.employee', 'locationDetection.client', 'elevatorType',
-            'outerDoorDirections', 'StopsNumbers', 'EntrancesNumber', 'elevatorTrip',
-            'elevatorRoom', 'MachineSpeed', 'MachineTYPE', 'MachineLoad', 'PeopleLoad',
-            'ControlCard', 'machineWarranty', 'elevatorWarranty', 'freeMaintenance',
-            'cabinRailsSize', 'counterWeightRailsSize', 'innerDoorType', 'doorSize'
+            'installments',
+            'createdBy.employee',
+            'locationDetection.client',
+            'elevatorType',
+            'outerDoorDirections',
+            'StopsNumbers',
+            'EntrancesNumber',
+            'elevatorTrip',
+            'elevatorRoom',
+            'MachineSpeed',
+            'MachineTYPE',
+            'MachineLoad',
+            'PeopleLoad',
+            'ControlCard',
+            'machineWarranty',
+            'elevatorWarranty',
+            'freeMaintenance',
+            'cabinRailsSize',
+            'counterWeightRailsSize',
+            'innerDoorType',
+            'doorSize'
         ])->findOrFail($id);
 
         $Setting = Template::findOrFail($contract->template_id);
@@ -325,16 +341,21 @@ class PdfContractController extends Controller
         $client = $contract->locationDetection->client;
 
         // return $client;
-        $client_name = $client->type == 2 || $client->type == 3
-            ? $client->data['name']
-            : implode(' ', [
-                $client->data['first_name'], $client->data['second_name'],
-                $client->data['third_name'], $client->data['last_name']
-            ]);
+        $client_name = ($client->type == 2 || $client->type == 3)
+            ? $client->name
+            : implode(
+                ' ',
+                [
+                    $client->first_name,
+                    $client->second_name,
+                    $client->third_name,
+                    $client->last_name
+                ]
+            );
 
         $id_number = ($client->type == 2 ? 'رقم السجل التجاري: ' : 'رقم الهوية: ') .
-            ($client->type == 2 ? $client->data['commercial_register'] : $client->data['id_number']);
-        $phone = $client->data['phone'];
+            ($client->type == 2 ? $client->commercial_register : $client->id_number);
+        $phone = $client->phone;
 
         // Prepare the final data set
         $data = [

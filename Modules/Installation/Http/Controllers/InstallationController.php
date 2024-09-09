@@ -19,14 +19,32 @@ class InstallationController extends Controller
     {
 
         $data = [];
-        $clients = Client::all();
+
         $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
         $tables = [
-            "floors", "elevator_types", 'external_door_specifications', "stops_numbers",
-            "elevator_trips", "machine_loads", "people_loads", 'additions',
-            "control_cards", "entrances_numbers", "outer_door_directions", "inner_door_types",
-            "templates", "door_sizes", "elevator_rooms", "machine_types", "employees",
-            "machine_speeds", "elevator_warranties", "counterweight_rails_sizes", "stages", "branches",
+            "floors",
+            "elevator_types",
+            'external_door_specifications',
+            "stops_numbers",
+            "elevator_trips",
+            "machine_loads",
+            "people_loads",
+            'additions',
+            "control_cards",
+            "entrances_numbers",
+            "outer_door_directions",
+            "inner_door_types",
+            "templates",
+            "door_sizes",
+            "elevator_rooms",
+            "machine_types",
+            "employees",
+            'building_types',
+            "machine_speeds",
+            "elevator_warranties",
+            "counterweight_rails_sizes",
+            "stages",
+            "branches",
         ];
 
 
@@ -94,8 +112,14 @@ class InstallationController extends Controller
         $data = [];
 
         $tables = [
-            "elevator_types", "stops_numbers", "elevator_trips", "weight_locations",
-            "users", "floors", "inner_door_types", "entrances_numbers"
+            "elevator_types",
+            "stops_numbers",
+            "elevator_trips",
+            "weight_locations",
+            "users",
+            "floors",
+            "outer_door_directions",
+            "entrances_numbers"
         ];
 
         $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
@@ -113,7 +137,10 @@ class InstallationController extends Controller
         $data = [];
 
         $tables = [
-            "stages", "elevator_types", "stops_numbers", "products"
+            "stages",
+            "elevator_types",
+            "stops_numbers",
+            "products"
         ];
 
         foreach ($tables as $table) {
@@ -134,7 +161,8 @@ class InstallationController extends Controller
         $data = [];
 
         $tables = [
-            "colors", "outer_door_directions"
+            "colors",
+            "outer_door_directions"
         ];
 
         foreach ($tables as $table) {
@@ -150,7 +178,11 @@ class InstallationController extends Controller
         $data = [];
 
         $tables = [
-            "cover_types", "weight_locations", "door_sizes", "inner_door_types", "external_door_specifications"
+            "cover_types",
+            "weight_locations",
+            "door_sizes",
+            "inner_door_types",
+            "external_door_specifications"
         ];
 
         foreach ($tables as $table) {

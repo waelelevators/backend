@@ -41,8 +41,8 @@
 
         <div>
             <div class="left">
-                <h3 style="text-align:center">
-                    {{ $data['CONTRACT_NUMBER'] }}#
+                <h3 style="text-align:left">
+                    {{ $data['CONTRACT_NUMBER'] }}
                 </h3>
             </div>
 

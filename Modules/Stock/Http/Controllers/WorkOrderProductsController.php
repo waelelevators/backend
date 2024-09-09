@@ -107,75 +107,74 @@ class WorkOrderProductsController extends Controller
             return response()->json(['message' => 'يجب عليك صرف منتج واحد على الاقل'], 422);
         }
 
-        // DB::beginTransaction();
+        DB::beginTransaction();
 
-        //   try {
-        $workOrder = WorkOrder::find($request->id);
+        try {
+            $workOrder = WorkOrder::find($request->id);
 
-        $contract_id = $workOrder->contract_id;
-        $stage_id = $workOrder->stage_id;
+            $contract_id = $workOrder->contract_id;
+            $stage_id = $workOrder->stage_id;
 
-        $dispatch = new Dispatch();
-        $dispatch->work_order_id = $request->id;
-        $dispatch->stage_id = $stage_id;
-        $dispatch->contract_id = $contract_id;
-        $dispatch->user_id = auth('sanctum')->user()->id;
-        $dispatch->employee_id = $request->employee_id;
-        $dispatch->save();
+            $dispatch = new Dispatch();
+            $dispatch->work_order_id = $request->id;
+            $dispatch->stage_id = $stage_id;
+            $dispatch->contract_id = $contract_id;
+            $dispatch->user_id = auth('sanctum')->user()->id;
+            $dispatch->employee_id = $request->employee_id;
+            $dispatch->save();
 
-        foreach ($request->products as $product) {
+            foreach ($request->products as $product) {
 
-            if ($product['qty'] != 0) {
+                if ($product['qty'] != 0) {
 
-                $dispatchItem = new DispatchItem();
-                $dispatchItem->dispatch_id = $dispatch->id;
-                $dispatchItem->product_id = $product['product_id'];
-                $dispatchItem->qty = $product['qty'];
-                $dispatchItem->dispatch_sheet_id = $product['id'];
-                $dispatchItem->save();
+                    $dispatchItem = new DispatchItem();
+                    $dispatchItem->dispatch_id = $dispatch->id;
+                    $dispatchItem->product_id = $product['product_id'];
+                    $dispatchItem->qty = $product['qty'];
+                    $dispatchItem->dispatch_sheet_id = $product['id'];
+                    $dispatchItem->save();
 
-                $workOrdersProduct = WorkOrdersProduct::find($product['id']);
-                $workOrdersProduct->received = $workOrdersProduct->received + $product['qty'];
-                $workOrdersProduct->save();
+                    $workOrdersProduct = WorkOrdersProduct::find($product['id']);
+                    $workOrdersProduct->received = $workOrdersProduct->received + $product['qty'];
+                    $workOrdersProduct->save();
+                }
             }
+            $workOrdersProducts = WorkOrdersProduct::where('work_order_id', $request->id)->get();
+
+            $data = [];
+
+            foreach ($workOrdersProducts as $product) {
+
+                $data[] = [
+                    'id' => $product->id,
+                    'name' => $product->product->name,
+                    'product_id' => $product->product->id,
+                    'quantity' => $product->qty,
+                    'received' => $product->received,
+                    'qty' => 0,
+                ];
+            }
+
+            $email = $workOrder->user->email;
+            MyHelper::pushNotification([$email], [
+                'title' => 'تم تسليم المنتجات',
+                'body' => 'تم تسليم المنتجات' . $workOrder->id
+
+            ]);
+
+            $employeeMail = Employee::find($request->employee_id)->user->email;
+            MyHelper::pushNotification([$employeeMail], [
+                'title' => ' تسليم المنتجات',
+                'body' => 'تم تسليم منتجات عليك الموافقه ' . $workOrder->id
+            ]);
+
+            DB::commit();
+
+            return response($data);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'حدث خطأ ما. الرجاء المحاولة لاحقًا.'], 500);
         }
-        $workOrdersProducts = WorkOrdersProduct::where('work_order_id', $request->id)->get();
-
-        $data = [];
-
-        foreach ($workOrdersProducts as $product) {
-
-            $data[] = [
-                'id' => $product->id,
-                'name' => $product->product->name,
-                'product_id' => $product->product->id,
-                'quantity' => $product->qty,
-                'received' => $product->received,
-                'qty' => 0,
-            ];
-        }
-
-
-        $email = $workOrder->user->email;
-        MyHelper::pushNotification([$email], [
-            'title' => 'تم تسليم المنتجات',
-            'body' => 'تم تسليم المنتجات' . $workOrder->id
-
-        ]);
-
-        $employeeMail = Employee::find($request->employee_id)->user->email;
-        MyHelper::pushNotification([$employeeMail], [
-            'title' => ' تسليم المنتجات',
-            'body' => 'تم تسليم منتجات عليك الموافقه ' . $workOrder->id
-        ]);
-
-        //  DB::commit();
-
-        return response($data);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(['message' => 'حدث خطأ ما. الرجاء المحاولة لاحقًا.'], 500);
-        // }
     }
 
     /**
@@ -190,20 +189,20 @@ class WorkOrderProductsController extends Controller
         $contract = LocationStatus::findOrFail($workOrder->assignment_id);
 
         $contractData = [
-            'client' => $contract->assignment->contract->locationDetection->client, // بيانات العميل
-            'stopNumbers' => $contract->assignment->contract->stopsNumbers->name, // عدد الوقفات
-            'elevatorTrip' => $contract->assignment->contract->elevatorTrip->name, // مشوار المصعد
-            'elevatorType' => $contract->assignment->contract->elevatorType->name,  // نوع المصعد
-            'doorSize' => $contract->assignment->contract->doorSize->name,  // مقاس فتحة الباب 
-            'machineType' => $contract->assignment->contract->machineType->name,  //   نوع الماكينة 
-            'machineSpeed' => $contract->assignment->contract->machineSpeed->name,  //   سرعة الماكينة 
-            'controlCard' => $contract->assignment->contract->controlCard->name,  //   نوع الكنترول 
-            'doorOpenDirection' => $contract->assignment->contract->outerDoorDirections->name,  //    اتجاه فتح الباب 
-            'entranceNumber' => $contract->assignment->contract->entrancesNumber->name,  //   عدد المداخل  
-            'stage' => $contract->assignment->stage,  //   المرحلة  
+            'client' => $contract?->assignment?->contract?->locationDetection?->client, // بيانات العميل
+            'stopNumbers' => $contract?->assignment?->contract?->stopsNumbers?->name, // عدد الوقفات
+            'elevatorTrip' => $contract?->assignment?->contract?->elevatorTrip?->name, // مشوار المصعد
+            'elevatorType' => $contract?->assignment?->contract?->elevatorType?->name,  // نوع المصعد
+            'doorSize' => $contract?->assignment?->contract?->doorSize?->name,  // مقاس فتحة الباب 
+            'machineType' => $contract?->assignment?->contract?->machineType?->name,  //   نوع الماكينة 
+            'machineSpeed' => $contract?->assignment?->contract?->machineSpeed?->name,  //   سرعة الماكينة 
+            'controlCard' => $contract?->assignment?->contract?->controlCard?->name,  //   نوع الكنترول 
+            'doorOpenDirection' => $contract?->assignment?->contract?->outerDoorDirections?->name,  //    اتجاه فتح الباب 
+            'entranceNumber' => $contract?->assignment?->contract?->entrancesNumber?->name,  //   عدد المداخل  
+            'stage' => $contract?->assignment?->stage,  //   المرحلة  
         ];
 
-        $stage = $contract->assignment->stage_id;
+        $stage = $contract?->assignment->stage_id;
         $elevator_type_id =  $contract->assignment->contract->elevator_type_id;
         $floor = $contract->assignment->contract->stop_number_id;
 

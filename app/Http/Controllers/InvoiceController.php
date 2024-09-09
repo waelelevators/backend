@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\MyHelper;
 use App\Models\Invoice;
-use App\Http\Requests\StoreInvoiceRequest;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UpdateInvoiceRequest;
 use App\Models\InvoiceDetail;
-use App\Models\Quotation;
 use App\Models\QuotationD;
 use App\Models\RFQ;
 use App\Models\RFQLineItem;
@@ -25,17 +24,17 @@ class InvoiceController extends Controller
     public function index($stage = 1)
     {
 
-        $quotation_ids =  QuotationD::where('rfq_id', 0)
+        $quotation_ids =  QuotationD::where('rfq_id', null)
             ->whereHas('quotation', function ($query) use ($stage) {
                 $query->where('stage', $stage);
             })
             ->pluck('id');
 
-        $quotationData = QuotationD::select('product_id', \DB::raw('SUM(quantity) as total_quantity'))
+        $quotationData = QuotationD::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
             ->whereHas('quotation', function ($query) use ($stage) {
                 $query->where('stage', $stage);
             })
-            ->where('rfq_id', 0)
+            ->where('rfq_id', null)
             ->groupBy('product_id')
             ->with('product')
             ->get();

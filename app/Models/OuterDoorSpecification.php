@@ -107,11 +107,11 @@ class OuterDoorSpecification extends Model
     // belongs to floor
     function opening_direction_tow()
     {
-        return $this->belongsTo(OuterDoorDirections::class, 'door_opening_direction_tow');
+        return $this->belongsTo(OuterDoorDirection::class, 'door_opening_direction_tow');
     }
 
     function opening_direction()
     {
-        return $this->belongsTo(OuterDoorDirections::class, 'door_opening_direction');
+        return $this->belongsTo(OuterDoorDirection::class, 'door_opening_direction');
     }
 }

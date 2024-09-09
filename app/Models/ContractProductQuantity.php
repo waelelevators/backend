@@ -12,7 +12,12 @@ class ContractProductQuantity extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'price', 'qty', 'elevator_type_id', 'floor', 'stage'
+        'product_id',
+        'price',
+        'qty',
+        'elevator_type_id',
+        'floor',
+        'stage'
     ];
 
     // // with product

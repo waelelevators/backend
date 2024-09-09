@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-class CabinManufactureStoreRequest extends FormRequest
+class CabinManufactureUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,17 +26,11 @@ class CabinManufactureStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'contract_id' => 'required|exists:contracts,id',
-            'weight_dbg' => 'required|string',
-            'weight_location' => 'required|exists:weight_locations,id',
-            'cabin_dbg' => 'required|string',
-            'door_size' => 'required|string',
-            'machine_chair' => 'required|string',
-            'machine_room_height' => 'required|string',
-            'machine_room_width' => 'required|string',
-            'machine_room_depth' => 'required|string',
-            'cabin_max_height' => 'required|string',
-            'last_floor_height' => 'required|string'
+    
+            'door_size' => 'required',
+            'door_direction' => 'required|integer',
+            'cover_type' => 'required|exists:cover_types,id',
+            'order_attached' => 'required|string',
         ];
     }
 

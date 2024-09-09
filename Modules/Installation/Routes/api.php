@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Installation\Http\Controllers\CabinManufactureController;
 use Modules\Installation\Http\Controllers\ContractController;
 use Modules\Installation\Http\Controllers\ExternalDoorManufactureController;
+use Modules\Installation\Http\Controllers\HandOverController;
 use Modules\Installation\Http\Controllers\InstallationController;
 use Modules\Installation\Http\Controllers\InternalDoorManufactureController;
 use Modules\Installation\Http\Controllers\LocationAssignmentController;
@@ -67,10 +68,7 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
 
     // اسناد الموقع للمناديب لتحديد جاهزي الموقع
     Route::get('location_assignment', [LocationAssignmentController::class, 'index']);
-    Route::get(
-        'location_assignment/representative/{id?}',
-        [LocationAssignmentController::class, 'representative']
-    );
+    Route::get('location_assignment/representative/{id?}', [LocationAssignmentController::class, 'representative']);
     Route::get('location_assignment/{id?}', [LocationAssignmentController::class, 'show']);
     Route::put('location_assignment/{id?}', [LocationAssignmentController::class, 'update']);
 
@@ -79,10 +77,12 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::put('location_statuses/{id}', [LocationStatusController::class, 'update']);
 
     Route::get('location_statuses', [LocationStatusController::class, 'index']);
+
     Route::get('location_statuses/no-work-orders', [
         LocationStatusController::class,
         'index'
     ])->defaults('filterNoWorkOrder', true);
+
     Route::get('location_statuses/{id?}', [LocationStatusController::class, 'show']);
     Route::delete('location_statuses', [LocationStatusController::class, 'destroy']);
 
@@ -148,6 +148,12 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::get('count-contracts', [ReportController::class, 'countContracts']);
     Route::get('reports/payment/{date?}', [ReportController::class, 'payment']);
 
+
+
+    Route::post('hand-overs', [HandOverController::class, 'store']);
+    Route::put('hand-overs/{id?}', [HandOverController::class, 'update']);
+    Route::get('hand-overs/{id?}', [HandOverController::class, 'show']);
+
     // Route::apiResource('contract', ContractController::class);
     // Route::post('contract/{contract}/assign', [ContractController::class, 'assign']);
     // Route::get('contract_quotations', [contractQuotationsController::class, 'index']);
@@ -183,6 +189,8 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::post('work-orders/approval', [WorkOrdersController::class, 'approval']); // اعتماد العملية
 
     Route::get('work-orders/{activeStatus}', [WorkOrdersController::class, 'index']);
+
+    Route::get('work-orders/hand-overs/{activeStatus}', [WorkOrdersController::class, 'handOver']);
 
     Route::get('my-work-orders', [MyWorkOrdersController::class, 'myWorkOrder']);
 

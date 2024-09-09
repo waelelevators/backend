@@ -22,7 +22,7 @@ class CoveringResource extends JsonResource
             'client' => $this->locationDetection->client,
             'elevatorType' => $this->elevatorType,
             'stopsNumber' => $this->stopsNumbers,
-
+            'cabin' => $this->cabin ?? "",
             'city' => $this->locationDetection->city,
             'neighborhood' => $this->locationDetection->neighborhood,
             'stage' => $this->stage,

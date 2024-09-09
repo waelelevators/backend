@@ -16,9 +16,13 @@ class SignedContractsController extends Controller
 
         //$contracts =  Contract::orderByDesc('created_at')->get();
 
-        $contracts = Contract::where('contract_status', 'assigned')->get(); // العقود الموقعة فقط
+        $contracts = Contract::where(
+            'contract_status',
+            'assigned'
+        )->get();
 
         return ContractResource::collection($contracts);
+
         //  return Contract::where('status', 'signed')->get();
     }
 

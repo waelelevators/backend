@@ -9,12 +9,20 @@ class ExternalDoorSpecificationManufacturer extends Model
 {
     use HasFactory;
 
-    protected $with = ['floor', 'externalDoorSpecification', 'doorCover'];
+    protected $hidden  = [
+        'ex_do_ma_id',
+        'do_spec_id',
+        'door_cover_id',
+        'updated_at',
+        'created_at',
+    ];
 
-    public function floor()
-    {
-        return $this->belongsTo(Floor::class);
-    }
+    protected $with = ['externalDoorSpecification', 'doorCover'];
+
+    // public function floor()
+    // {
+    //     return $this->belongsTo(Floor::class);
+    // }
     public function externalDoorSpecification()
     {
         return $this->belongsTo(OuterDoorDirection::class, 'do_spec_id', 'id');

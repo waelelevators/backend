@@ -49,6 +49,11 @@ class WorkOrder  extends Model
         return $this->belongsTo(LocationStatus::class, 'assignment_id', 'id');
     }
 
+    public function contract(): BelongsTo
+    {
+        return $this->belongsTo(Contract::class, 'contract_id', 'id');
+    }
+
     /**
      * Get the elevator type that owns the ContractProductQuantity
      *
@@ -57,7 +62,6 @@ class WorkOrder  extends Model
     public function technicians(): HasMany
     {
         return $this->hasMany(TechniciansWorkOrder::class);
-        // ->where('stage_id', $this->stage_id);
     }
 
     /**

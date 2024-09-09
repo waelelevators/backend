@@ -12,11 +12,11 @@ use App\Models\DoorSize;
 use App\Models\ElevatorType;
 use App\Models\ElevatorWarranty;
 use App\Models\InnerDoorType;
+use App\Models\InstallationLocationDetection;
 use App\Models\Installment;
 use App\Models\MachineLoad;
 use App\Models\MachineType;
 use App\Models\OuterDoorDirection;
-use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -608,9 +608,9 @@ class ContractController extends Controller
         $contracts = Contract::where('contract_status', 'assigned')->get();
 
         $contracts = $contracts->filter(function ($contract) {
-
+            // $contract->stage_id == 2 && $contract->cabinStatus == 0 ||
             return $contract->stage_id == 1 && $contract->externalStatus == 0 && $contract->doors_number > 0 ||
-                $contract->stage_id == 2 && $contract->cabinStatus == 0 ||
+                $contract->stage_id == 2 && $contract?->cabin?->status_id == 6 ||
                 $contract->stage_id == 3 && $contract->internalStatus == 0 && $contract->elevatorType->need_to_internal_door == 1;
         });
 
@@ -800,7 +800,6 @@ class ContractController extends Controller
                 'region'          => $request['region'] ?? null,
                 'city'            => $request['city'] ?? null,
                 'neighborhood'    => $request['neighborhood'] ?? null,
-                'street'          => $request['street'] ?? null,
                 'location_url'    => $request['location_url'] ?? null,
                 'lat'             => $request['lat'] ?? null,
                 'long'            => $request['long'] ?? null
@@ -811,18 +810,15 @@ class ContractController extends Controller
                 return !is_null($value);
             });
 
-            // InstallationLocationDetection::where(
-            //     'id',
-            //     $request['locationId']
-            // )
-            //     ->update([
-            //         'location_data' => $data,
-            //         'status' => 0
-            //     ]); // تحديث بيانات كشف الموقع
+            InstallationLocationDetection::where('id', $request['locationId'])
+                ->update([
+                    'location_data' => $data
+                ]); //   [المنطقة - المدينة - الحي]تحديث بيانات كشف الموقع
 
             $contract->project_name                                = $request['projectName'] ?? '';
             $contract->total                                       = $request['priceIncludeTax'];
             $contract->tax                                         = $request['taxValue'];
+            $contract->build_type_id                               = $request['buildingType'];
             $contract->discount                                    = $request['discountValue'] ?? 0;
             $contract->elevator_type_id                            = $request['elevatorType'];
             $contract->doors_number                                = $request['doorsNumbers'];
@@ -906,15 +902,34 @@ class ContractController extends Controller
     }
     private function uploadBase64Pdf($base64Pdf, $path)
     {
+
+        // Check if the provided base64 string contains a valid PDF header
+        if (!preg_match('#^data:application/pdf;base64,#i', $base64Pdf)) {
+            throw new \Exception('Invalid PDF data.');
+        }
+
+
         $pdfData = base64_decode(preg_replace('#^data:application/pdf;base64,#i', '', $base64Pdf));
+
+        // Check if the decoding was successful
+        if ($pdfData === false) {
+            throw new \Exception('Failed to decode base64 PDF data.');
+        }
 
         // Generate a unique filename
         $filename = uniqid() . '.pdf'; // You can adjust the extension based on the image format
 
-        // Save the image to the storage directory
-        Storage::disk('public')->put($path . '/' . $filename, $pdfData);
+        // Use Storage facade to store the PDF in the public disk
+        try {
+            Storage::disk('public')->put($path . '/' . $filename, $pdfData);
+        } catch (\Exception $e) {
+            // Handle any errors that might occur during file storage
+            throw new \Exception('Failed to upload PDF: ' . $e->getMessage());
+        }
+        
+        // $fullPath = 'storage/' . $path . '/' . $filename;
 
-        $fullPath = 'storage/' . $path . '/' . $filename;
+        $fullPath = Storage::url($path . '/' . $filename);
 
         return $fullPath;
     }
@@ -928,8 +943,6 @@ class ContractController extends Controller
     {
 
         $model = Contract::with([
-
-
             'stage',
             'stage',
             'elevatorRoom',

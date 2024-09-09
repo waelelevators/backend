@@ -20,15 +20,18 @@ class MyWorkOrdersController extends Controller
     {
 
         $model = WorkOrder::with('locationStatus', 'stage')
-            ->orderByDesc('created_at')->get();
+            ->orderByDesc('created_at')
+            ->whereNotIn('manager_approval', ['conditionally', 'approved'])
+            ->get();
 
         return WorkOrderResource::collection($model);
     }
     public function myWorkOrder()
     {
-        $employeeId = auth('sanctum')->user()->id;
+        $employeeId = auth('sanctum')->user()->id; // عمليات الفني (الموبايل)
 
         $model = WorkOrder::with('locationStatus', 'stage')
+            ->whereNotIn('manager_approval', ['conditionally', 'approved'])
             ->whereHas('technicians', function ($q) use ($employeeId) {
                 $q->where('technician_id', $employeeId);
             })->orderByDesc('created_at')->get();

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TechniciansWorkOrder  extends Model
 {
@@ -24,12 +23,12 @@ class TechniciansWorkOrder  extends Model
     }
 
     /**
-     * Get the emplyee that owns the TechniciansWorkOrder
+     * Get the User that owns the TechniciansWorkOrder
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class, 'technician_id');
+        return $this->belongsTo(User::class, 'technician_id');
     }
 }

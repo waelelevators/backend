@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Contract extends Model
 {
@@ -53,16 +52,40 @@ class Contract extends Model
         // 'contract_number',
         // 'other_additions',
     ];
-    protected $with = ['locationDetection'];
+
 
     // with client
-    // protected $with = [
-    //     'locationDetection', 'stage', 'stage', 'elevatorRoom', 'template', 'representatives',
-    //     'DoorSize', 'CabinRailsSize', 'PeopleLoad', 'CounterWeightRailsSize', 'innerDoorType', 'elevatorWarranty',
-    //     'outerDoorSpecifications', 'MachineSpeed', 'MachineWarranty', 'installments', 'EntrancesNumber', 'branch',
-    //     'elevatorType', 'elevatorTrip', 'elevatorRail', 'elevatorRoom', 'elevatorWeight', 'machineType',
-    //     'machineLoad', 'controlCard', 'outerDoorDirections', 'stopsNumbers', 'freeMaintenance', 'createdBy'
-    // ];
+    protected $with = [
+        'locationDetection',
+        'stage',
+        'stage',
+        'elevatorRoom',
+        'representatives',
+        'DoorSize',
+        'CabinRailsSize',
+        'PeopleLoad',
+        'CounterWeightRailsSize',
+        'innerDoorType',
+        'elevatorWarranty',
+        'outerDoorSpecifications',
+        'MachineSpeed',
+        'MachineWarranty',
+        'installments',
+        'EntrancesNumber',
+        'branch',
+        'elevatorType',
+        'elevatorTrip',
+        'elevatorRail',
+        'elevatorRoom',
+        'elevatorWeight',
+        'machineType',
+        'machineLoad',
+        'controlCard',
+        'outerDoorDirections',
+        'stopsNumbers',
+        'freeMaintenance',
+        'createdBy'
+    ];
 
     // protected $appends = [
     //     'city', 'region',
@@ -71,7 +94,6 @@ class Contract extends Model
     //     'paid_amount',
     //     'more_additions',
     //     'is_ready_to_start'
-
     // ];
 
     public function representatives()
@@ -92,11 +114,13 @@ class Contract extends Model
      */
     public function scopeReadyToStart($query)
     {
+
         return $query->join('stages', 'stages.id', '=', 'contracts.stage_id')
             ->where(function ($query) {
                 $query->where(function ($query) {
                     $query->where('stage_id', 1)
                         ->whereHas('payments', function ($query) {
+                            $amountToCompare = $this->getAmountForStage(1); // Replace with your function
                             $query->havingRaw('SUM(amount) >= contracts.total * stages.required_percentage / 100');
                         });
                 })
@@ -128,7 +152,6 @@ class Contract extends Model
     {
         return $this->payments()->sum('amount');
     }
-
     public function getPaidAmountInStage($stage)
     {
         return $this->payments()->where('stage_id', $stage)->sum('amount');
@@ -270,8 +293,6 @@ class Contract extends Model
     {
         return $this->belongsTo(ElevatorWarranty::class);
     }
-
-    // installments
     public function installments()
     {
         return $this->hasMany(Installment::class);
@@ -321,6 +342,7 @@ class Contract extends Model
     {
         return $this->belongsTo(MachineLoad::class);
     }
+
 
     public function machineWarranty()
     {
@@ -407,7 +429,6 @@ class Contract extends Model
         return $this->hasMany(Quotation::class, 'contract_id')->where('stage', 3);
     }
 
-
     // stage
     public function stage()
     {
@@ -467,17 +488,14 @@ class Contract extends Model
     }
     public function getCabinStatusAttribute()
     {
-
         $coverStatus = $this->cabin()->latest('created_at')->exists();
         return $coverStatus ? 1 : 0;
     }
     public function getInternalStatusAttribute()
     {
-
         $coverStatus = $this->internal()->latest('created_at')->exists();
         return $coverStatus ? 1 : 0;
     }
-
 
     /**
      * Get all of the workOrders for the Contract

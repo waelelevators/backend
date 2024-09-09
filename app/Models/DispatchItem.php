@@ -25,4 +25,9 @@ class DispatchItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function contractProductItems()
+    {
+        return $this->belongsTo(ContractProductQuantity::class, 'dispatch_sheet_id');
+    }
 }

@@ -29,21 +29,25 @@ class PdfExchangeProductController extends Controller
         $contract =  $workOrder->locationStatus->assignment->contract;
 
         $data = [
-            'name' => $contract?->locationDetection?->client->type == 1 ?
-                $contract?->locationDetection?->client->data['first_name'] . ' ' .
-                $contract?->locationDetection?->client->data['second_name']  :
-                $contract?->locationDetection?->client->data['name'],
+            'name' => $contract?->locationDetection?->client['name'],
             'contract_number' => $contract->contract_number,
-            'phone' => $contract->locationDetection->client->data['phone'] ?? '',
+            'phone' => $contract->locationDetection->client['phone'] ?? '',
             'DATE' => date('Y-m-d', strtotime($workOrder->created_at)),
             'elevator_trip_id' => $contract->elevator_trip_id, // مشوار المصعد 
             'stop_number_id' => $contract->stop_number_id, // عدد الوقفات
             'stage' => $workOrder->stage['name'], // اسم المرحلة
             'TECHNICIANS' => $workOrder->technicians, // الفنيين
+
+
+
+            'ENTRANCES_NUMBER' => $contract->EntrancesNumber->name, // عدد المداخل 
+            'DOORDIRECTIONS' => $contract->outerDoorDirections?->name, // اتجاه فتح الباب الخارجي 
+
             'ELEVATOR_TYPE' => $contract->elevatorType->name, // نوع المصعد
-            'ELEVATOR_TRIP' => $contract->elevatorTrip->name, // مشوار المصعد
             'DOOR_SIZE' => $contract->doorSize->name, // مقاس الباب
 
+            'ELEVATOR_TRIP' => $contract->elevatorTrip->name, // مشوار المصعد
+            'STOPS_NUMBERS' => $contract->stopsNumbers->name, // عدد الوقفات 
 
             'WEIGHT_RAILS' => $contract->counterWeightRailsSize->name, // مقاس سكة الثقل
             'CABIN_RAILS' => $contract->cabinRailsSize->name, // مقاس سكة الكبينة

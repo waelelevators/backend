@@ -15,28 +15,47 @@ class WorkOrderResource extends JsonResource
     public function toArray($request)
     {
         //   return parent::toArray($request);
-        $contract = $this->locationStatus->assignment->contract;
+        //  $contract = $this->locationStatus->assignment->contract;
 
         return [
             'id' => $this->id,
-            'contract_number' => $contract->contract_number,
-            'contract_status' => $contract->contract_status,
-            'client' => $contract->locationDetection->client->name,
-            'phone' => $contract->locationDetection->client->phone,
-            'elevatorType' => $contract->elevatorType->name,
+            'contract_number' => $this->contract->contract_number,
+            'contract_id' => $this->contract->id,
+            'door_size' => $this->contract->doorSize->name,
+            'machine_type' => $this->contract->machineType->name,
+            'machine_weight' => $this->contract->machineLoad->name,
+            'machine_speed' => $this->contract->machineSpeed->name,
+            'contract_status' => $this->contract->contract_status,
+            'client' => $this->contract->locationDetection->client->name,
+            'phone' => $this->contract->locationDetection->client->phone,
+            'elevatorType' => $this->contract->elevatorType->name,
             'manager_approval' => $this->manager_approval,
-            'stopNumber' => $contract->stopsNumbers->name,
-            'city' => $contract->locationDetection->city->name,
-            'neighborhood' => $contract->locationDetection->neighborhood->name,
+            'stopNumber' => $this->contract->stopsNumbers->name,
+            'city' => $this->contract->locationDetection->city->name,
+            'neighborhood' => $this->contract->locationDetection->neighborhood->name,
             'technicians' => $this->technicians,
             'statusName' => $this->status->name,
+            'statusValue' => $this->status->value,
             'statusColor' => $this->status->color,
             'freeze' => $this->freeze,
             'duration' => $this->duration,
-            'stage' => $this->stage->name,
+            'stageName' => $this->stage->name,
+            'stageId' => $this->stage->id,
+            'cabinStatus' => $this->contract->cabinStatus,
             'start_at' => $this->start_at,
             'end_at' => $this->end_at,
             'created_at' => $this->created_at,
+        ];
+    }
+
+    public function transformData()
+    {
+        return [
+            'id' => $this->id,
+            'contract_number' => $this->contract->contract_number,
+            'client' => $this->contract->locationDetection->client->name,
+            'phone' => $this->contract->locationDetection->client->phone,
+            'technicians' => $this->technicians,
         ];
     }
 }

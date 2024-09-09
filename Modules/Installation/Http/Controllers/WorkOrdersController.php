@@ -8,11 +8,13 @@ use App\Models\Contract;
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
 use App\Models\Employee;
+use App\Models\ExternalDoorManufacturer;
 use App\Models\LocationAssignment;
 use App\Models\LocationStatus;
 use App\Models\Notification;
 use App\Models\Status;
 use App\Models\TechniciansWorkOrder;
+use App\Models\User;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderLog;
 use App\Models\WorkOrdersProduct;
@@ -31,17 +33,62 @@ class WorkOrdersController extends Controller
     public function index($activeStatus)
     {
 
-        if ($activeStatus == 'all') { // العمليات الجارية
-            $workOrders =  WorkOrder::with('locationStatus', 'stage', 'technicians.employee')->orderByDesc('created_at')->get();
+        if ($activeStatus == 'all') {
+            // العمليات الجارية
+            $workOrders =  WorkOrder::with('technicians.employee')
+                ->orderByDesc('created_at')->get();
+        } else if ($activeStatus == 'mechanical') {
+
+            $workOrders = WorkOrder::whereIn('status_id', ['pending', 'in progress', 'rejected', 'ready for delivery'])
+                ->whereIn('stage_id', [1, 2])
+                ->with('technicians.employee')->orderByDesc('created_at')->get();
+        } else if ($activeStatus == 'electrical') {
+
+            $workOrders = WorkOrder::whereIn('status_id', ['pending', 'in progress', 'rejected', 'ready for delivery'])
+                ->where('stage_id', 3)
+                ->with('technicians.employee')->orderByDesc('created_at')->get();
         } else { // جاهز للموافقة (كبير الفنيين) 
 
             $status = Status::find($activeStatus);
 
             $workOrders = WorkOrder::where('status_id', $status->value)
-                ->with('locationStatus', 'stage', 'technicians.employee')->orderByDesc('created_at')->get();
+                ->with('technicians.employee')->orderByDesc('created_at')->get();
         }
         // return $workOrders;
         return WorkOrderResource::Collection($workOrders);
+    }
+
+    public function handOver($id)
+    {
+
+        $externalDoor = ExternalDoorManufacturer::with('externalDoorSpecification', 'orderResponse')
+            ->findOrFail($id);
+
+        $workOrders =  WorkOrder::with('technicians.employee')
+            ->where([
+                ['contract_id', $externalDoor->contract_id],
+                ['stage_id', 1]
+            ])
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($externalDoor) {
+
+
+            $resource =  new WorkOrderResource($workOrders);
+
+            $transformedData = $resource->transformData();
+            return response()->json(
+                [
+                    'workOrders' => $transformedData,
+                    'externalDoors' => $externalDoor
+                ]
+            );
+        }
+        return response()->json([
+            'message' =>
+            'We Dont WorkOrder With this'
+        ]);
     }
 
     public function remaining($id)
@@ -53,14 +100,12 @@ class WorkOrdersController extends Controller
             ->get();
     }
 
-
-
     public function dispatch($id)
     {
         $dispatchs = Dispatch::where('work_order_id', $id)->pluck('id');
 
         return DispatchItem::whereIn('dispatch_id', $dispatchs)
-            ->with('product', 'dispatch.employee')->get();
+            ->with('product', 'dispatch.employee', 'contractProductItems')->get();
     }
 
     public function resume(Request $request)
@@ -90,7 +135,8 @@ class WorkOrdersController extends Controller
 
         $workOrder->save();
 
-        $emails = $workOrder->technicians->pluck('employee.user.email')->toArray();
+        $emails = $workOrder->technicians
+            ->pluck('employee.user.email')->toArray();
 
         MyHelper::pushNotification($emails, [
             'title' => 'تعديل تجميد المهمه' . $workOrder->id,
@@ -156,14 +202,14 @@ class WorkOrdersController extends Controller
 
             MyHelper::pushNotification([$workOrder->user->email], [
                 'title' => 'عدم بدء المهمه' . $workOrder->id,
-                'body' => 'الفني ' . auth('sanctum')->user()->name . ' عدم بداء المهمه 🥷🏽👍' . $request->comment,
+                'body' => 'الفني ' . auth('sanctum')->user()->name . ' عدم بدء المهمه 🥷🏽👍' . $request->comment,
                 'deep_link' => 'http://localhost:3000/installations/work-orders/' . $workOrder->id,
             ]);
 
             return response([
                 'status' => 'success',
                 'data' => WorkOrder::all(),
-                'message' => 'عدم بداء المهمه'
+                'message' => 'عدم بدء المهمه'
             ], 200);
         }
     }
@@ -176,6 +222,9 @@ class WorkOrdersController extends Controller
 
         return $workOrder->load(
             'locationStatus',
+            'locationStatus.assignment',
+            'locationStatus.assignment.contract.locationDetection.client',
+
             'comments',
             'comments.user',
             'technicians.employee'
@@ -190,21 +239,35 @@ class WorkOrdersController extends Controller
 
         $request->validate([
             'assignment_id' => 'required|exists:location_statuses,id', // التاكد من وجود العقد اولا
+            'contract_id' => 'required|exists:contracts,id', //
             'employees'     => 'required|array', // Ensure 'employees' is an array and is required.
-            'employees.*' => 'exists:employees,id|distinct',
+            'employees.*' => 'exists:users,id|distinct',
         ]);
         DB::beginTransaction();
 
         try {
+
             $LocationAssignmentModel = LocationStatus::find($request->assignment_id);
 
-            $stage_id = $LocationAssignmentModel->assignment->stage_id;
+            // Check if assignment exists
+            $assignment = $LocationAssignmentModel->assignment;
+            if (!$assignment) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Assignment not found.'
+                ], 404);
+            }
+
+            // Get stage_id from assignment
+            $stage_id = $assignment->stage_id;
 
             $existingWorkOrder = WorkOrder::where(
-                'assignment_id',
-                $request->assignment_id
-            )
-                ->where('stage_id', $stage_id)->first();
+                [
+                    ['assignment_id', '=', $request->assignment_id],
+                    ['stage_id', '=', $stage_id],
+                    ['contract_id', '=', $request->contract_id],
+                ]
+            )->first();
 
             if ($existingWorkOrder) {
 
@@ -216,11 +279,13 @@ class WorkOrdersController extends Controller
 
             $workOrder = new WorkOrder;
             $workOrder->stage_id = $stage_id;
+            $workOrder->contract_id = $request->contract_id;
             $workOrder->assignment_id = $request->assignment_id;
             $workOrder->user_id = auth('sanctum')->user()->id;
             $workOrder->save();
 
-            $employees = Employee::whereIn('id', $request->employees)->with('user')->get();
+            $employees = User::whereIn('id', $request->employees)->get();
+
 
             foreach ($employees as $employee) {
                 $technicianWorkOrder = new TechniciansWorkOrder();
@@ -232,7 +297,7 @@ class WorkOrdersController extends Controller
 
 
                 Notification::Create([
-                    'user_id' => $employee->user_id,
+                    'user_id' => $employee->id,
                     'data' => [
                         'title' => 'تم اليك اسناد مهمه رقم #' . $workOrder->id,
                         'body' => 'الرجاء البداء فى المهمه فورا 🥷🏽👍',
@@ -273,12 +338,12 @@ class WorkOrdersController extends Controller
         $request->validate([
             'id' => 'required|exists:work_orders,id',
             'status' => 'required|in:approved,rejected,conditionally',
-            'comment' => 'required_if:status,rejected,conditionally',
             'approval' => 'required',
+            //  'comment' => 'required_if:status,rejected,conditionally',
         ], [
-            'comment.required_if' => 'يجب كتابه التعليق',
             'status.required' => 'الحاله المختاره غير صحيحه',
             'status.in' => 'الحاله المختاره غير صحيحه',
+            // 'comment.required_if' => 'يجب كتابه التعليق',
         ]);
 
         if ($request->approval == 'chief_approval') {
@@ -337,9 +402,9 @@ class WorkOrdersController extends Controller
             $workOrder->end_at =   now();
             $workOrder->duration = $duration;
 
-            if ($workOrder->status_id == 'ready for delivery') {
-                $workOrder->status_id = 'approved';
-            }
+            // if ($workOrder->status_id == 'ready for delivery') {
+            $workOrder->status_id = 'approved';
+            //  }
 
             $workOrder->save();
 
@@ -381,8 +446,8 @@ class WorkOrdersController extends Controller
 
         $workOrder = WorkOrder::find($request->id);
 
-        $workOrder->load('technicians.employee.user');
-        $emails = $workOrder->technicians->pluck('employee.user.email')->toArray();
+        $workOrder->load('technicians.employee');
+        $emails = $workOrder->technicians->pluck('employee.email')->toArray();
 
 
         MyHelper::pushNotification($emails, [

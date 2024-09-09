@@ -20,9 +20,16 @@ class InstallationLocationDetection extends Model
     // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
 
     protected $appends = [
-        'city', 'region', 'neighborhood',  'elevatorType',
-        'doorOpingDirection', 'stopsNumber', 'elevatorTrip',
-        'weightLocation', 'floor', 'contractStatus'
+        'city',
+        'region',
+        'neighborhood',
+        'elevatorType',
+        'doorOpingDirection',
+        'stopsNumber',
+        'elevatorTrip',
+        'weightLocation',
+        'floor',
+        'contractStatus'
     ];
 
     public function contracts()
@@ -60,7 +67,7 @@ class InstallationLocationDetection extends Model
     }
     public function  getDoorOpingDirectionAttribute()
     {
-        return InnerDoorType::where('id', $this->well_data['door_open_direction_id'])->first();
+        //   return OuterDoorDirection::where('id', $this->floor_data['outer_door_directions'])->first();
     }
     public function  getWeightLocationAttribute()
     {
@@ -95,8 +102,7 @@ class InstallationLocationDetection extends Model
     {
         return Floor::get();
     }
-
-
+ 
     public function getFloorDataAttribute($value)
     {
         // Decode the JSON string into an associative array

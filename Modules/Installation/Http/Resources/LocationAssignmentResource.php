@@ -17,6 +17,7 @@ class LocationAssignmentResource extends JsonResource
         return [
             'id' => $this->id,
             'contract_number' => $this->contract->contract_number,
+            'contract_id' => $this->contract->id,
             'client' => $this->contract->locationDetection->client,
             'city' => $this->contract->locationDetection->city,
             'neighborhood' => $this->contract->locationDetection->neighborhood,

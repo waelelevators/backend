@@ -32,6 +32,7 @@ class EmployeeController extends Controller
     {
 
         DB::transaction(function () use ($request) {
+
             $user = new User;
             $user->name = $request->name;
             $user->email = $request->email;
@@ -50,12 +51,12 @@ class EmployeeController extends Controller
             ];
 
             $employee->save();
-        });
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم اضافة الموظف بنجاح',
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم اضافة الموظف بنجاح',
+            ]);
+        });
     }
 
 

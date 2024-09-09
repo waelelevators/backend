@@ -59,10 +59,16 @@ class PaymentController extends Controller
             'contract_id' => 'required',
             'stage_id' => 'required|integer|between:1,3',
             'amount' => [
-                'required', 'numeric', 'gt:0',
+                'required',
+                'numeric',
+                'gt:0',
                 function ($attribute, $value, $fail) use ($request) {
                     $contract = Contract::find($request->contract_id);
                     $remainingAmount =  $contract->getRemainingAmountInStage($request->stage);
+
+                   
+
+
                     //   $isPreviousStagePaid =  $contract->isPreviousStagePaid($request->stage);
 
                     if ($value === null) {

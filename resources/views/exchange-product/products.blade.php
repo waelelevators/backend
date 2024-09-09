@@ -1,30 +1,24 @@
 <table style="margin-bottom:30px;width:670px" class="pdf table table-bordered table-striped">
     <thead>
         <tr style="background-color:#20536b">
+            <td><span style="color:white">#</span></td>
             <td><span style="color:white">المواد</span></td>
-            <td><span style="color:white">الكميات</span></td>
-            <td><span style="color:white">المواد</span></td>
-            <td><span style="color:white">الكميات</span></td>
-            <td><span style="color:white">المواد</span></td>
-            <td><span style="color:white">الكميات</span></td>
-            <td><span style="color:white">المواد</span></td>
-            <td><span style="color:white">الكميات</span></td>
+            <td><span style="color:white">الاجمالي</span></td>
+            <td><span style="color:white">المستلمة</span></td>
+
         </tr>
     </thead>
     <tbody>
         @foreach ($products as $index => $product)
-            @if ($index % 4 == 0)
-                <tr>
-            @endif
-            <td>{{ $product->product->name }}</td>
-            <td>{{ $product->qty }}</td>
-            @if (($index + 1) % 4 == 0)
-                </tr>
-            @endif
-        @endforeach
-        @if (count($products) % 4 != 0)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $product->product->name }}</td>
+                <td>{{ $product->contractProductItems->qty }}</td>
+                <td>{{ $product->qty }}</td>
+
             </tr>
-        @endif
+        @endforeach
+
     </tbody>
 </table>
 

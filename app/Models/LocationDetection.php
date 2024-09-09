@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class LocationDetection extends Model
 {
     use HasFactory;
+
+    protected $with = ['client'];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 }

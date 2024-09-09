@@ -75,7 +75,7 @@ class WorkOrderLogController extends Controller
                 ], 200);
             } else {
 
-                $emails = $WorkOrder->technicians->pluck('employee.user.email')->toArray();
+                $emails = $WorkOrder->technicians->pluck('employee.email')->toArray();
 
                 MyHelper::pushNotification($emails, [
                     'title' => 'اضافة تعليق على امر العمل رقم #' . $WorkOrder->id,

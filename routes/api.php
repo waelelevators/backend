@@ -118,6 +118,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // معمولة في المودل
     Route::get('contracts/products/{contract_id}/{stage_id}', [ContractController::class, 'products']);
+
     // معمولة في المودل
     Route::post('contracts/products/{contract_id}', [ContractController::class, 'createQuotation']);
 
@@ -341,7 +342,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // عرض العملاء
     Route::get('cliens', function () {
-        $clients =  Client::get(['id','name']);
+        $clients =  Client::get(['id', 'name']);
         return $clients;
     });
     // معمولة في المودل
@@ -398,19 +399,6 @@ Route::middleware('auth:sanctum')->group(function () {
     //     return $product_quantity;
     // });
 
-
-    Route::get('industries', function () {
-
-        $industries = DB::table('industries')->get();
-
-        return $industries->map(function ($industry) {
-
-            return [
-                'id' => $industry->name,
-                'name' => $industry->name,
-            ];
-        });
-    });
 
     Route::get('all_users', function () {
 
@@ -555,10 +543,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    // Route::get('{type}', function ($type) {
-    //     return DB::table($type)->get();
-    // });
-
 
     Route::get('regions', [RegionController::class, 'index']);
     Route::post('regions', [RegionController::class, 'store']);
@@ -622,9 +606,19 @@ Route::get('contract_quotations_data', function () {
     $data = [];
 
     $tables = [
-        "elevator_types", "stops_numbers", "elevator_trips", "machine_loads", "people_loads",
-        'additions', "control_cards", "entrances_numbers", "door_sizes",
-        "machine_types", "machine_speeds", "elevator_warranties", "drive_types"
+        "elevator_types",
+        "stops_numbers",
+        "elevator_trips",
+        "machine_loads",
+        "people_loads",
+        'additions',
+        "control_cards",
+        "entrances_numbers",
+        "door_sizes",
+        "machine_types",
+        "machine_speeds",
+        "elevator_warranties",
+        "drive_types"
     ];
 
     $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
@@ -643,9 +637,15 @@ Route::get('maintenance_data', function () {
     $data = [];
 
     $tables = [
-        "elevator_types", "machine_types", "machine_speeds", "door_sizes",
-        "stops_numbers", "control_cards",
-        "drive_types", "maintenance_types", "building_types"
+        "elevator_types",
+        "machine_types",
+        "machine_speeds",
+        "door_sizes",
+        "stops_numbers",
+        "control_cards",
+        "drive_types",
+        "maintenance_types",
+        "building_types"
     ];
 
     $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();

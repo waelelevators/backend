@@ -93,10 +93,14 @@ class QuotationController extends Controller
             ];
 
             $quotation->representative_id = $representative_id;
+
             $quotation->notes =  $request['notes'];
             $quotation->more_adds =  collect($request['addition']);
             $quotation->template_id =  $request['templateName'];
             $quotation->user_id = Auth::guard('sanctum')->user()->id;
+            $quotation->save();
+
+            $quotation->q_number = 'Qu-' . $quotation->id;
             $quotation->save();
 
             DB::commit();
@@ -184,7 +188,7 @@ class QuotationController extends Controller
     }
 
 
-  
+
     /**
      * Remove the specified resource from storage.
      * @param int $id

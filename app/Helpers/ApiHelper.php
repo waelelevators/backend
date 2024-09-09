@@ -30,6 +30,40 @@ class ApiHelper
         //return response()->json(['url' => $fullPath], 201);
     }
 
+    public static function uploadBase64Pdf($base64Pdf, $path)
+    {
+
+        // Check if the provided base64 string contains a valid PDF header
+        if (!preg_match('#^data:application/pdf;base64,#i', $base64Pdf)) {
+            throw new \Exception('Invalid PDF data.');
+        }
+
+
+        $pdfData = base64_decode(preg_replace('#^data:application/pdf;base64,#i', '', $base64Pdf));
+
+        // Check if the decoding was successful
+        if ($pdfData === false) {
+            throw new \Exception('Failed to decode base64 PDF data.');
+        }
+
+        // Generate a unique filename
+        $filename = uniqid() . '.pdf'; // You can adjust the extension based on the image format
+
+        // Use Storage facade to store the PDF in the public disk
+        try {
+            Storage::disk('public')->put($path . '/' . $filename, $pdfData);
+        } catch (\Exception $e) {
+            // Handle any errors that might occur during file storage
+            throw new \Exception('Failed to upload PDF: ' . $e->getMessage());
+        }
+
+        // $fullPath = 'storage/' . $path . '/' . $filename;
+
+        $fullPath = Storage::url($path . '/' . $filename);
+
+        return $fullPath;
+    }
+
     public static function changeResponseStatus($status, $m_id, $type)
     {
         if ($status == 2) {
@@ -59,7 +93,6 @@ class ApiHelper
     {
         // Attempt to find an existing Representative with the given contract_id and contract_type
         $r = Representative::findOrFail($id);
-
 
         $r->how_did_you_get_to_us = $request['reachUs'];
         $r->name = null;
@@ -375,76 +408,72 @@ class ApiHelper
         $clientType = $request['clientType'];
 
         if ($request->has('phone') && $request['phone'] !== '') {
-            $findClient = Client::whereJsonContains('data->phone', $request['phone'])
-                ->where('type', $clientType)
+            $findClient = Client::where(
+                [
+                    ['phone', $request['phone']],
+                    ['type', $clientType]
+                ]
+            )
                 ->first();
 
             if ($findClient) return $findClient;
         }
 
-        if (isset($request['image'])) $image = ApiHelper::uploadBase64Image($request['image'], 'client');
-        else $image = ''; // صورة الهوية او السجل التجاري
-
         $client =  new Client;
 
         $client->type = $clientType;
 
-        if ($clientType == 1) {
+        switch ($clientType) {
+            case 1:
 
-            $client->data = [
-                'first_name' => $request['firstName'] ?? '',
-                'second_name' => $request['secondName'] ?? '',
-                'third_name' => $request['thirdName'] ?? '',
-                'last_name' => $request['forthName'] ?? '',
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'id_number' => $request['idNumber'] ?? '',
-                'image' => $image ?? '',
-            ];
-        } elseif ($clientType == 2) {
+                if (
+                    !empty($request['firstName']) &&
+                    !empty($request['secondName']) &&
+                    !empty($request['thirdName']) &&
+                    !empty($request['forthName'])
+                ) {
+                    $client->name = "{$request['firstName']}
+                    {$request['secondName']}
+                    {$request['thirdName']}
+                    {$request['forthName']}";
+                } elseif (!empty($request['firstName']) && !empty($request['forthName'])) {
+                    $client->name = "{$request['firstName']} {$request['forthName']}";
+                }
 
-            $client->data = [
-                'name' => $request['companyName'] ?? '',
-                'owner_name' => $request['represents'] ?? '',
-                'commercial_register' => $request['commercial_register'] ?? '',
-                'tax_number' => $request['taxNo'] ?? '',
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'image' => $image ?? '',
-            ];
-        } elseif ($clientType == 3) {
+                if (!empty($request['idNumber'])) {
+                    $client->id_number = $request['idNumber'];
+                }
 
-            $client->data = [
+                $client->first_name = $request['firstName'];
+                $client->second_name = $request['secondName'] ?? '';
+                $client->third_name = $request['thirdName'] ?? '';
+                $client->last_name = $request['forthName'];
 
-                'name' => $request['entityName'] ?? '', // اسم الجهة
-                'id_number' => $request['idNumber'] ?? '', // رقم هوية الممثل
-                'owner_name' => $request['represents'] ?? '', // يمثلها
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'image' => $image ?? '',
-            ];
-        } else {
-            $client->data = [
+                break;
+            case 2:
+                $client->name = $request['companyName'];
+                $client->owner_name = $request['represents'];
+                if (!empty($request['commercialRegistrationNo'])) {
+                    $client->id_number = $request['commercialRegistrationNo'];
+                }
+                if (!empty($request['taxNo'])) {
+                    $client->id_number = $request['taxNo'];
+                }
 
-                'first_name' => $request['firstName'] ?? '',
-                'second_name' => $request['secondName'] ?? '',
-                'third_name' => $request['thirdName'] ?? '',
-                'last_name' => $request['forthName'] ?? '',
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'id_number' => $request['idNumber'] ?? '',
-                'name' => $request['companyName'] ?? '',
-                'owner_name' => $request['represents'] ?? '',
-                'commercial_register' => $request['commercial_register'] ?? '',
-                'tax_number' => $request['taxNo'] ?? '',
-                'image' => $image ?? ''
-            ];
+                break;
+            case 3:
+                $client->name = $request['entityName']; // اسم الجهة
+
+                if (!empty($request['idNumber'])) {
+                    $client->id_number = $request['idNumber'];
+                }
+                $client->owner_name = $request['represents']; // يمثلها
+                break;
         }
 
+        $client->phone = $request['phone'];
+        $client->phone2 = $request['phone2'];
+        $client->whatsapp = $request['whatsapp'];
         $client->save();
         return $client;
     }
@@ -485,68 +514,62 @@ class ApiHelper
             if ($findClient) return $findClient;
         }
 
-        $image = (isset($request['image'])) ? ApiHelper::uploadBase64Image($request['image'], 'client') : ''; // صورة الهوية او السجل التجاري
 
         $client =  new Client;
 
         $client->type = $clientType;
 
-        if ($clientType == 1) {
+        switch ($clientType) {
+            case 1:
 
-            $client->data = [
-                'first_name' => $request['firstName'] ?? '',
-                'second_name' => $request['secondName'] ?? '',
-                'third_name' => $request['thirdName'] ?? '',
-                'last_name' => $request['forthName'] ?? '',
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'id_number' => $request['idNumber'] ?? '',
-                'image' => $image ?? '',
-            ];
-        } elseif ($clientType == 2) {
+                if (
+                    !empty($request['firstName']) &&
+                    !empty($request['secondName']) &&
+                    !empty($request['thirdName']) &&
+                    !empty($request['forthName'])
+                ) {
+                    $client->name = "{$request['firstName']}
+                    {$request['secondName']}
+                    {$request['thirdName']}
+                    {$request['forthName']}";
+                } elseif (!empty($request['firstName']) && !empty($request['forthName'])) {
+                    $client->name = "{$request['firstName']} {$request['forthName']}";
+                }
 
-            $client->data = [
-                'name' => $request['companyName'] ?? '',
-                'owner_name' => $request['represents'] ?? '',
-                'commercial_register' => $request['commercial_register'] ?? '',
-                'tax_number' => $request['taxNo'] ?? '',
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'image' => $image ?? '',
-            ];
-        } elseif ($clientType == 3) {
+                if (!empty($request['idNumber'])) {
+                    $client->id_number = $request['idNumber'];
+                }
 
-            $client->data = [
+                $client->first_name = $request['firstName'];
+                $client->second_name = $request['secondName'] ?? '';
+                $client->third_name = $request['thirdName'] ?? '';
+                $client->last_name = $request['forthName'];
 
-                'name' => $request['entityName'] ?? '', // اسم الجهة
-                'id_number' => $request['idNumber'] ?? '', // رقم هوية الممثل
-                'owner_name' => $request['represents'] ?? '', // يمثلها
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'image' => $image ?? '',
-            ];
-        } else {
-            $client->data = [
+                break;
+            case 2:
+                $client->name = $request['companyName'];
+                $client->owner_name = $request['represents'];
+                if (!empty($request['commercialRegistrationNo'])) {
+                    $client->id_number = $request['commercialRegistrationNo'];
+                }
+                if (!empty($request['taxNo'])) {
+                    $client->id_number = $request['taxNo'];
+                }
 
-                'first_name' => $request['firstName'] ?? '',
-                'second_name' => $request['secondName'] ?? '',
-                'third_name' => $request['thirdName'] ?? '',
-                'last_name' => $request['forthName'] ?? '',
-                'phone' => $request['phone'] ?? '',
-                'phone2' => $request['anotherPhone'] ?? '',
-                'whatsapp' => $request['whatsappPhone'] ?? '',
-                'id_number' => $request['idNumber'] ?? '',
-                'name' => $request['companyName'] ?? '',
-                'owner_name' => $request['represents'] ?? '',
-                'commercial_register' => $request['commercial_register'] ?? '',
-                'tax_number' => $request['taxNo'] ?? '',
-                'image' => $image ?? ''
-            ];
+                break;
+            case 3:
+                $client->name = $request['entityName']; // اسم الجهة
+
+                if (!empty($request['idNumber'])) {
+                    $client->id_number = $request['idNumber'];
+                }
+                $client->owner_name = $request['represents']; // يمثلها
+                break;
         }
 
+        $client->phone = $request['phone'];
+        $client->phone2 = $request['phone2'];
+        $client->whatsapp = $request['whatsapp'];
         $client->save();
         return $client;
     }
