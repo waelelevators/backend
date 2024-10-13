@@ -43,6 +43,9 @@ class ContractController extends Controller
     {
 
         $contracts = Contract::orderByDesc('created_at')->get();
+        dd($contracts);
+
+        // return response()->json($contracts);
 
         return  ContractResource::collection($contracts);
     }
@@ -852,7 +855,7 @@ class ContractController extends Controller
             $contract->note                                        = $request['notes'];
             $contract->save();
 
-            // ApiHelper::updateUsData($request, $request['representativeId']); // كيف وصلت لنا 
+            // ApiHelper::updateUsData($request, $request['representativeId']); // كيف وصلت لنا
 
             $dataArr = is_array($request['externalDoorSpecifications']) ?
                 $request['externalDoorSpecifications'] :
@@ -926,7 +929,7 @@ class ContractController extends Controller
             // Handle any errors that might occur during file storage
             throw new \Exception('Failed to upload PDF: ' . $e->getMessage());
         }
-        
+
         // $fullPath = 'storage/' . $path . '/' . $filename;
 
         $fullPath = Storage::url($path . '/' . $filename);

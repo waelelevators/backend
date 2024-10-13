@@ -18,29 +18,29 @@ class ContractResource extends JsonResource
         return [
 
             'id' => $this->id,
-            'isCompleteStage' => $this->is_complete_stage,
-            'contractNumber' => $this->contract_number,
-            'clientName' => $this->locationDetection->client->name,
-            'idNumber' => $this->locationDetection->client->id_number,
-            'phone' => $this->locationDetection->client->phone,
-            'elevatorType' => $this->elevatorType->name,
-            'stopsNumber' => $this->stopsNumbers->name,
-            'contractStatus' => $this->contract_status,
-            'city' => $this->locationDetection->city->name,
-            'neighborhood' => $this->locationDetection->neighborhood->name,
-            'stage' => $this->stage->name,
-            'total' => $this->total,
-            'remainingCost' => $this->remaining_cost,
-            'discount' => $this->discount,
-            'tax' => $this->tax,
-            'createdAt' => $this->created_at,
+            'isCompleteStage' => $this->is_complete_stage ?? null,
+            'contractNumber' => $this->contract_number ?? null,
+            'clientName' => $this->locationDetection->client->name ?? null,
+            'idNumber' => $this->locationDetection->client->id_number ?? null,
+            'phone' => $this->locationDetection->client->phone ?? null,
+            'elevatorType' => $this->elevatorType->name ?? null,
+            'stopsNumber' => $this->stopsNumbers->name ?? null,
+            'contractStatus' => $this->contract_status ?? null,
+            'city' => $this->locationDetection->city->name ?? null,
+            'neighborhood' => $this->locationDetection->neighborhood->name ?? null,
+            'stage' => $this->stage->name ?? null,
+            'total' => $this->total ?? null,
+            'remainingCost' => $this->remaining_cost ?? null,
+            'discount' => $this->discount ?? null,
+            'tax' => $this->tax ?? null,
+            'createdAt' => $this->created_at ?? null,
 
 
             // 'locationDetection' => $this->locationDetection,
             // 'project_name' => $this->project_name,
             // 'location_data' => $this->location_data,
 
-            // 
+            //
 
 
             // 'elevator_trip' => $this->elevatorTrip,
