@@ -17,10 +17,9 @@ class UpgradeElevatorController extends Controller
      * Display a listing of the resource.
      * @return Renderable
      */
-    public function index($id)
+    public function index()
     {
-        $upgrade = MaintenanceUpgradeElevator::where("m_location_id", $id)->orderByDesc('created_at')->get();
-        return MaintenanceUpgradeResource::collection($upgrade);
+        return [];
     }
 
     /**
@@ -28,79 +27,79 @@ class UpgradeElevatorController extends Controller
      * @param Request $request
      * @return Renderable
      */
-    public function store(UpgradeElevatorStoreRequest $request)
-    {
+    // public function store(UpgradeElevatorStoreRequest $request)
+    // {
 
-        $upgrade = new MaintenanceUpgradeElevator();
+    //     $upgrade = new MaintenanceUpgradeElevator();
 
-        $elevatorsParts = is_array($request['elevatorsParts']) ?
-            $request['elevatorsParts'] :
-            array($request['elevatorsParts']);
+    //     $elevatorsParts = is_array($request['elevatorsParts']) ?
+    //         $request['elevatorsParts'] :
+    //         array($request['elevatorsParts']);
 
-        $upgrade->m_location_id = $request['m_location_id'];
-        $upgrade->elevators_parts = json_encode($elevatorsParts);
-        $upgrade->notes = $request['notes'] ?? '';
-        $upgrade->total_cost = $request['total_cost'];
-        $upgrade->tax = $request['tax'];
-        $upgrade->done_by = $request['done_by'];
-        $upgrade->user_id = Auth::guard('sanctum')->user()->id;
-        $upgrade->save();
+    //     $upgrade->m_location_id = $request['m_location_id'];
+    //     $upgrade->elevators_parts = json_encode($elevatorsParts);
+    //     $upgrade->notes = $request['notes'] ?? '';
+    //     $upgrade->total_cost = $request['total_cost'];
+    //     $upgrade->tax = $request['tax'];
+    //     $upgrade->done_by = $request['done_by'];
+    //     $upgrade->user_id = Auth::guard('sanctum')->user()->id;
+    //     $upgrade->save();
 
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم اضافة القطع  بنجاح',
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'تم اضافة القطع  بنجاح',
+    //     ]);
+    // }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        $model = MaintenanceUpgradeElevator::findOrFail($id);
+    // /**
+    //  * Show the specified resource.
+    //  * @param int $id
+    //  * @return Renderable
+    //  */
+    // public function show($id)
+    // {
+    //     $model = MaintenanceUpgradeElevator::findOrFail($id);
 
-        return $model;
-    }
+    //     return $model;
+    // }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-        $upgrade = MaintenanceUpgradeElevator::findOrFail($id);
+    // /**
+    //  * Update the specified resource in storage.
+    //  * @param Request $request
+    //  * @param int $id
+    //  * @return Renderable
+    //  */
+    // public function update(Request $request, $id)
+    // {
+    //     //
+    //     $upgrade = MaintenanceUpgradeElevator::findOrFail($id);
 
-        $elevatorsParts = is_array($request['elevatorsParts']) ?
-            $request['elevatorsParts'] :
-            array($request['elevatorsParts']);
+    //     $elevatorsParts = is_array($request['elevatorsParts']) ?
+    //         $request['elevatorsParts'] :
+    //         array($request['elevatorsParts']);
 
-        $upgrade->elevators_parts = json_encode($elevatorsParts);
-        $upgrade->notes = $request['notes'] ?? '';
-        $upgrade->total_cost = $request['total_cost'];
-        $upgrade->tax = $request['tax'];
-        $upgrade->done_by = $request['done_by'];
-        $upgrade->user_id = Auth::guard('sanctum')->user()->id;
-        $upgrade->save();
+    //     $upgrade->elevators_parts = json_encode($elevatorsParts);
+    //     $upgrade->notes = $request['notes'] ?? '';
+    //     $upgrade->total_cost = $request['total_cost'];
+    //     $upgrade->tax = $request['tax'];
+    //     $upgrade->done_by = $request['done_by'];
+    //     $upgrade->user_id = Auth::guard('sanctum')->user()->id;
+    //     $upgrade->save();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم تعديل القطع بنجاح',
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'تم تعديل القطع بنجاح',
+    //     ]);
+    // }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    // /**
+    //  * Remove the specified resource from storage.
+    //  * @param int $id
+    //  * @return Renderable
+    //  */
+    // public function destroy($id)
+    // {
+    //     //
+    // }
 }

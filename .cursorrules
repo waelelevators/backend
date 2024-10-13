@@ -9,62 +9,52 @@
     Rule: All business logic must be abstracted into service classes inside each module. Controllers should only handle HTTP requests and responses.
     AI Task: Ensure the generation of service classes for each module, allowing code reuse and easier maintenance.
 
-4. Module-Based API Routes
+3. Module-Based API Routes
 
     Rule: Each module must define its routes in a separate routes/api.php file within the module folder, following RESTful standards.
     AI Task: Ensure that routes are generated and grouped by module, following the REST API conventions for consistency and scalability.
 
-5. Standardized API Responses using Resources
+4. Standardized API Responses using Resources
 
     Rule: Use Laravel API Resources to standardize JSON responses from all modules. Include metadata, pagination, and links as required.
     AI Task: Automatically generate API Resource classes in each module to ensure uniform and scalable responses across the API.
 
-6. Form Request Validation
+5. Form Request Validation
 
     Rule: Every incoming request must be validated using Form Requests to ensure proper data is being processed by the system.
     AI Task: Automatically create Form Request classes for each API route within its respective module, enforcing strong validation rules.
 
-7. Versioned API for Backward Compatibility
+6. Versioned API for Backward Compatibility
 
     Rule: APIs must be versioned (e.g., /api/v1/) to allow backward compatibility and smooth transitions to future updates.
     AI Task: Ensure that API routes within each module are versioned, and automatically suggest version upgrades for breaking changes.
 
-8. Job Queues for Asynchronous Tasks
-
-    Rule: Any time-consuming operations (e.g., generating reports, notifications) should be handled by Laravel Queues to keep the API responsive.
-    AI Task: Automatically dispatch long-running tasks to queues from within the modules, and suggest configuration for queue systems like Redis.
-
-9. Role-Based Access Control (RBAC) in Modules
+7. Role-Based Access Control (RBAC) in Modules
 
     Rule: Implement Role-Based Access Control (RBAC) within each module using policies and gates to handle permissions.
     AI Task: Automatically generate policies and gates for each module based on the required access levels, ensuring security and scalability in permission handling.
 
-10. Database Migrations and Seeding in Modules
+8. Database Migrations and Seeding in Modules
 
     Rule: Every module must define its own database migrations and seeding logic to maintain a modular and scalable database structure.
     AI Task: Automatically generate migration and seeding files for each module, ensuring compatibility with Laravel's migration system.
 
-11. Caching for Improved Performance
+9. Caching for Improved Performance
 
     Rule: Frequently accessed data should be cached using Laravel Cache (Redis, Memcached, etc.) to improve response times and scalability.
     AI Task: Automatically detect which data can be cached, and generate caching mechanisms for data-heavy modules.
 
-12. Testing and Test Coverage
-
-    Rule: Each module must have comprehensive unit tests and integration tests to ensure the application remains stable as it scales.
-    AI Task: Automatically generate unit tests for controllers, services, and repositories within each module, ensuring full test coverage.
-
-13. API Rate Limiting for Scalability
+10. API Rate Limiting for Scalability
 
     Rule: Use Laravel’s throttle middleware to limit the number of requests to the API and prevent abuse.
     AI Task: Automatically apply rate limiting to sensitive or high-traffic API routes within each module.
 
-14. Error Handling and Logging in Modules
+11. Error Handling and Logging in Modules
 
     Rule: Each module should handle errors gracefully and log them to ensure issues can be tracked and resolved efficiently.
     AI Task: Ensure each module has its own error handling logic and logs errors to a central logging system (e.g., using Laravel's logging facilities).
 
-15. Dependency Injection for Maintainability
+12. Dependency Injection for Maintainability
 
     Rule: Use dependency injection for services and repositories in all controllers and other classes to improve code maintainability.
     AI Task: Automatically inject dependencies in the constructor of controllers and services within each module, following Laravel’s service container rules

@@ -110,4 +110,7 @@ Route::prefix('maintenance')->group(function () {
 
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
     });
+
+    // upgrades
+    Route::get('/upgrades', [UpgradeElevatorController::class, 'index']);
 });

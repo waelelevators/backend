@@ -5,20 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MaintenanceUpdate extends Model
+class MaintenanceUpgrade extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'maintenance_contract_id',
-        'description',
-        'product_id',
-        'productable',
-        'quantity',
-        'tax',
-        'subtotal',
-        'price',
-        'notes',
         'status',
+        'city_id',
+        'user_id',
+        'neighborhood_id',
+        'latitude',
+        'longitude',
+        'client_id',
+        'elevator_type_id',
+        'building_type_id',
+        'stops_count',
+        'has_window',
+        'has_stairs',
+        'site_images',
+        'total',
+        'tax',
+        'discount',
+        'net_price'
     ];
 
     public function maintenanceContract()
@@ -29,5 +38,10 @@ class MaintenanceUpdate extends Model
     public function requiredProducts()
     {
         return $this->morphMany(RequiredProduct::class, 'productable');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Client::class);
     }
 }
