@@ -1,7 +1,8 @@
 <?php
 
-
-
+use App\Models\Employee;
+use App\Models\Fault;
+use App\Models\Product;
 use App\Models\Region;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ use Modules\Maintenance\Http\Controllers\MonthlyMaintenanceController;
 use Modules\Maintenance\Http\Controllers\MonthlyMaintenanceTechnicantController;
 use Modules\Maintenance\Http\Controllers\QuotationController;
 use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
+use Modules\Maintenance\Http\Controllers\ReportController;
+use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,97 +33,75 @@ use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 |
 */
 
-Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
+// Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
-    // ..
-    Route::get('location_data', [MaintenanceController::class, 'location']);
-    Route::get('malfunction_data', [MaintenanceController::class, 'malfunction']);
+// });
 
-    //   كشف الموقع
-    Route::post('location_detections', [LocationDetectionController::class, 'store']);
-    Route::get('location_detections', [LocationDetectionController::class, 'index']);
-    Route::get('location_detections/{id?}', [LocationDetectionController::class, 'show']);
-    Route::put('location_detections/{id}', [LocationDetectionController::class, 'update']);
-    //  Route::get('location_detections/change_status', [LocationDetectionController::class, 'changeStatus']);
-    Route::delete('location_detections/{id?}', [LocationDetectionController::class, 'destroy']);
+// prefix maintenance
+Route::prefix('maintenance')->group(function () {
 
-    //    تحديث مصعد
-    Route::post('upgrade_elevators', [UpgradeElevatorController::class, 'store']);
-    Route::get('upgrade_elevators/parts/{id?}', [UpgradeElevatorController::class, 'index']);
-    Route::get('upgrade_elevators/{id?}', [UpgradeElevatorController::class, 'show']);
-    Route::put('upgrade_elevators/{id}', [UpgradeElevatorController::class, 'update']);
-    Route::delete('upgrade_elevators/{id?}', [UpgradeElevatorController::class, 'destroy']);
+    Route::get('/reports', [ReportController::class, 'index']); // جلب كل البلاغات
+    Route::get('/reports/{id}', [ReportController::class, 'show']); // جلب بلاغ معين
+    Route::post('/reports/initial', [ReportController::class, 'createInitialReport']); // المرحلة الأولى
+    // الرحله الثانيه اضافة فني الصيانه
+    Route::post('/reports/assign-technician', [ReportController::class, 'assignTechnicianToReport']);
+    Route::post('/reports/problems', [ReportController::class, 'addProblemsToReport']);
+    // approve report
+    Route::post('/reports/approve', [ReportController::class, 'approveReport']);
 
-    //  عروض الاسعار
-    Route::post('quotations', [QuotationController::class, 'store']);
-    Route::get('quotations', [QuotationController::class, 'index']);
-    Route::get('quotations/{id?}', [QuotationController::class, 'show']);
-    Route::put('quotations/{id}', [QuotationController::class, 'update']);
-    Route::delete('quotations/{id?}', [QuotationController::class, 'destroy']);
+    // اضافة الاسبيرات او المنتجات المستخدمه في الصيانه
+    // Route::post('/reports/add-required-products', [ReportController::class, 'addRequiredProductsToReport']);
+    // products
+    Route::get('/products', function () {
+        $products = Product::all();
+        return [
+            'data' => $products
+        ];
+    });
 
-    Route::get('quotations/search/{idNumber?}', [QuotationController::class, 'search']);
+    // add products to report
+    Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
 
-    // حالة عقد الصيانة
-    Route::get('m_status', [MaintenanceStatusController::class, 'index']);
+    Route::get('/contracts', [MaintenanceContractController::class, 'index']);
+    // contracts/:id
+    Route::get('/contracts/{id}', [MaintenanceContractController::class, 'show']);
 
-    // المناطق
-    Route::get('area', [AreaController::class, 'index']);
-    Route::post('area', [AreaController::class, 'store']);
-    Route::put('area/{id}', [AreaController::class, 'update']);
-    Route::get('area/{id?}', [AreaController::class, 'show']);
-    Route::delete('area/{id?}', [AreaController::class, 'destroy']);
+    Route::post('/contracts', [MaintenanceContractController::class, 'store']);
 
-    // عقودات الصيانة
-    Route::post('m_info', [MaintenanceInfoController::class, 'store']);
-    Route::get('m_info/m_status={id?}', [MaintenanceInfoController::class, 'index']);
-    Route::get('m_info/{id?}', [MaintenanceInfoController::class, 'show']);
-    Route::put('m_info/{id}', [MaintenanceInfoController::class, 'update']);
+    // technicians
+    Route::get('/technicians', function () {
+        $technicians = Employee::all();
+        return [
+            'data' => $technicians
+        ];
+    });
 
 
-    // العقودات الحالية
-    Route::get('current_contracts/m_status={id?}', [CurrentMaintenanceController::class, 'index']);
-    Route::get('current_contracts/{id?}', [CurrentMaintenanceController::class, 'show']);
-
-
-    // توزيع العقودات 
-    Route::put('m_dis/{id?}', [MaintenanceDistributionController::class, 'update']);
-    Route::get('m_dis/area_id={id?}', [MaintenanceDistributionController::class, 'index']);
-
-    // دفعيات الصيانة
-    Route::post('payments', [MaintenancePaymentController::class, 'store']);
-    Route::get('payments', [MaintenancePaymentController::class, 'index']);
-
-
-    //  الصيانات الشهرية او الزيارات الشهرية
-    Route::get('monthly', [MonthlyMaintenanceController::class, 'index']);
-    Route::post('monthly', [MonthlyMaintenanceController::class, 'store']);
-    Route::get('monthly/{id?}', [MonthlyMaintenanceController::class, 'show']);
-    Route::put('monthly/{id}', [MonthlyMaintenanceController::class, 'update']);
-
-    // زيارات الفنيين الشهرية
-    Route::post('monthly_tech', [MonthlyMaintenanceTechnicantController::class, 'store']);
-    Route::get('monthly_tech', [MonthlyMaintenanceTechnicantController::class, 'index']);
-    Route::get('monthly_tech/{id?}', [MonthlyMaintenanceTechnicantController::class, 'show']);
-    Route::put('monthly_tech/{id}', [MonthlyMaintenanceTechnicantController::class, 'update']);
-
-
-    // الاعطال  
-    Route::post('malfunctions', [MalfunctionController::class, 'store']);
-    Route::get('malfunctions', [MalfunctionController::class, 'index']);
-    Route::get('malfunctions/{id?}', [MalfunctionController::class, 'show']);
-    Route::put('malfunctions/{id}', [MalfunctionController::class, 'update']);
+    // faults
+    Route::get('/faults', function () {
+        $faults = Fault::all();
+        return [
+            'data' => $faults
+        ];
+    });
 
 
     Route::get('maintenance_data', function () {
         $data = [];
 
         $tables = [
-            "elevator_types", "machine_types", "machine_speeds", "door_sizes",
-            "stops_numbers", "control_cards",
-            "drive_types", "maintenance_types", "building_types", "maintenance_statuses"
+            "elevator_types",
+            "machine_types",
+            "machine_speeds",
+            "door_sizes",
+            "stops_numbers",
+            "control_cards",
+            "drive_types",
+            "maintenance_types",
+            "building_types"
         ];
 
-        $regionsWithCity =   Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
+        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
 
         foreach ($tables as $table) {
             // get name and id for each table
@@ -128,10 +109,5 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
         }
 
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
-    });
-
-    //   نوع العطل
-    Route::get('{type}', function ($type) {
-        return DB::table($type)->get(['id', 'name']);
     });
 });

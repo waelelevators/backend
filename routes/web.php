@@ -5,8 +5,9 @@ use App\Http\Controllers\PdfContractController;
 use App\Http\Controllers\PdfExchangeProductController;
 use App\Http\Controllers\PdfInstallationLDController;
 use App\Http\Controllers\PdfQuotationController;
+use App\Models\MaintenanceReport;
 use Illuminate\Support\Facades\Route;
-
+use Modules\Maintenance\Entities\MaintenanceContract;
 
 // use PDF;
 
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+
+Route::get('maintenance-contract-logs', function () {
+    return MaintenanceReport::find(1)->load('requiredProducts', 'requiredProducts.product', 'technician', 'user');
+});
 
 
 // Route::get('/ahmedhmed/{id}', function ($id) {
