@@ -113,4 +113,7 @@ Route::prefix('maintenance')->group(function () {
 
     // upgrades
     Route::get('/upgrades', [UpgradeElevatorController::class, 'index']);
+    Route::post('/upgrades', [UpgradeElevatorController::class, 'store']);
+
+    Route::get('/upgrades/{id}', [UpgradeElevatorController::class, 'show']);
 });

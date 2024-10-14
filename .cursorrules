@@ -44,11 +44,6 @@
     Rule: Frequently accessed data should be cached using Laravel Cache (Redis, Memcached, etc.) to improve response times and scalability.
     AI Task: Automatically detect which data can be cached, and generate caching mechanisms for data-heavy modules.
 
-10. API Rate Limiting for Scalability
-
-    Rule: Use Laravel’s throttle middleware to limit the number of requests to the API and prevent abuse.
-    AI Task: Automatically apply rate limiting to sensitive or high-traffic API routes within each module.
-
 11. Error Handling and Logging in Modules
 
     Rule: Each module should handle errors gracefully and log them to ensure issues can be tracked and resolved efficiently.
@@ -58,3 +53,9 @@
 
     Rule: Use dependency injection for services and repositories in all controllers and other classes to improve code maintainability.
     AI Task: Automatically inject dependencies in the constructor of controllers and services within each module, following Laravel’s service container rules
+
+13. Authentication using Laravel Sanctum
+
+14. Module Documentation
+
+    Rule: Each module must include a README file with a description of the module, its purpose, and how to use it.

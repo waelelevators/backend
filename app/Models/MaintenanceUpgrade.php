@@ -27,7 +27,8 @@ class MaintenanceUpgrade extends Model
         'total',
         'tax',
         'discount',
-        'net_price'
+        'net_price',
+        'speed_id',
     ];
 
     public function maintenanceContract()
@@ -40,8 +41,38 @@ class MaintenanceUpgrade extends Model
         return $this->morphMany(RequiredProduct::class, 'productable');
     }
 
-    public function customer()
+    public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class);
+    }
+
+    public function speed()
+    {
+        return $this->belongsTo(MachineSpeed::class);
+    }
+
+    public function elevatorType()
+    {
+        return $this->belongsTo(ElevatorType::class);
+    }
+
+    public function buildingType()
+    {
+        return $this->belongsTo(BuildingType::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

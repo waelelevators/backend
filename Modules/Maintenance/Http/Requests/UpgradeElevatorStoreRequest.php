@@ -23,15 +23,6 @@ class UpgradeElevatorStoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'm_location_id' => 'required|exists:maintenance_location_detections,id',
-            //'elevatorsParts' => 'required|json',
-            'total_cost' => 'required|numeric|min:0',
-            'discount' => 'numeric|min:0',
-            'tax' => 'numeric|min:0',
-            'status' => 'integer|in:0,1,2', // Add more values if needed
-            'done_by' => 'required|exists:users,id',
-     
-        ];
+        return [];
     }
 }

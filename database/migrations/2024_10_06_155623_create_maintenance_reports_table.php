@@ -15,13 +15,13 @@ class CreateMaintenanceReportsTable extends Migration
     {
         Schema::create('maintenance_reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('maintenance_contract_id')->constrained('maintenance_contracts');
-            $table->string('status');
+            $table->integer('maintenance_contract_id');
+            $table->string('status')->default('created');
             $table->json('problems');
-            $table->decimal('tax', 8, 2);
-            $table->decimal('price_without_tax', 10, 2);
+            $table->decimal('tax', 8, 2)->default(0);
+            $table->decimal('price_without_tax', 10, 2)->default(0);
             $table->decimal('discount', 8, 2)->default(0);
-            $table->decimal('final_price', 10, 2);
+            $table->decimal('final_price', 10, 2)->default(0);
             $table->timestamps();
         });
     }

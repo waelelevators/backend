@@ -104,7 +104,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('contract/{contract}/assign', [ContractController::class, 'assign']);
     // Route::apiResource('contract_data', [ContractController::class, 'contract_data']);
 
-    // العملاء 
+    // العملاء
     Route::get('client', [ClientsController::class, 'index']);
     Route::get('client/{id?}', [ClientsController::class, 'show']);
     Route::post('client', [ClientsController::class, 'store']);
@@ -561,101 +561,131 @@ Route::middleware('auth:sanctum')->group(function () {
 
         return DB::table($tableName)->insert($request->all());
     });
+
+
+
+
+    Route::get('rule_categories', [PermissionsController::class, 'index']);
+    Route::post('rule_categories', [PermissionsController::class, 'ruleCategory']);
+
+    Route::post('rules', [PermissionsController::class, 'updateRule']);
+    Route::get('rules/{id?}', [PermissionsController::class, 'rules']);
+    Route::get('rules/{ruleId}/items', [PermissionsController::class, 'ruleItems']);
+
+    Route::post('login', [AuthController::class, 'login']);
+
+
+    Route::post('your-laravel-upload-endpoint', function (Request $request) {
+        $base64File = $request->input('file');
+
+        // Decode the base64 string to get the binary data
+        $fileData = base64_decode($base64File);
+
+        // Save the file to storage or perform any other necessary operations
+        // Example: Save the file to storage
+        $filePath = 'uploads/' . time() . '_' . 'ahmed' . '.png';
+        Storage::disk('public')->put($filePath, $fileData);
+
+        // You can return a response as needed
+        return response()->json(['message' => 'File uploaded successfully', 'path' => $filePath]);
+    });
+
+
+    /************************************** quotations  ***************************************************************/
+
+    Route::apiResource('contract_quotations', contractQuotationsController::class);
+
+    // Route::get('contract_quotations', [contractQuotationsController::class, 'index']);
+    // Route::get('contract_quotations/{id?}', [contractQuotationsController::class, 'show']);
+    // Route::post('contract_quotations', [contractQuotationsController::class, 'store']);
+    // Route::put('contract_quotations/{id}', [contractQuotationsController::class, 'update']);
+    // Route::delete('contract_quotations/{id}', [contractQuotationsController::class, 'destroy']);
+
+    Route::get('contract_quotations_data', function () {
+        $data = [];
+
+        $tables = [
+            "elevator_types",
+            "stops_numbers",
+            "elevator_trips",
+            "machine_loads",
+            "people_loads",
+            'additions',
+            "control_cards",
+            "entrances_numbers",
+            "door_sizes",
+            "machine_types",
+            "machine_speeds",
+            "elevator_warranties",
+            "drive_types"
+        ];
+
+        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
+
+        foreach ($tables as $table) {
+            // get name and id for each table
+            $data[$table] = DB::table($table)->get();
+        }
+
+        return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
+
+        //return response($data);
+    });
+
+    Route::get(
+        'clients-data',
+        function () {
+
+            $data = [];
+
+
+            $tables = [
+                "building_types",
+                "clients",
+                "employees",
+            ];
+
+
+            foreach ($tables as $table) {
+                // get name and id for each table
+                $data[$table] = DB::table($table)->get();
+            }
+
+            $regionsWithCities =  Region::whereHas(relation: 'cities.neighborhoods')->with('cities.neighborhoods')->get();
+
+            return response()->json([
+                'data' => $data,
+                'regionsWithCities' => $regionsWithCities
+            ]);
+        }
+    );
+
+    Route::get('maintenance_data', function () {
+        $data = [];
+
+        $tables = [
+            "elevator_types",
+            "machine_types",
+            "machine_speeds",
+            "door_sizes",
+            "stops_numbers",
+            "control_cards",
+            "drive_types",
+            "maintenance_types",
+            "building_types"
+        ];
+
+        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
+
+        foreach ($tables as $table) {
+            // get name and id for each table
+            $data[$table] = DB::table($table)->get();
+        }
+
+        return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
+    });
 });
 
 
-
-
-Route::get('rule_categories', [PermissionsController::class, 'index']);
-Route::post('rule_categories', [PermissionsController::class, 'ruleCategory']);
-
-Route::post('rules', [PermissionsController::class, 'updateRule']);
-Route::get('rules/{id?}', [PermissionsController::class, 'rules']);
-Route::get('rules/{ruleId}/items', [PermissionsController::class, 'ruleItems']);
-
-Route::post('login', [AuthController::class, 'login']);
-
-
-Route::post('your-laravel-upload-endpoint', function (Request $request) {
-    $base64File = $request->input('file');
-
-    // Decode the base64 string to get the binary data
-    $fileData = base64_decode($base64File);
-
-    // Save the file to storage or perform any other necessary operations
-    // Example: Save the file to storage
-    $filePath = 'uploads/' . time() . '_' . 'ahmed' . '.png';
-    Storage::disk('public')->put($filePath, $fileData);
-
-    // You can return a response as needed
-    return response()->json(['message' => 'File uploaded successfully', 'path' => $filePath]);
-});
-
-
-/************************************** quotations  ***************************************************************/
-
-Route::apiResource('contract_quotations', contractQuotationsController::class);
-
-// Route::get('contract_quotations', [contractQuotationsController::class, 'index']);
-// Route::get('contract_quotations/{id?}', [contractQuotationsController::class, 'show']);
-// Route::post('contract_quotations', [contractQuotationsController::class, 'store']);
-// Route::put('contract_quotations/{id}', [contractQuotationsController::class, 'update']);
-// Route::delete('contract_quotations/{id}', [contractQuotationsController::class, 'destroy']);
-
-Route::get('contract_quotations_data', function () {
-    $data = [];
-
-    $tables = [
-        "elevator_types",
-        "stops_numbers",
-        "elevator_trips",
-        "machine_loads",
-        "people_loads",
-        'additions',
-        "control_cards",
-        "entrances_numbers",
-        "door_sizes",
-        "machine_types",
-        "machine_speeds",
-        "elevator_warranties",
-        "drive_types"
-    ];
-
-    $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
-
-    foreach ($tables as $table) {
-        // get name and id for each table
-        $data[$table] = DB::table($table)->get();
-    }
-
-    return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
-
-    //return response($data);
-});
-
-Route::get('maintenance_data', function () {
-    $data = [];
-
-    $tables = [
-        "elevator_types",
-        "machine_types",
-        "machine_speeds",
-        "door_sizes",
-        "stops_numbers",
-        "control_cards",
-        "drive_types",
-        "maintenance_types",
-        "building_types"
-    ];
-
-    $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
-
-    foreach ($tables as $table) {
-        // get name and id for each table
-        $data[$table] = DB::table($table)->get();
-    }
-
-    return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
-});
 
 /************************************** quotations  ***************************************************************/

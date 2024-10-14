@@ -25,6 +25,10 @@ class CreateMaintenanceVisitsTable extends Migration
             $table->string('notes')->nullable();
             $table->string('test_checklist')->nullable();
             $table->boolean('customer_approval')->default(false);
+
+
+
+
             $table->timestamps();
         });
     }

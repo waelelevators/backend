@@ -14,18 +14,19 @@ class CreateMaintenanceContractDetailsTable extends Migration
     public function up()
     {
         Schema::create('maintenance_contract_details', function (Blueprint $table) {
+
             $table->id();
-            $table->bigInteger('installation_contract_id')->unsigned();
-            $table->string('customer_id');
+            $table->string('installation_contract_id');
+            $table->string('client_id');
             $table->string('user_id');
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
-            $table->integer('visits_count')->nullable();
-            $table->decimal('cost', 10, 2)->nullable();
+            $table->string('start_date')->nullable();
+            $table->string('end_date')->nullable();
+            $table->string('visits_count')->nullable();
+            $table->string('cost')->nullable();
             $table->text('notes')->nullable();
-            $table->integer('remaining_visits')->nullable();
-            $table->integer('cancellation_allowance')->nullable()->default(1); // يمكن للعميل الاعتذار عن الزياره مرات محدده فقط
-            $table->string('payment_status')->nullable()->default('unpaid');
+            $table->string('remaining_visits')->nullable()->default(0);
+            $table->string('cancellation_allowance')->nullable()->default(1);
+            $table->enum('payment_status', ['pending', 'paid', 'failed'])->nullable();
             $table->string('receipt_attachment')->nullable();
             $table->string('contract_attachment')->nullable();
             $table->timestamps();

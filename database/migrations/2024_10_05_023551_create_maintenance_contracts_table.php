@@ -14,23 +14,24 @@ class CreateMaintenanceContractsTable extends Migration
     public function up()
     {
         Schema::create('maintenance_contracts', function (Blueprint $table) {
+
             $table->id();
-            $table->string('contract_number')->unique();
-            $table->string('area');
+            $table->string('contract_number');
+            $table->string('area_id');
             $table->string('user_id');
-            $table->enum('contract_type', ['contract', 'draft'])->default('draft');
-            $table->decimal('total', 10, 2);
-            $table->string('city_id');
-            $table->string('neighborhood_id');
-            $table->float('latitude')->nullable();
-            $table->float('longitude')->nullable();
-            $table->string('customer_id');
-            $table->string('elevator_type_id');
-            $table->string('building_type_id');
-            $table->integer('stops_count');
+            $table->string('contract_type')->default('draft');
+            $table->decimal('total', 10, 2)->default(0);
+            $table->string('city_id')->nullable();
+            $table->string('neighborhood_id')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('client_id')->nullable();
+            $table->string('elevator_type_id')->nullable();
+            $table->string('building_type_id')->nullable();
+            $table->integer('stops_count')->nullable();
             $table->boolean('has_window')->default(false);
             $table->boolean('has_stairs')->default(false);
-            $table->string('site_images')->nullable();
+            $table->json('site_images')->nullable();
             $table->timestamps();
         });
     }
