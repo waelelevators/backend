@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Maintenance\Enums\MaintenanceUpgradeStatus;
 
 class MaintenanceUpgrade extends Model
 {
@@ -29,12 +30,25 @@ class MaintenanceUpgrade extends Model
         'discount',
         'net_price',
         'speed_id',
+        'attachment_contract',
+        'attachment_receipt',
+        'rejection_reason',
     ];
+
+    // table maintenance_upgrades
+    protected $table = 'maintenance_upgrades';
+
+    protected $casts = [
+        'status' => MaintenanceUpgradeStatus::class,
+    ];
+
+
 
     public function maintenanceContract()
     {
         return $this->belongsTo(MaintenanceContract::class);
     }
+
 
     public function requiredProducts()
     {
@@ -63,16 +77,27 @@ class MaintenanceUpgrade extends Model
 
     public function elevatorType()
     {
-        return $this->belongsTo(ElevatorType::class);
+        return $this->belongsTo(ElevatorType::class, 'elevator_type_id');
     }
 
     public function buildingType()
     {
-        return $this->belongsTo(BuildingType::class);
+        return $this->belongsTo(BuildingType::class, 'building_type_id');
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+
+    public function products()
+    {
+        return $this->morphMany(RequiredProduct::class, 'productable');
+    }
+    // logs
+    public function logs()
+    {
+        return $this->morphMany(GeneralLog::class, 'loggable');
     }
 }

@@ -8,6 +8,7 @@ use App\Models\MaintenanceUpgrade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Modules\Maintenance\Enums\MaintenanceUpgradeStatus;
 
 class UpgradeElevatorService
 {
@@ -17,8 +18,8 @@ class UpgradeElevatorService
 
         $user = auth('sanctum')->user();
         return DB::transaction(function () use ($data, $user) {
-            // $client = ApiHelper::handleClientData($data);
-            $client_id = 1;
+            $client = ApiHelper::handleClientData($data);
+            $client_id = $client->id;
 
             $taxValue = 0.15;
             $total = $data['total'];
@@ -45,7 +46,7 @@ class UpgradeElevatorService
                 'neighborhood_id' => $data['neighborhood'],
                 'speed_id' => $data['speed'],
                 'building_type_id' => $data['building_type_id'],
-                'status' => 'pending',
+                'status' => MaintenanceUpgradeStatus::PENDING,
                 'tax' => $tax,
 
 

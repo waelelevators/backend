@@ -33,8 +33,8 @@ class ElevatorType extends Model
         'id' => 'integer',
     ];
 
-    public function contractQuotations(): HasMany
-    {
-        return $this->hasMany(ContractQuotations::class);
-    }
+    // public function contractQuotations(): HasMany
+    // {
+    //     return $this->hasMany(Contract::class);
+    // }
 }

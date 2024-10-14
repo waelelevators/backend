@@ -37,10 +37,6 @@ class MaintenanceReport extends Model
         return $this->belongsTo(MaintenanceContract::class);
     }
 
-    public function products()
-    {
-        return $this->morphMany(RequiredProduct::class, 'productable');
-    }
 
 
     public function technician()

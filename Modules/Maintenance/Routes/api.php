@@ -21,6 +21,7 @@ use Modules\Maintenance\Http\Controllers\QuotationController;
 use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
+use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +115,19 @@ Route::prefix('maintenance')->group(function () {
     // upgrades
     Route::get('/upgrades', [UpgradeElevatorController::class, 'index']);
     Route::post('/upgrades', [UpgradeElevatorController::class, 'store']);
+    Route::post('/upgrades/upload-attachment', [UpgradeElevatorController::class, 'uploadAttachment']);
 
     Route::get('/upgrades/{id}', [UpgradeElevatorController::class, 'show']);
+
+    // rejectUpgrade
+    Route::post('/upgrades/reject', [UpgradeElevatorController::class, 'rejectUpgrade']);
+    // acceptUpgrade
+    Route::post('/upgrades/accept', [UpgradeElevatorController::class, 'acceptUpgrade']);
+    Route::post('/upgrades/add-required-products', [UpgradeElevatorController::class, 'addRequiredProducts']);
+
+
+    // MaintenanceVisit
+    Route::get('/visits', [MaintenanceVisitController::class, 'index']);
+    Route::get('/visits/{id}', [MaintenanceVisitController::class, 'show']);
+    Route::post('/visits', [MaintenanceVisitController::class, 'store']);
 });
