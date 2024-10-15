@@ -32,7 +32,8 @@ class MaintenanceContractController extends Controller
 
     public function show($id)
     {
-        $contract = MaintenanceContract::findOrFail($id);
+        $contract = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType', 'contractDetails', 'activeContract', 'client', 'logs')->findOrFail($id);
+        // return $contract;
         return new MaintenanceContractResource($contract);
     }
 }

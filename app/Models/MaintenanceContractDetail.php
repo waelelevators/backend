@@ -36,6 +36,12 @@ class MaintenanceContractDetail extends Model
         return $this->belongsTo(User::class);
     }
 
+    // visits
+    public function visits()
+    {
+        return $this->hasMany(MaintenanceVisit::class);
+    }
+
     // logs
     public function logs()
     {

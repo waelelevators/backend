@@ -2,6 +2,7 @@
 
 namespace Modules\Maintenance\Entities;
 
+use App\Models\MaintenanceVisit;
 use Illuminate\Database\Eloquent\Model;
 
 class MaintenanceContractDetail extends Model
@@ -25,5 +26,10 @@ class MaintenanceContractDetail extends Model
     public function contract()
     {
         return $this->belongsTo(MaintenanceContract::class, 'installation_contract_id');
+    }
+
+    public function visits()
+    {
+        return $this->hasMany(MaintenanceVisit::class);
     }
 }

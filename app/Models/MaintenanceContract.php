@@ -36,6 +36,19 @@ class MaintenanceContract extends Model
         return $this->belongsTo(ElevatorType::class);
     }
 
+    // contract details
+    public function contractDetails()
+    {
+        return $this->hasMany(MaintenanceContractDetail::class, 'maintenance_contract_id');
+    }
+
+
+    // active_contract_id
+    public function activeContract()
+    {
+        return $this->belongsTo(MaintenanceContractDetail::class, 'active_contract_id');
+    }
+
     // logs
     public function logs()
     {
