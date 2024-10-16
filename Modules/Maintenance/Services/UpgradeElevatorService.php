@@ -5,6 +5,7 @@ namespace Modules\Maintenance\Services;
 use App\Helpers\ApiHelper;
 use App\Models\Client;
 use App\Models\MaintenanceUpgrade;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,9 +14,8 @@ use Modules\Maintenance\Enums\MaintenanceUpgradeStatus;
 class UpgradeElevatorService
 {
 
-    public function createUpgrade(array $data)
+    public function createUpgrade($data)
     {
-
         $user = auth('sanctum')->user();
         return DB::transaction(function () use ($data, $user) {
             $client = ApiHelper::handleClientData($data);

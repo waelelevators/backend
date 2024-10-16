@@ -686,6 +686,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+Route::get('test', function () {
+    return response()->json(['data' => ['message' => 'Hello, world!']]);
+});
+
 
 
 /************************************** quotations  ***************************************************************/

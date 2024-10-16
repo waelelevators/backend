@@ -34,9 +34,10 @@ class UpgradeElevatorController extends Controller
         return new MaintenanceUpgradeResource($upgrade);
     }
 
-    public function store(UpgradeElevatorStoreRequest $request)
+    public function store(Request $request)
     {
-        $upgrade = $this->upgradeService->createUpgrade($request->validated());
+        // dd($request->all());
+        $upgrade = $this->upgradeService->createUpgrade($request->all());
 
         return new MaintenanceUpgradeResource($upgrade);
         try {

@@ -15,6 +15,11 @@ class CreateGeneralLogsTable extends Migration
     {
         Schema::create('general_logs', function (Blueprint $table) {
             $table->id();
+            $table->morphs('loggable');
+            $table->integer('user_id');
+            $table->string('action');
+            $table->text('comment')->nullable();
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

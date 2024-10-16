@@ -28,7 +28,7 @@ class MaintenanceVisit extends Model
     // relations
     public function maintenanceContract()
     {
-        return $this->belongsTo(MaintenanceContract::class);
+        return $this->belongsTo(MaintenanceContract::class, 'maintenance_contract_id', 'id');
     }
 
     public function maintenanceContractDetail()

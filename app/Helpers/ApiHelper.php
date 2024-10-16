@@ -283,7 +283,7 @@ class ApiHelper
             ->where('type', $clientType)
             ->first();
 
-        if ($findClient) return $findClient; // العميل موجود مسبقا 
+        if ($findClient) return $findClient; // العميل موجود مسبقا
 
         $client =  new Client;
         $client->type = $clientType;
@@ -351,7 +351,7 @@ class ApiHelper
             ->where('type', $clientType)
             ->first();
 
-        if ($findClient) return $findClient; // العميل موجود مسبقا 
+        if ($findClient) return $findClient; // العميل موجود مسبقا
 
         $client =  new Client;
         $clientType = $request['clientType'];
@@ -479,6 +479,7 @@ class ApiHelper
     }
     public static  function handleClientData($request)
     {
+
 
         $clientType = $request['clientType'];
 

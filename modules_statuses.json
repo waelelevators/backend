@@ -4,5 +4,6 @@
     "Installation": true,
     "Maintenance": true,
     "Migration": true,
-    "Purchase": true
+    "Purchase": true,
+    "Mobile": true
 }

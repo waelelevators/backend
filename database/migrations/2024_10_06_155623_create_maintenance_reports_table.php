@@ -18,6 +18,8 @@ class CreateMaintenanceReportsTable extends Migration
             $table->integer('maintenance_contract_id');
             $table->string('status')->default('created');
             $table->json('problems');
+            $table->text('notes')->nullable();
+            $table->integer('technician_id')->nullable();
             $table->decimal('tax', 8, 2)->default(0);
             $table->decimal('price_without_tax', 10, 2)->default(0);
             $table->decimal('discount', 8, 2)->default(0);
