@@ -25,8 +25,8 @@ class MaintenanceContractController extends Controller
 
     public function store(MaintenanceContractStoreRequest $request)
     {
-
-        $contract = $this->maintenanceContractService->createContract($request->validated());
+        // return $request;
+        $contract = $this->maintenanceContractService->createContract($request->all());
         return new MaintenanceContractResource($contract);
     }
 

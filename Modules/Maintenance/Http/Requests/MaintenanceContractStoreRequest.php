@@ -14,7 +14,7 @@ class MaintenanceContractStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'contract_number' => 'required|unique:maintenance_contracts,contract_number',
+            // 'contract_number' => 'required|unique:maintenance_contracts,contract_number',
             'area_id' => 'required|exists:areas,id',
             'contract_type' => 'in:contract,draft',
             'total' => 'numeric',
@@ -33,7 +33,7 @@ class MaintenanceContractStoreRequest extends FormRequest
             'start_date' => 'required',
             'end_date' => 'required',
             'visits_count' => 'required|integer',
-            'cost' => 'required|numeric',
+            // 'cost' => 'required|numeric',
             'notes' => 'nullable|string',
             'cancellation_allowance' => 'nullable|numeric',
             'receipt_attachment' => 'nullable|file|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif|max:2048',
