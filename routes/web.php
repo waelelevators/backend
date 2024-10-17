@@ -27,7 +27,8 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 Route::get('maintenance-contract-logs', function () {
 
-    return MaintenanceVisit::with('maintenanceContract.client')->get();
+    return MaintenanceContract::with('contractDetail.visits', 'activeContract')->latest()->first();
+    return MaintenanceVisit::latest()->first();
     return MaintenanceReport::find(1)->load('requiredProducts', 'requiredProducts.product', 'technician', 'user');
 });
 

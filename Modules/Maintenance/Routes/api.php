@@ -130,4 +130,9 @@ Route::prefix('maintenance')->group(function () {
     Route::get('/visits', [MaintenanceVisitController::class, 'index']);
     Route::get('/visits/{id}', [MaintenanceVisitController::class, 'show']);
     Route::post('/visits', [MaintenanceVisitController::class, 'store']);
+
+
+    // البحث عن عميل من جدول العملاء باستخدم
+    // clients `type`, `tax_number`, `id_number`, `whatsapp`, `phone2`, `phone`, `last_name`, `third_name`, `second_name`, `first_name`, `owner_name`, `name`, `user_id`
+    Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
 });

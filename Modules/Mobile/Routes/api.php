@@ -36,17 +36,46 @@ Route::prefix('mobile')->group(function () {
         return ["data" =>  [
             [
                 'id' => 1,
-                'label' => 'تصليح خط انتاج',
-                'icon' => 'https://via.placeholder.com/150',
-                'name' => 'repairing',
+                'label' => 'تشحيم سكك التقل',
+                'icon' => 'exit-outline',
+                'name' => 'p1',
             ],
             [
                 'id' => 2,
-                'label' => 'تصليح ماكينة طباعة',
-                'icon' => 'https://via.placeholder.com/150',
-                'name' => 'repairing_2',
+                'label' => 'تنظيف التابلوه من الغبار',
+                'icon' => 'exit-outline',
+                'name' => 'p2',
 
             ],
+            [
+                'id' => 3,
+                'label' => 'فحص كومينات الموتور',
+                'icon' => 'exit-outline',
+                'name' => 'p3',
+            ],
+            // تنظيف الكابينات
+            [
+                'id' => 4,
+                'label' => 'تنظيف الكابينات',
+                'icon' => 'exit-outline',
+                'name' => 'p4',
+            ],
+            // تشحيم السكك
+            [
+                'id' => 5,
+                'label' => 'تشحيم السكك',
+                'icon' => 'exit-outline',
+                'name' => 'p5',
+            ],
+            // تنظيف المكنه
+            [
+                'id' => 6,
+                'label' => 'تنظيف المكنه والموتور ',
+                'icon' => 'exit-outline',
+                'name' => 'p6',
+            ],
+            // تنظيف المكنه
+
         ]];
     });
     // remove-image

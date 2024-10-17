@@ -49,19 +49,20 @@ class VisitService
 
     public function updateVisit($id, array $data)
     {
-        $visit = MaintenanceVisit::findOrFail($id);
-        if (isset($data['updateStatus'])) {
+
+        $visit = MaintenanceVisit::findOrFail($data['visit_id']);
+        if (isset($data['updateStatus']) && $data['updateStatus'] == true) {
             if ($data['status'] == 'ongoing') {
-                $visit->update(['visit_start_date' => now()]);
+                $visit->update(['visit_start_date' => now(), 'status' => 'ongoing']);
             }
             if ($data['status'] == 'completed') {
-                $visit->update(['visit_end_date' => now()]);
+                $visit->update(['visit_end_date' => now(), 'status' => 'completed']);
             }
         } else {
             $visit->test_checklist = $data['maintenanceItems'];
             $visit->notes = $data['notes'];
-            $visit->save();
         }
+        $visit->save();
         return $visit;
     }
 

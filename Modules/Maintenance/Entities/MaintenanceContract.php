@@ -31,12 +31,18 @@ class MaintenanceContract extends Model
         'stops_count',
         'has_window',
         'has_stairs',
-        'site_images'
+        'site_images',
+        'active_contract_id',
     ];
 
     public function contractDetail()
     {
         return $this->hasOne(MaintenanceContractDetail::class, 'installation_contract_id');
+    }
+
+    public function activeContract()
+    {
+        return $this->belongsTo(MaintenanceContractDetail::class, 'active_contract_id');
     }
 
     public function city()

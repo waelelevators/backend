@@ -2,7 +2,9 @@
 
 namespace Modules\Maintenance\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\MaintenanceContract;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Maintenance\Http\Requests\MaintenanceContractStoreRequest;
 use Modules\Maintenance\Services\MaintenanceContractService;
@@ -27,6 +29,7 @@ class MaintenanceContractController extends Controller
     {
         // return $request;
         $contract = $this->maintenanceContractService->createContract($request->all());
+
         return new MaintenanceContractResource($contract);
     }
 
@@ -35,5 +38,20 @@ class MaintenanceContractController extends Controller
         $contract = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType', 'contractDetails', 'activeContract', 'client', 'logs')->findOrFail($id);
         // return $contract;
         return new MaintenanceContractResource($contract);
+    }
+
+
+    public function searchClients(Request $request)
+    {
+
+        $clients = Client::query();
+
+        foreach ($request->all() as $field => $value) {
+            if ($value) {
+                $clients->where($field, 'like', "%{$value}%");
+            }
+        }
+
+        return $clients->first();
     }
 }
