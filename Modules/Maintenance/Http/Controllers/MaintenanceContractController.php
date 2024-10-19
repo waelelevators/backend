@@ -19,9 +19,13 @@ class MaintenanceContractController extends Controller
         $this->maintenanceContractService = $maintenanceContractService;
     }
 
-    public function index()
+    public function index($type = null)
     {
-        $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->get();
+        if ($type == 'draft') {
+            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'draft')->get();
+        } else {
+            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'contract')->get();
+        }
         return MaintenanceContractResource::collection($contracts);
     }
 
@@ -54,6 +58,4 @@ class MaintenanceContractController extends Controller
 
         return $clients->first();
     }
-
-    
 }

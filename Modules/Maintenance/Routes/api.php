@@ -63,7 +63,7 @@ Route::prefix('maintenance')->group(function () {
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
 
-    Route::get('/contracts', [MaintenanceContractController::class, 'index']);
+    Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
     // contracts/:id
     Route::get('/contracts/{id}', [MaintenanceContractController::class, 'show']);
@@ -133,6 +133,6 @@ Route::prefix('maintenance')->group(function () {
 
 
     // البحث عن عميل من جدول العملاء باستخدم
-    // clients `type`, `tax_number`, `id_number`, `whatsapp`, `phone2`, `phone`, `last_name`, `third_name`, `second_name`, `first_name`, `owner_name`, `name`, `user_id`
     Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
+    // clients/:id
 });
