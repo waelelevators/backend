@@ -5,6 +5,7 @@ use App\Http\Controllers\PdfContractController;
 use App\Http\Controllers\PdfExchangeProductController;
 use App\Http\Controllers\PdfInstallationLDController;
 use App\Http\Controllers\PdfQuotationController;
+use App\Models\Client;
 use App\Models\MaintenanceReport;
 use App\Models\MaintenanceVisit;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,7 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 Route::get('maintenance-contract-logs', function () {
 
+    return Client::find(5702);
     return MaintenanceContract::with('contractDetail.visits', 'activeContract')->latest()->first();
     return MaintenanceVisit::latest()->first();
     return MaintenanceReport::find(1)->load('requiredProducts', 'requiredProducts.product', 'technician', 'user');

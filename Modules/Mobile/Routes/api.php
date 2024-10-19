@@ -43,21 +43,21 @@ Route::prefix('mobile')->group(function () {
             [
                 'id' => 2,
                 'label' => 'تنظيف التابلوه من الغبار',
-                'icon' => 'exit-outline',
+                'icon' => 'cog',
                 'name' => 'p2',
 
             ],
             [
                 'id' => 3,
                 'label' => 'فحص كومينات الموتور',
-                'icon' => 'exit-outline',
+                'icon' => 'git-network',
                 'name' => 'p3',
             ],
             // تنظيف الكابينات
             [
                 'id' => 4,
                 'label' => 'تنظيف الكابينات',
-                'icon' => 'exit-outline',
+                'icon' => 'color-fill',
                 'name' => 'p4',
             ],
             // تشحيم السكك

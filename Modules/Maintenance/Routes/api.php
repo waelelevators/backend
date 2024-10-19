@@ -64,10 +64,10 @@ Route::prefix('maintenance')->group(function () {
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
 
     Route::get('/contracts', [MaintenanceContractController::class, 'index']);
+    Route::post('/contracts', [MaintenanceContractController::class, 'store']);
     // contracts/:id
     Route::get('/contracts/{id}', [MaintenanceContractController::class, 'show']);
 
-    Route::post('/contracts', [MaintenanceContractController::class, 'store']);
 
     // technicians
     Route::get('/technicians', function () {

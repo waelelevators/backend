@@ -20,7 +20,8 @@ class MaintenanceContractDetail extends Model
         'cancellation_allowance',
         'payment_status',
         'receipt_attachment',
-        'contract_attachment'
+        'contract_attachment',
+        'maintenance_contract_id'
     ];
 
     public function contract()

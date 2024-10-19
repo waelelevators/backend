@@ -28,9 +28,9 @@ class MaintenanceContractService
 
     public function createContract(array $data)
     {
-        // $client = ApiHelper::handleAddClient($data);
+        $client = ApiHelper::handleAddClient($data);
         // return ($client);
-        $data['client_id'] = 10;
+        $data['client_id'] = $client->id;
 
 
         $contractData = array_diff_key($data, array_flip([
@@ -103,6 +103,7 @@ class MaintenanceContractService
     // create visit
     public function createVisits($data)
     {
+
 
         $startDate = Carbon::parse($data['start_date']);
         $visitData = [];
