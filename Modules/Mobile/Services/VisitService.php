@@ -16,7 +16,7 @@ class VisitService
             'maintenanceContract.area',
             'maintenanceContractDetail',
             'user',
-        ])->get();
+        ])->paginate(10);
     }
 
     public function getVisitById($id)

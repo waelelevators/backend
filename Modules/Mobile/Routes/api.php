@@ -84,6 +84,11 @@ Route::prefix('mobile')->group(function () {
     // report
     Route::get('reports', [ReportController::class, 'index']);
 
+    // reports add
+    Route::post('technician/reports', [ReportController::class, 'technicianReports']);
+
+
+
 
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);

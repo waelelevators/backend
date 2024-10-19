@@ -22,9 +22,9 @@ class MaintenanceContractController extends Controller
     public function index($type = null)
     {
         if ($type == 'draft') {
-            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'draft')->get();
+            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'draft')->paginate(10);
         } else {
-            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'contract')->get();
+            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'contract')->paginate(10);
         }
         return MaintenanceContractResource::collection($contracts);
     }
@@ -48,14 +48,17 @@ class MaintenanceContractController extends Controller
     public function searchClients(Request $request)
     {
 
-        $clients = Client::query();
+        $request->validate([
+            'elevator_type_id' => 'nullable',
+            'phone' => 'nullable',
+        ]);
+        $client_id = Client::where('phone', $request->phone)->first()->id;
+        $maintenance_contracts = MaintenanceContract::where('elevator_type_id', $request->elevator_type_id)
+            ->where('client_id', $client_id)
+            ->where('contract_type', 'draft')
+            ->with('area', 'city', 'neighborhood', 'elevatorType')
+            ->get();
 
-        foreach ($request->all() as $field => $value) {
-            if ($value) {
-                $clients->where($field, 'like', "%{$value}%");
-            }
-        }
-
-        return $clients->first();
+        return MaintenanceContractResource::collection($maintenance_contracts);
     }
 }
