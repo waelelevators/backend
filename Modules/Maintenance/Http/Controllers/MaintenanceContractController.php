@@ -59,6 +59,13 @@ class MaintenanceContractController extends Controller
             ->with('area', 'city', 'neighborhood', 'elevatorType')
             ->get();
 
+        // ahmed hmed
+
         return MaintenanceContractResource::collection($maintenance_contracts);
+
+        $data = [
+            'maintenance_contracts' => MaintenanceContractResource::collection($maintenance_contracts),
+            'client' => $client,
+        ];
     }
 }
