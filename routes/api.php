@@ -572,7 +572,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('rules/{id?}', [PermissionsController::class, 'rules']);
     Route::get('rules/{ruleId}/items', [PermissionsController::class, 'ruleItems']);
 
-    Route::post('login', [AuthController::class, 'login']);
 
 
     Route::post('your-laravel-upload-endpoint', function (Request $request) {
@@ -685,6 +684,9 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
     });
 });
+
+
+Route::post('login', [AuthController::class, 'login']);
 
 Route::get('test', function () {
     return response()->json(['data' => ['message' => 'Hello, world!']]);

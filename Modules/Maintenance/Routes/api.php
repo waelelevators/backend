@@ -22,6 +22,7 @@ use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
+use Modules\Maintenance\Http\Controllers\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,16 @@ use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 
 // prefix maintenance
 Route::prefix('maintenance')->group(function () {
+
+    // login
+    Route::post('/login', [LoginController::class, 'login']);
+    // logout
+    Route::post('/logout', [LoginController::class, 'logout']);
+
+    // otp
+    Route::post('/otp', [LoginController::class, 'otp']);
+    // verify otp
+    Route::post('/verify-otp', [LoginController::class, 'verifyOtp']);
 
     Route::get('/reports', [ReportController::class, 'index']); // جلب كل البلاغات
     Route::get('/reports/{id}', [ReportController::class, 'show']); // جلب بلاغ معين
@@ -65,6 +76,8 @@ Route::prefix('maintenance')->group(function () {
 
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
+    // convert draft to contract
+    Route::post('/contracts/convert-to-contract', [MaintenanceContractController::class, 'convertDraftToContract']);
     // contracts/:id
     Route::get('/contracts/{id}', [MaintenanceContractController::class, 'show']);
 

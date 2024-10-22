@@ -30,9 +30,9 @@ class MaintenanceContractStoreRequest extends FormRequest
             'has_stairs' => 'boolean',
             'site_images' => 'nullable|array', // تغيير هنا
             // 'site_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // إضافة قاعدة جديدة للتحقق من كل صورة
-            'start_date' => 'required',
-            'end_date' => 'required',
-            'visits_count' => 'required|integer',
+            // 'start_date' => 'required',
+            // 'end_date' => 'required',
+            // 'visits_count' => 'required|integer',
             // 'cost' => 'required|numeric',
             'notes' => 'nullable|string',
             'cancellation_allowance' => 'nullable|numeric',

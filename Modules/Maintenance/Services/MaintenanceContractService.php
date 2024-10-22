@@ -3,6 +3,7 @@
 namespace Modules\Maintenance\Services;
 
 use App\Helpers\ApiHelper;
+use App\Models\MaintenanceContract;
 use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceVisit;
 use App\Service\GeneralLogService;
@@ -31,11 +32,13 @@ class MaintenanceContractService
         $client = ApiHelper::handleAddClient($data);
         // return ($client);
         $data['client_id'] = $client->id;
+        // return auth('sanctum')->user();
+        $user_id = auth('sanctum')->user()->id;
 
 
         $contractData = array_diff_key($data, array_flip([
-            'start_date',
-            'end_date',
+            // 'start_date',
+            // 'end_date',
             'visits_count',
             'cost',
             'notes',
@@ -46,19 +49,10 @@ class MaintenanceContractService
         ]));
 
 
-
-        // if (isset($data['site_images']) && is_array($data['site_images'])) {
-        //     $imagesPaths = [];
-        //     foreach ($data['site_images'] as $image) {
-        //         $path = $image->store('site_images', 'public');
-        //         $imagesPaths[] = $path;
-        //     }
-        //     $contractData['site_images'] = json_encode($imagesPaths);
-        // }
-
-        $contractData['contract_number'] = 'M-' . date('Y-m-d') . '-' . rand(1000, 9999);
         $contractData['contract_type'] = $data['isDraft'] ? 'draft' : 'contract';
-        $contractData['user_id'] = 1;
+        $contractData['user_id'] = $user_id;
+
+        // dd($contractData);
 
         $contract = $this->maintenanceContractRepository->create($contractData);
 
@@ -68,8 +62,8 @@ class MaintenanceContractService
 
 
         $detailData = array_intersect_key($data, array_flip([
-            'start_date',
-            'end_date',
+            // 'start_date',
+            // 'end_date',
             'visits_count',
             'cost',
             'notes',
@@ -86,11 +80,13 @@ class MaintenanceContractService
         $detailData['remaining_visits'] = $detailData['visits_count'];
 
         // dd($detailData);
+        // رقم الكوتيشن
+        $quotation_number = "Q-" . date('Y-m-d') . "-" . rand(1000, 9999);
 
         if ($data['isDraft'] !== true) {
 
             $detail = $this->maintenanceContractDetailRepository->create($detailData);
-            $contract->update(['active_contract_id' => $detail->id]);
+            $contract->update(['active_contract_id' => $detail->id, 'quotation_number' => $quotation_number]);
             $this->createVisits($detail);
             $this->generalLogService::log($detail, 'create', 'Contract detail created', ['data' => $detailData, 'user_id' => 1]);
         }
@@ -121,5 +117,52 @@ class MaintenanceContractService
         }
 
         return MaintenanceVisit::insert($visitData);
+    }
+
+    // convert draft to contract
+    public function convertDraftToContract($data)
+    {
+
+
+        $quotation_number = "Q-" . date('Y-m-d') . "-" . rand(1000, 9999);
+        $data['contract_number'] = $quotation_number;
+        // convert draft to contract contract type most be draft
+        $contract = MaintenanceContract::findOrFail($data['contract_id']);
+        $contract->update($data);
+
+
+        // create contract detail
+        $contractDetail = $this->createContractDetail($contract, $data);
+
+        // create visits
+        $this->createVisits([
+            'id' => $contractDetail->id,
+            'maintenance_contract_id' => $contract->id,
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'visits_count' => $data['visits_count'],
+        ]);
+
+        return $contract;
+    }
+
+    public function createContractDetail($contract, $data)
+    {
+        $user_id = auth('sanctum')->user()->id;
+        // maintenance_contract_details `id`, `installation_contract_id`, `maintenance_contract_id`, `client_id`, `user_id`, `start_date`, `end_date`,
+        //  `visits_count`, `cost`, `notes`, `remaining_visits`, `cancellation_allowance`, `payment_status`, `receipt_attachment`, `contract_attachment`, `created_at`, `updated_at`
+        $contractData = [
+            'maintenance_contract_id' => $contract->id,
+            'installation_contract_id' => $contract->installation_contract_id,
+            'client_id' => $contract->client_id,
+            'user_id' => $user_id,
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'visits_count' => $data['visits_count'],
+            'cost' => $contract->cost,
+            'remaining_visits' => $data['visits_count'],
+            'cancellation_allowance' => 1,
+        ];
+        return MaintenanceContractDetail::create($contractData);
     }
 }

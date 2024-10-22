@@ -16,7 +16,8 @@ class CreateMaintenanceContractDetailsTable extends Migration
         Schema::create('maintenance_contract_details', function (Blueprint $table) {
 
             $table->id();
-            $table->string('installation_contract_id');
+            $table->integer('installation_contract_id');
+            $table->integer('maintenance_contract_id');
             $table->string('client_id');
             $table->string('user_id');
             $table->string('start_date')->nullable();

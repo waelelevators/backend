@@ -31,8 +31,11 @@ class MaintenanceContractController extends Controller
 
     public function store(MaintenanceContractStoreRequest $request)
     {
-        // return $request;
-        $contract = $this->maintenanceContractService->createContract($request->all());
+        if ($request->has('contract_id') && $request->contract_id > 0) {
+            $contract = $this->maintenanceContractService->convertDraftToContract($request->all());
+        } else {
+            $contract = $this->maintenanceContractService->createContract($request->all());
+        }
 
         return new MaintenanceContractResource($contract);
     }
@@ -67,5 +70,19 @@ class MaintenanceContractController extends Controller
             'maintenance_contracts' => MaintenanceContractResource::collection($maintenance_contracts),
             'client' => $client,
         ];
+    }
+
+
+    public function convertDraftToContract(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'start_date' => 'required',
+            'visits_count' => 'required',
+            'end_date' => 'required',
+        ]);
+
+        $contract = $this->maintenanceContractService->convertDraftToContract($request->all());
+        return new MaintenanceContractResource($contract);
     }
 }

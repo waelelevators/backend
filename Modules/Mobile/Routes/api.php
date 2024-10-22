@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\Fault;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Modules\Maintenance\Http\Controllers\LoginController;
 use Modules\Mobile\Http\Controllers\AuthController;
 use Modules\Mobile\Http\Controllers\VisitController;
 use Modules\Mobile\Http\Controllers\ReportController;
@@ -21,75 +24,90 @@ Route::prefix('mobile')->group(function () {
     // Route::middleware('auth:api')->get('/mobile', function (Request $request) {
     //     return $request->user();
     // });
-    Route::post('visits/remove-image', [VisitController::class, 'removeImage']);
 
-    Route::get('visits', [VisitController::class, 'index']);
-    Route::get('visits/{id}', [VisitController::class, 'show']);
-    Route::post('visits/{id}', [VisitController::class, 'update']);
+    // auth group
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('visits/remove-image', [VisitController::class, 'removeImage']);
 
-    Route::post('/upload-image', [VisitController::class, 'uploadImage']);
+        // products
 
-    // update location
-    Route::post('visits/{id}/location-update', [VisitController::class, 'updateLocation']);
 
-    Route::get('maintenance-items', function () {
-        return ["data" =>  [
-            [
-                'id' => 1,
-                'label' => 'تشحيم سكك التقل',
-                'icon' => 'exit-outline',
-                'name' => 'p1',
-            ],
-            [
-                'id' => 2,
-                'label' => 'تنظيف التابلوه من الغبار',
-                'icon' => 'cog',
-                'name' => 'p2',
+        Route::get('visits', [VisitController::class, 'index']);
+        Route::get('visits/{id}', [VisitController::class, 'show']);
+        Route::post('visits/{id}', [VisitController::class, 'update']);
 
-            ],
-            [
-                'id' => 3,
-                'label' => 'فحص كومينات الموتور',
-                'icon' => 'git-network',
-                'name' => 'p3',
-            ],
-            // تنظيف الكابينات
-            [
-                'id' => 4,
-                'label' => 'تنظيف الكابينات',
-                'icon' => 'color-fill',
-                'name' => 'p4',
-            ],
-            // تشحيم السكك
-            [
-                'id' => 5,
-                'label' => 'تشحيم السكك',
-                'icon' => 'exit-outline',
-                'name' => 'p5',
-            ],
-            // تنظيف المكنه
-            [
-                'id' => 6,
-                'label' => 'تنظيف المكنه والموتور ',
-                'icon' => 'exit-outline',
-                'name' => 'p6',
-            ],
-            // تنظيف المكنه
+        Route::post('/upload-image', [VisitController::class, 'uploadImage']);
 
-        ]];
+        // update location
+        Route::post('visits/{id}/location-update', [VisitController::class, 'updateLocation']);
+
+        Route::get('maintenance-items', function () {
+            return ["data" =>  [
+                [
+                    'id' => 1,
+                    'label' => 'تشحيم سكك التقل',
+                    'icon' => 'exit-outline',
+                    'name' => 'p1',
+                ],
+                [
+                    'id' => 2,
+                    'label' => 'تنظيف التابلوه من الغبار',
+                    'icon' => 'cog',
+                    'name' => 'p2',
+
+                ],
+                [
+                    'id' => 3,
+                    'label' => 'فحص كومينات الموتور',
+                    'icon' => 'git-network',
+                    'name' => 'p3',
+                ],
+                // تنظيف الكابينات
+                [
+                    'id' => 4,
+                    'label' => 'تنظيف الكابينات',
+                    'icon' => 'color-fill',
+                    'name' => 'p4',
+                ],
+                // تشحيم السكك
+                [
+                    'id' => 5,
+                    'label' => 'تشحيم السكك',
+                    'icon' => 'exit-outline',
+                    'name' => 'p5',
+                ],
+                // تنظيف المكنه
+                [
+                    'id' => 6,
+                    'label' => 'تنظيف المكنه والموتور ',
+                    'icon' => 'exit-outline',
+                    'name' => 'p6',
+                ],
+                // تنظيف المكنه
+
+            ]];
+        });
+        // products
+        Route::get('products', function () {
+            return ["data" =>  Product::all()];
+        });
+        Route::get('faults', function () {
+            return ["data" =>  Fault::all()];
+        });
+
+
+        // report
+        Route::get('technician/reports', [ReportController::class, 'index']);
+        Route::get('technician/reports/{id}', [ReportController::class, 'show']);
+        // upate faults
+        Route::post('technician/reports/{id}/faults', [ReportController::class, 'updateFaults']);
+
+        // reports add
+        Route::post('technician/reports', [ReportController::class, 'technicianReports']);
+        Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     });
-    // remove-image
-
-
-    // report
-    Route::get('reports', [ReportController::class, 'index']);
-
-    // reports add
-    Route::post('technician/reports', [ReportController::class, 'technicianReports']);
 
 
 
-
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('login', [LoginController::class, 'login'])->name('login');
 });
