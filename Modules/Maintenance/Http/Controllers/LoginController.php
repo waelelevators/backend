@@ -36,7 +36,7 @@ class LoginController extends Controller
                     'name' => $client->name,
                     'phone' => $client->phone,
                     'level' => 'customer',
-                    'completedJobs' => 10,
+                    'otp' => 123456,
                     'token' => $clientToken
                 ]
             ]]);
@@ -50,6 +50,8 @@ class LoginController extends Controller
                 'phone' => $user->phone,
                 // 'level' => 'customer',
                 'level' => 'technician',
+                'completedJobs' => 10,
+                'otp' => 123456,
                 'rating' => 4.8,
                 'token' => $userToken
             ]
@@ -58,12 +60,47 @@ class LoginController extends Controller
 
     public function otp(Request $request)
     {
-        return $request->phone;
+
+        // set new otp code  for auth user
+        $user = auth('sanctum')->user();
+
+        $user->otp = 123456;
+        $user->save();
+
+
+
+
+
+        return [
+            'data' => [
+                'otp' => 123456,
+                'user' => auth('sanctum')->user()
+            ]
+        ];
     }
 
     public function verifyOtp(Request $request)
     {
-        return $request->otp;
+
+        $request->validate([
+            'otp' => 'required|numeric',
+        ]);
+        if (auth('sanctum')->user()->otp != $request->otp) {
+            throw ValidationException::withMessages([
+                'otp' => ['كود التحقق غير صحيح.'],
+            ]);
+        } else {
+            auth('sanctum')->user()->otp = null;
+            auth('sanctum')->user()->save();
+            return [
+                'data' => [
+                    'user' => auth('sanctum')->user()
+                ]
+            ];
+        }
+        // append phone to request
+        // $request->merge(['phone' => auth('sanctum')->user()->phone]);
+        // $this->login($request);
     }
 
     public function logout(Request $request)

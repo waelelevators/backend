@@ -4,6 +4,9 @@ namespace Modules\Mobile\Http\Controllers;
 
 use App\Models\MaintenanceReport;
 use App\Models\Fault;
+use App\Models\MaintenanceContract;
+use App\Models\Product;
+use App\Models\RequiredProduct;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -21,8 +24,9 @@ class ReportController extends Controller
             'maintenanceContract.neighborhood',
             'requiredProducts'
         )
-            // news
             ->orderBy('id', 'desc')
+            ->where('technician_id', auth()->user()->id)
+            ->where('status', '!=', 'completed')
             ->get();
 
         $reports = $reports->map(function ($report) {
@@ -86,7 +90,7 @@ class ReportController extends Controller
             'maintenanceContract.neighborhood',
             'requiredProducts'
         )
-            ->find(1);
+            ->find($id);
 
 
         $data =  [
@@ -108,11 +112,33 @@ class ReportController extends Controller
 
         return ['data' => $data];
     }
+
+    // contractors
+    public function contractors()
+    {
+        $contractors = MaintenanceContract::with('client', 'city', 'neighborhood', 'activeContract')
+            ->where('contract_type', '!=', 'draft')
+            ->take(10)->get();
+
+        $contractors = $contractors->map(function ($contractor) {
+            return [
+                'id' => $contractor->id,
+                'customerName' => $contractor->client->name ?? 'غير معروف',
+                'address' => $contractor->city->name . ',
+                 ' . $contractor->neighborhood->name ?? 'غير معروف',
+                'phone' => $contractor->client->phone ?? 'غير معروف',
+                'contractType' => $contractor->activeContract->type ?? null,
+                'startDate' => $contractor->activeContract->start_date ?? null,
+                'endDate' => $contractor->activeContract->end_date ?? null,
+            ];
+        });
+        return ['data' => $contractors];
+    }
     // technicianReports
     public function technicianReports(Request $request)
     {
 
-        $user_id = 1;
+        $user_id = auth('sanctum')->user()->id;
         MaintenanceReport::create([
             'technician_id' => $user_id,
             'status' => 'open',
@@ -146,5 +172,55 @@ class ReportController extends Controller
             'message' => 'Faults updated successfully',
             'faults' => Fault::whereIn('id', $currentFaults)->get()
         ]);
+    }
+
+    // addProducts
+    public function UpdateProducts(Request $request, $id)
+    {
+        $report = MaintenanceReport::findOrFail($id);
+
+        foreach ($request->products as $product) {
+
+            $product_id =  $product['id'] ?? null;
+            if ($product_id) {
+                $requiredProduct = RequiredProduct::find($product_id);
+
+                $requiredProduct->quantity = $product['quantity'];
+                $requiredProduct->subtotal = $product['subtotal'];
+                $requiredProduct->save();
+                if ($product['quantity'] == 0) {
+                    $requiredProduct->delete();
+                }
+            } else {
+
+                $price = $product['product']['sale_price'];
+                $subtotal = $price * $product['quantity'];
+                $tax = $subtotal * 0.15;
+
+
+                $report->requiredProducts()->create([
+                    'product_id' => $product['product']['id'],
+                    'quantity' => $product['quantity'],
+                    'price' => $price,
+                    'subtotal' => $subtotal,
+                    'tax' => $tax,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Products updated successfully',
+            'products' => $report->required_products
+        ]);
+    }
+
+    // updateStatus
+    public function updateStatus(Request $request)
+    {
+        $report = MaintenanceReport::findOrFail($request->id);
+        $report->status = 'waiting_approval';
+        $report->save();
+
+        return $this->show($request->id);
     }
 }

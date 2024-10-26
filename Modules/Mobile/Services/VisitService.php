@@ -50,7 +50,7 @@ class VisitService
     public function updateVisit($id, array $data)
     {
 
-        $visit = MaintenanceVisit::findOrFail($data['visit_id']);
+        $visit = MaintenanceVisit::findOrFail($id);
         if (isset($data['updateStatus']) && $data['updateStatus'] == true) {
             if ($data['status'] == 'ongoing') {
                 $visit->update(['visit_start_date' => now(), 'status' => 'ongoing']);

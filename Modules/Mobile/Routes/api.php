@@ -99,12 +99,25 @@ Route::prefix('mobile')->group(function () {
         // report
         Route::get('technician/reports', [ReportController::class, 'index']);
         Route::get('technician/reports/{id}', [ReportController::class, 'show']);
+
+        // get contractors to report
+        Route::get('technician/contractors', [ReportController::class, 'contractors']);
+        // reports/add-products
+        Route::post('technician/reports/{id}/update-products', [ReportController::class, 'updateProducts']);
         // upate faults
         Route::post('technician/reports/{id}/faults', [ReportController::class, 'updateFaults']);
+        // technician/reports/update-status
+        Route::post('technician/reports/update-status', [ReportController::class, 'updateStatus']);
+        Route::post('technician/reports/{id}/update-products', [ReportController::class, 'updateProducts']);
 
         // reports add
         Route::post('technician/reports', [ReportController::class, 'technicianReports']);
+
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+        // resend otp
+        Route::post('resend-otp', [LoginController::class, 'otp']);
+        // verify otp
+        Route::post('verify-otp', [LoginController::class, 'verifyOtp']);
     });
 
 
