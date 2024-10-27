@@ -23,6 +23,7 @@ use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 use Modules\Maintenance\Http\Controllers\LoginController;
+use Modules\Maintenance\Http\Controllers\AnalysisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -148,4 +149,7 @@ Route::prefix('maintenance')->group(function () {
     // البحث عن عميل من جدول العملاء باستخدم
     Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
     // clients/:id
+
+    // analysis
+    Route::get('/analysis/{param}/{year?}', 'AnalysisController@index');
 });

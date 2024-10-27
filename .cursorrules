@@ -58,4 +58,12 @@
 
 14. Module Documentation
 
+
+    Rule: Each module must include a README file with a description of the module, its purpose, and how to use it.
+
+
+Always using thos books as refrce
+- Designing Data-Intensive Applications Author Martin Kleppmann -  2017
+- Clean Architecture: A Craftsman's Guide to Software Structure and Design - 2017
+
     Rule: Each module must include a README file with a description of the module, its purpose, and how to use it.
