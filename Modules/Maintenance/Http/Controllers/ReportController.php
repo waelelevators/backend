@@ -148,6 +148,8 @@ class ReportController extends Controller
 
             $report = MaintenanceReport::findOrFail($reportId);
 
+
+
             $upgrade = new MaintenanceUpgrade();
             $upgrade->maintenance_contract_id = $report->maintenance_contract_id;
             $upgrade->status = 'pending';
@@ -163,16 +165,11 @@ class ReportController extends Controller
             $upgrade->has_window = $request->has_window;
             $upgrade->has_stairs = $request->has_stairs;
             $upgrade->speed_id = $request->speed_id;
-
-            if ($request->hasFile('site_images')) {
-                $images = [];
-                foreach ($request->file('site_images') as $image) {
-                    $path = $image->store('upgrades/images', 'public');
-                    $images[] = $path;
-                }
-                $upgrade->site_images = $images;
-            }
-
+            $upgrade->total = 0;
+            $upgrade->tax = $report->tax ?? 0;
+            $upgrade->net_price = $report->price_without_tax;
+            $upgrade->total = $report->final_price;
+            $upgrade->user_id = auth('sanctum')->user()->id;
             $upgrade->save();
 
             if ($report->requiredProducts->count() > 0) {
@@ -181,12 +178,18 @@ class ReportController extends Controller
                         'product_id' => $product->product_id,
                         'quantity' => $product->quantity,
                         'price' => $product->price,
+                        'tax' => $product->tax,
                     ]);
                 }
             }
 
-            // $report->status = 'converted_to_upgrade';
+            $report->status = 'converted_to_upgrade';
             $report->save();
+
+            $upgrade->total = $report->requiredProducts->sum('subtotal') + $report->tax ?? 0;
+            $upgrade->save();
+
+
 
             $report->logs()->create([
                 'action' => 'converted_to_upgrade',
@@ -195,7 +198,6 @@ class ReportController extends Controller
 
             $upgrade->logs()->create([
                 'action' => 'created_from_report',
-                'user_id' => auth()->id(),
                 'description' => 'تم إنشاء المقايسة من البلاغ رقم ' . $report->id,
             ]);
 
@@ -214,7 +216,8 @@ class ReportController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'حدث خطأ أثناء تحويل البلاغ',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                // 'error' => $e->getTraceAsString()
             ], 500);
         }
     }

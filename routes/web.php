@@ -8,6 +8,7 @@ use App\Http\Controllers\PdfQuotationController;
 use App\Models\Client;
 use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceReport;
+use App\Models\MaintenanceUpgrade;
 use App\Models\MaintenanceVisit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,10 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 
 Route::get('maintenance-contract-logs', function () {
+
+    MaintenanceUpgrade::with('logs', 'requiredProducts')->find(8);
+    $report = MaintenanceReport::with('logs', 'requiredProducts')->find(2);
+    return  $report->requiredProducts->sum('subtotal');
 
     $years = MaintenanceContractDetail::selectRaw('YEAR(start_date) as year')
         ->distinct()

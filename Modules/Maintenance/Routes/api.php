@@ -6,18 +6,6 @@ use App\Models\Product;
 use App\Models\Region;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use Modules\Maintenance\Http\Controllers\AreaController;
-use Modules\Maintenance\Http\Controllers\CurrentMaintenanceController;
-use Modules\Maintenance\Http\Controllers\LocationDetectionController;
-use Modules\Maintenance\Http\Controllers\MaintenanceController;
-use Modules\Maintenance\Http\Controllers\MaintenanceDistributionController;
-use Modules\Maintenance\Http\Controllers\MaintenanceInfoController;
-use Modules\Maintenance\Http\Controllers\MaintenancePaymentController;
-use Modules\Maintenance\Http\Controllers\MaintenanceStatusController;
-use Modules\Maintenance\Http\Controllers\MalfunctionController;
-use Modules\Maintenance\Http\Controllers\MonthlyMaintenanceController;
-use Modules\Maintenance\Http\Controllers\MonthlyMaintenanceTechnicantController;
-use Modules\Maintenance\Http\Controllers\QuotationController;
 use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
@@ -48,6 +36,7 @@ Route::prefix('maintenance')->group(function () {
     // logout
     Route::post('/logout', [LoginController::class, 'logout']);
 
+
     // otp
     Route::post('/otp', [LoginController::class, 'otp']);
     // verify otp
@@ -75,7 +64,7 @@ Route::prefix('maintenance')->group(function () {
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
     // convert report to upgrade'
-    Route::post('/reports/convert-to-upgrade', [ReportController::class, 'convertReportToUpgrade']);
+    Route::post('/reports/convert-to-upgrade/{reportId}', [ReportController::class, 'convertReportToUpgrade']);
 
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
@@ -101,6 +90,7 @@ Route::prefix('maintenance')->group(function () {
             'data' => $faults
         ];
     });
+
 
 
     Route::get('maintenance_data', function () {
