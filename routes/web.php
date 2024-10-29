@@ -6,8 +6,10 @@ use App\Http\Controllers\PdfExchangeProductController;
 use App\Http\Controllers\PdfInstallationLDController;
 use App\Http\Controllers\PdfQuotationController;
 use App\Models\Client;
+use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceReport;
 use App\Models\MaintenanceVisit;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Modules\Maintenance\Entities\MaintenanceContract;
 
@@ -27,6 +29,99 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 
 Route::get('maintenance-contract-logs', function () {
+
+    $years = MaintenanceContractDetail::selectRaw('YEAR(start_date) as year')
+        ->distinct()
+        ->orderBy('year')
+        ->pluck('year');
+
+
+
+    $renewalRates = [];
+
+    foreach ($years as $year) {
+        $previousYearClients = MaintenanceContractDetail::selectRaw('COUNT(DISTINCT client_id) as total')
+            ->whereYear('end_date', $year - 1)
+            ->first()
+            ->total;
+
+        if ($previousYearClients == 0) {
+            continue;
+        }
+        return [
+            'year' => $year,
+            'previous_year_clients' => $previousYearClients
+        ];
+
+        $renewedClients = MaintenanceContractDetail::selectRaw('COUNT(DISTINCT client_id) as total')
+            ->whereYear('start_date', $year)
+            ->whereIn('client_id', function ($query) use ($year) {
+                $query->select('client_id')
+                    ->from('maintenance_contract_details')
+                    ->whereYear('end_date', $year - 1);
+            })
+            ->first()
+            ->total;
+
+        if ($previousYearClients > 0) {
+            $renewalRates[$year] = [
+                'year' => $year,
+                'previous_year_clients' => $previousYearClients,
+                'renewed_clients' => $renewedClients,
+                'renewal_rate' => round(($renewedClients / $previousYearClients) * 100, 2)
+            ];
+        }
+    }
+
+    return $renewalRates;
+
+    $customerRenewals = MaintenanceContractDetail::select(
+        'client_id',
+        DB::raw('COUNT(*) as total_contracts'),
+        DB::raw('MIN(start_date) as first_contract_date'),
+        DB::raw('MAX(end_date) as latest_contract_end'),
+        DB::raw('COUNT(DISTINCT YEAR(start_date)) as active_years'),
+        DB::raw('SUM(cost) as total_revenue'),
+        DB::raw('GROUP_CONCAT(DISTINCT YEAR(start_date) ORDER BY start_date) as contract_years')
+    )
+        ->whereNotNull('start_date')
+        ->whereNotNull('end_date')
+        ->groupBy('client_id')
+        ->having('total_contracts', '>', 0)
+        ->get();
+
+    return $customerRenewals;
+
+
+
+
+    return DB::table('maintenance_contract_details as current')
+        ->join('maintenance_contract_details as next', function ($join) {
+            $join->on('current.client_id', '=', 'next.client_id')
+                ->whereRaw('next.start_date >= current.end_date');
+        })
+        ->select(
+            DB::raw('
+                    CASE
+                        WHEN (next.cost - current.cost) / current.cost * 100 <= 0 THEN "decrease"
+                        WHEN (next.cost - current.cost) / current.cost * 100 <= 10 THEN "slight_increase"
+                        WHEN (next.cost - current.cost) / current.cost * 100 <= 25 THEN "moderate_increase"
+                        ELSE "significant_increase"
+                    END as price_change_category
+                '),
+            DB::raw('COUNT(*) as total_renewals'),
+            DB::raw('AVG(DATEDIFF(next.start_date, current.end_date)) as avg_renewal_gap_days'),
+            DB::raw('AVG((next.cost - current.cost) / current.cost * 100) as avg_price_change_percentage')
+        )
+        ->whereRaw('next.start_date = (
+                SELECT MIN(start_date)
+                FROM maintenance_contract_details
+                WHERE client_id = current.client_id
+                AND start_date >= current.end_date
+                AND id != current.id
+            )')
+        ->groupBy('price_change_category')
+        ->get();
 
     return Client::find(5702);
     return MaintenanceContract::with('contractDetail.visits', 'activeContract')->latest()->first();

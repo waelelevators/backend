@@ -28,6 +28,7 @@ class CreateRequiredProductsTable extends Migration
         });
     }
 
+
     /**
      * Reverse the migrations.
      *

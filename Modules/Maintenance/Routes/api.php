@@ -61,7 +61,7 @@ Route::prefix('maintenance')->group(function () {
     Route::post('/reports/problems', [ReportController::class, 'addProblemsToReport']);
     // approve report
     Route::post('/reports/approve', [ReportController::class, 'approveReport']);
-
+    // convert report to upgrade
     // اضافة الاسبيرات او المنتجات المستخدمه في الصيانه
     // Route::post('/reports/add-required-products', [ReportController::class, 'addRequiredProductsToReport']);
     // products
@@ -74,6 +74,8 @@ Route::prefix('maintenance')->group(function () {
 
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
+    // convert report to upgrade'
+    Route::post('/reports/convert-to-upgrade', [ReportController::class, 'convertReportToUpgrade']);
 
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
@@ -150,6 +152,10 @@ Route::prefix('maintenance')->group(function () {
     Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
     // clients/:id
 
+    // CustomerRetentionRate
+    Route::get('/analysis/customer-retention-rate', [AnalysisController::class, 'CustomerRetentionRate']);
+    // CustomerLifetimeValue
+    Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
     // analysis
-    Route::get('/analysis/{param}/{year?}', 'AnalysisController@index');
+    Route::get('/analysis/{param}/{year?}', [AnalysisController::class, 'index']);
 });
