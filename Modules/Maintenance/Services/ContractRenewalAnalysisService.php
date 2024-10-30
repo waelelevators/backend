@@ -249,15 +249,18 @@ class ContractRenewalAnalysisService
                 ];
             }
         }
-
-        return $renewalRates;
+        $data = [];
+        foreach ($renewalRates as $key => $value) {
+            array_push($data, $value);
+        }
+        return $data;
     }
 
     private function analyzeCostImpactOnRenewal()
     {
 
 
-        return DB::table('maintenance_contract_details as current')
+        $impact =  DB::table('maintenance_contract_details as current')
             ->join('maintenance_contract_details as next', function ($join) {
                 $join->on('current.client_id', '=', 'next.client_id')
                     ->whereRaw('next.start_date >= current.end_date');
@@ -284,6 +287,22 @@ class ContractRenewalAnalysisService
             )')
             ->groupBy('price_change_category')
             ->get();
+
+        $categoryTranslations = [
+            'decrease' => 'انخفاض',
+            'moderate_increase' => 'زيادة متوسطة',
+            'significant_increase' => 'زيادة كبيرة',
+            'slight_increase' => 'زيادة طفيفة'
+        ];
+
+        return $impact->map(function ($item) use ($categoryTranslations) {
+            return [
+                'category' => $categoryTranslations[$item->price_change_category],
+                'renewals' => $item->total_renewals,
+                'avg_gap' => round((float)$item->avg_renewal_gap_days, 2),
+                'avg_change' => round((float)$item->avg_price_change_percentage, 1)
+            ];
+        });
     }
 
     private function formatCustomerRenewalData($customerRenewals)

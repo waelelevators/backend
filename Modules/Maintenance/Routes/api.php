@@ -144,6 +144,9 @@ Route::prefix('maintenance')->group(function () {
 
     // CustomerRetentionRate
     Route::get('/analysis/customer-retention-rate', [AnalysisController::class, 'CustomerRetentionRate']);
+    // deep anlysis
+    Route::get('/analysis/deep-analysis/{analysisType}', [AnalysisController::class, 'deepAnalysis']);
+
     // CustomerLifetimeValue
     Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
     // analysis

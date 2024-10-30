@@ -162,15 +162,35 @@ class AnalysisController extends Controller
     public function CustomerLifetimeValue()
     {
         // return $this->run();
-        // return $this->analyzeRenewalPatterns();
+        return $this->analyzeRenewalPatterns();
         // return $this->renewalAnalysisService->analyzeRenewalPeriods();
         // return $this->AnalysisService->getCustomersByContractYears();
         return $this->getDetailedClientAnalysis();
         return $this->AnalysisService->CustomerLifetimeValue();
     }
+    public function deepAnalysis($analysisType)
+    {
+        if ($analysisType == 'CustomerLifetimeValue') {
+            return $this->AnalysisService->CustomerLifetimeValue();
+        } else if ($analysisType == 'CustomerRetentionRate') {
+            return $this->AnalysisService->CustomerRetentionRate();
+        } else if ($analysisType == 'getDetailedClientAnalysis') {
+            return $this->getDetailedClientAnalysis();
+        } else if ($analysisType == 'analyzeRenewalPatterns') {
+            return $this->analyzeRenewalPatterns();
+        } else if ($analysisType == 'analyzeRenewalPeriods') {
+            return $this->renewalAnalysisService->analyzeRenewalPeriods();
+        } else if ($analysisType == 'getCustomersByContractYears') {
+            return $this->AnalysisService->getCustomersByContractYears();
+        } else {
+            return response()->json(['error' => 'Invalid analysis type'], 400);
+        }
+    }
+
 
     public function getDetailedClientAnalysis()
     {
+        // TIMESTAMPDIFF(YEAR, MIN(start_date), MAX(end_date))
         try {
             $analysis = MaintenanceContractDetail::select([
                 'client_id',
@@ -180,7 +200,7 @@ class AnalysisController extends Controller
                 DB::raw('MAX(end_date) as latest_contract_end'),
                 DB::raw('CASE
                     WHEN DATEDIFF(MAX(end_date), MIN(start_date)) <= 0 THEN 1
-                    ELSE ROUND(DATEDIFF(MAX(end_date), MIN(start_date)) / 365.25, 1)
+                    ELSE ROUND(TIMESTAMPDIFF(YEAR, MIN(start_date), MAX(end_date)))
                 END as customer_lifetime_years')
             ])
                 ->whereNotNull('start_date')
@@ -236,38 +256,55 @@ class AnalysisController extends Controller
             ], 500);
         }
 
+        $customerSegmentation = [
+            [
+                'name' => 'عملاء دائمون',
+                'value' => $result['data']['customer_renewal_summary']['customer_segments']['loyal_customers'],
+                'percentage' => $result['data']['customer_renewal_summary']['customer_segments_percentage']['loyal_customers'] . '%'
+            ],
+            [
+                'name' => 'عملاء منتظمون',
+                'value' => $result['data']['customer_renewal_summary']['customer_segments']['regular_customers'],
+                'percentage' => $result['data']['customer_renewal_summary']['customer_segments_percentage']['regular_customers'] . '%'
+            ],
+            [
+                'name' => 'عملاء جدد',
+                'value' => $result['data']['customer_renewal_summary']['customer_segments']['new_customers'],
+                'percentage' => $result['data']['customer_renewal_summary']['customer_segments_percentage']['new_customers'] . '%'
+            ],
+        ];
+
         return response()->json([
-            'نمط_تجديد_العقود' => [
-                'ملخص_العملاء' => [
-                    'إجمالي_العملاء' => $result['data']['customer_renewal_summary']['total_customers'],
-                    'نمط_التعاقد' => [
-                        'عقد_واحد' => $result['data']['customer_renewal_summary']['renewal_patterns']['single_contract'],
-                        'عقود_متعددة' => $result['data']['customer_renewal_summary']['renewal_patterns']['multiple_contracts']
+            'data' => [
+                'summary' => [
+                    'total_customers' => $result['data']['customer_renewal_summary']['total_customers'],
+                    'contract_Pattern' => [
+                        'single_contract' => $result['data']['customer_renewal_summary']['renewal_patterns']['single_contract'],
+                        'multiple_contracts' => $result['data']['customer_renewal_summary']['renewal_patterns']['multiple_contracts']
                     ],
-                    'متوسط_العقود_للعميل' => $result['data']['customer_renewal_summary']['average_contracts_per_customer'],
-                    'تصنيف_العملاء' => [
-                        'عملاء_دائمون' => [
-                            'عدد' => $result['data']['customer_renewal_summary']['customer_segments']['loyal_customers'],
-                            'نسبة' => $result['data']['customer_renewal_summary']['customer_segments_percentage']['loyal_customers'] . '%'
-                        ],
-                        'عملاء_منتظمون' => [
-                            'عدد' => $result['data']['customer_renewal_summary']['customer_segments']['regular_customers'],
-                            'نسبة' => $result['data']['customer_renewal_summary']['customer_segments_percentage']['regular_customers'] . '%'
-                        ],
-                        'عملاء_جدد' => [
-                            'عدد' => $result['data']['customer_renewal_summary']['customer_segments']['new_customers'],
-                            'نسبة' => $result['data']['customer_renewal_summary']['customer_segments_percentage']['new_customers'] . '%'
-                        ]
+                    'average_contracts_per_pustomer' => $result['data']['customer_renewal_summary']['average_contracts_per_customer'],
+                    'customerSegmentation' => $customerSegmentation
+                ],
+                'renewalPeriods' => [
+                    [
+                        'name' => 'تجديد فوري',
+                        'value' => count($result['data']['renewal_gaps']['immediate_renewal'] ?? [])
+                    ],
+                    [
+                        'name' => 'تجديد عادي',
+                        'value' => count($result['data']['renewal_gaps']['normal_renewal'] ?? [])
+                    ],
+                    [
+                        'name' => 'تجديد متخرج',
+                        'value' => count($result['data']['renewal_gaps']['delayed_renewal'] ?? [])
+                    ],
+                    [
+                        'name' => 'تجديد متخرج جداً',
+                        'value' => count($result['data']['renewal_gaps']['late_renewal'] ?? [])
                     ]
                 ],
-                'فترات_التجديد' => [
-                    'تجديد_فوري' => count($result['data']['renewal_gaps']['immediate_renewal'] ?? []),
-                    'تجديد_عادي' => count($result['data']['renewal_gaps']['normal_renewal'] ?? []),
-                    'تجديد_متأخر' => count($result['data']['renewal_gaps']['delayed_renewal'] ?? []),
-                    'تجديد_متأخر_جداً' => count($result['data']['renewal_gaps']['late_renewal'] ?? [])
-                ],
-                'معدلات_التجديد_السنوية' => $result['data']['yearly_renewal_rates'],
-                'تأثير_التكلفة' => $result['data']['cost_impact']
+                'renewalRates' => $result['data']['yearly_renewal_rates'],
+                'priceImpact' => $result['data']['cost_impact']
             ]
         ]);
     }

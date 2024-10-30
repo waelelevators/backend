@@ -31,6 +31,98 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 Route::get('maintenance-contract-logs', function () {
 
+    $years = MaintenanceContractDetail::selectRaw('YEAR(start_date) as year')
+        ->distinct()
+        ->orderBy('year')
+        ->pluck('year');
+
+    $renewalRates = [];
+    foreach ($years as $year) {
+        $previousYearClients = MaintenanceContractDetail::selectRaw('COUNT(DISTINCT client_id) as total')
+            ->whereYear('end_date', $year - 1)
+            ->first()
+            ->total;
+
+        $renewedClients = MaintenanceContractDetail::selectRaw('COUNT(DISTINCT client_id) as total')
+            ->whereYear('start_date', $year)
+            ->whereIn('client_id', function ($query) use ($year) {
+                $query->select('client_id')
+                    ->from('maintenance_contract_details')
+                    ->whereYear('end_date', $year - 1);
+            })
+            ->first()
+            ->total;
+
+        if ($previousYearClients > 0) {
+            $renewalRates[$year] = [
+                'year' => $year,
+                'previous_year_clients' => $previousYearClients,
+                'renewed_clients' => $renewedClients,
+                'renewal_rate' => round(($renewedClients / $previousYearClients) * 100, 2)
+            ];
+        }
+    }
+    $data = [];
+    foreach ($renewalRates as $key => $value) {
+        array_push($data, $value);
+    }
+    return $data;
+
+    $impact =  DB::table('maintenance_contract_details as current')
+        ->join('maintenance_contract_details as next', function ($join) {
+            $join->on('current.client_id', '=', 'next.client_id')
+                ->whereRaw('next.start_date >= current.end_date');
+        })
+        ->select(
+            DB::raw('
+            CASE
+                WHEN (next.cost - current.cost) / current.cost * 100 <= 0 THEN "decrease"
+                WHEN (next.cost - current.cost) / current.cost * 100 <= 10 THEN "slight_increase"
+                WHEN (next.cost - current.cost) / current.cost * 100 <= 25 THEN "moderate_increase"
+                ELSE "significant_increase"
+            END as price_change_category
+        '),
+            DB::raw('COUNT(*) as total_renewals'),
+            DB::raw('AVG(DATEDIFF(next.start_date, current.end_date)) as avg_renewal_gap_days'),
+            DB::raw('AVG((next.cost - current.cost) / current.cost * 100) as avg_price_change_percentage')
+        )
+        ->whereRaw('next.start_date = (
+        SELECT MIN(start_date)
+        FROM maintenance_contract_details
+        WHERE client_id = current.client_id
+        AND start_date >= current.end_date
+        AND id != current.id
+    )')
+        ->groupBy('price_change_category')
+        ->get();
+
+
+
+    $categoryTranslations = [
+        'decrease' => 'انخفاض',
+        'moderate_increase' => 'زيادة متوسطة',
+        'significant_increase' => 'زيادة كبيرة',
+        'slight_increase' => 'زيادة طفيفة'
+    ];
+
+    return $impact->map(function ($item) use ($categoryTranslations) {
+        return [
+            'category' => $categoryTranslations[$item->price_change_category],
+            'renewals' => $item->total_renewals,
+            'avg_gap' => round((float)$item->avg_renewal_gap_days, 2),
+            'avg_change' => round((float)$item->avg_price_change_percentage, 1)
+        ];
+    });
+    return array_map(function ($item) use ($categoryTranslations) {
+        return [
+            'category' => $categoryTranslations[$item->price_change_category],
+            'renewals' => $item->total_renewals,
+            'avg_gap' => round((float)$item->avg_renewal_gap_days, 2),
+            'avg_change' => round((float)$item->avg_price_change_percentage, 1)
+        ];
+    }, $impact->toArray());
+
+
     MaintenanceUpgrade::with('logs', 'requiredProducts')->find(8);
     $report = MaintenanceReport::with('logs', 'requiredProducts')->find(2);
     return  $report->requiredProducts->sum('subtotal');

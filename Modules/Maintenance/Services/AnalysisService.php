@@ -157,7 +157,7 @@ class AnalysisService
     public function getCustomersByContractYears()
     {
         try {
-
+            // ROUND(DATEDIFF(MAX(end_date), MIN(start_date)) / 365.25, 1)
             $customerLifetimes = MaintenanceContractDetail::select([
                 'client_id',
                 DB::raw('TIMESTAMPDIFF(YEAR, MIN(start_date), MAX(end_date)) as years_completed'),
