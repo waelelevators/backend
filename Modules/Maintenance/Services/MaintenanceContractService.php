@@ -3,6 +3,7 @@
 namespace Modules\Maintenance\Services;
 
 use App\Helpers\ApiHelper;
+use App\Models\Branch;
 use App\Models\MaintenanceContract;
 use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceVisit;
@@ -16,6 +17,8 @@ class MaintenanceContractService
     protected $maintenanceContractRepository;
     protected $maintenanceContractDetailRepository;
     protected $generalLogService;
+
+    protected $maintenance_types = ['free', 'pid', 'external', 'upgrade', 'renewal', 'other'];
 
     public function __construct(
         MaintenanceContractRepository $maintenanceContractRepository,
@@ -42,6 +45,7 @@ class MaintenanceContractService
             'visits_count',
             'cost',
             'notes',
+            'representative_id',
             'cancellation_allowance',
             'payment_status',
             'receipt_attachment',
@@ -50,6 +54,7 @@ class MaintenanceContractService
 
 
         $contractData['contract_type'] = $data['isDraft'] ? 'draft' : 'contract';
+        $contractData['contract_number'] = $this->contractCode($data['maintenance_type'], $data['branch_id']);
         $contractData['user_id'] = $user_id;
 
         // dd($contractData);
@@ -62,8 +67,8 @@ class MaintenanceContractService
 
 
         $detailData = array_intersect_key($data, array_flip([
-            // 'start_date',
-            // 'end_date',
+            'start_date',
+            'end_date',
             'visits_count',
             'cost',
             'notes',
@@ -78,6 +83,7 @@ class MaintenanceContractService
         $detailData['client_id'] = $data['client_id'];
         $detailData['user_id'] = $contract->user_id;
         $detailData['remaining_visits'] = $detailData['visits_count'];
+        $detailData['maintenance_type'] = $this->maintenance_type[$data['maintenance_type'] - 1] ?? 'free';
 
         // dd($detailData);
         // رقم الكوتيشن
@@ -86,7 +92,7 @@ class MaintenanceContractService
         if ($data['isDraft'] !== true) {
 
             $detail = $this->maintenanceContractDetailRepository->create($detailData);
-            $contract->update(['active_contract_id' => $detail->id, 'quotation_number' => $quotation_number]);
+            $contract->update(['active_contract_id' => $detail->id]);
             $this->createVisits($detail);
             $this->generalLogService::log($detail, 'create', 'Contract detail created', ['data' => $detailData, 'user_id' => 1]);
         }
@@ -96,6 +102,8 @@ class MaintenanceContractService
     }
 
 
+
+    // ahmed hmed
     // create visit
     public function createVisits($data)
     {
@@ -124,8 +132,8 @@ class MaintenanceContractService
     {
 
 
-        $quotation_number = "Q-" . date('Y-m-d') . "-" . rand(1000, 9999);
-        $data['contract_number'] = $quotation_number;
+        // $quotation_number = "Q-" . date('Y-m-d') . "-" . rand(1000, 9999);
+        // $data['contract_number'] = $quotation_number;
         // convert draft to contract contract type most be draft
         $contract = MaintenanceContract::findOrFail($data['contract_id']);
         $contract->update($data);
@@ -164,5 +172,25 @@ class MaintenanceContractService
             'cancellation_allowance' => 1,
         ];
         return MaintenanceContractDetail::create($contractData);
+    }
+
+
+    // contractcode
+    public function contractCode($maintenance_type, $barch_id)
+    {
+        $barch = Branch::find($barch_id);
+
+        $code  = $barch->prefix;
+        $last_id = $barch->last_maintenance_id;
+        $contractCode = '';
+
+        if ($this->maintenance_types[$maintenance_type - 1] != 'external') {
+            $contractCode .= $code . '-' . $last_id;
+        } else {
+            $contractCode .= 'EXT-' . $code . '-' . $last_id;
+        }
+        $barch->last_maintenance_id = $last_id + 1; // increment last id by 1 for next contract
+        $barch->save();
+        return $contractCode;
     }
 }

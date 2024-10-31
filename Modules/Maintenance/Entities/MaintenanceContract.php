@@ -20,6 +20,7 @@ class MaintenanceContract extends Model
         'area_id',
         'user_id',
         'contract_type',
+        'repersentative_id',
         'total',
         'city_id',
         'neighborhood_id',

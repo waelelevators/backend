@@ -36,7 +36,7 @@ class MaintenanceContractController extends Controller
         } else {
             $contract = $this->maintenanceContractService->createContract($request->all());
         }
-
+        return $contract;
         return new MaintenanceContractResource($contract);
     }
 
