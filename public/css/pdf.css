@@ -1,0 +1,143 @@
+body {
+  direction: rtl;
+  font-family: "changa";
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  direction: rtl;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+
+/* .column {
+    float: left;
+    width: 33.33%;
+  } */
+.top-space {
+  margin: 10px;
+}
+
+h2 {
+  padding: 50px 50px;
+  font-size: 40px;
+}
+
+p {
+  font-size: 20px;
+}
+
+.offer-box {
+  width: 50%;
+  padding: 5px;
+  margin: 0 10px 10 10px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);
+  float: right;
+}
+
+.offer-box p {
+  text-align: center;
+}
+
+.offer-price li {
+  font-size: 17pt;
+}
+
+
+
+/******************************************************************* المقدمة ***************************************************/
+
+.box {
+  padding: 50px;
+  margin: 50px;
+}
+
+.desc-box-intro {
+  margin-bottom: 10px;
+  margin-right: 10px;
+  width: 250px;
+
+  float: right;
+  border: 0px solid #2196f3;
+  border-left-width: 1px;
+}
+
+.desc-box-intro .desc-header {
+  height: 10px;
+  background-color: rgba(0, 0, 0, 0.09);
+  border-right-width: 1px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.desc-header p {
+  text-align: center;
+  font-size: 12px;
+}
+
+
+/******************************************************************* المقدمة ***************************************************/
+
+.desc-box {
+  width: 15%;
+  height: 110px;
+  float: right;
+  border: 0px solid #2196f3;
+  border-left-width: 1px;
+}
+
+.desc-box .desc-header {
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.09);
+  padding: 5px;
+  border-right-width: 1px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+}
+
+
+
+
+.desc-box .desc-body {
+  height: 60px;
+  padding: 10px;
+}
+
+.spit {
+  width: 50%;
+  text-align: center;
+}
+
+.left-signature {
+  float: left;
+  width: 50%;
+}
+
+.right-signature {
+  float: right;
+  width: 50%;
+}
+
+.right {
+  float: right;
+  width: 33%;
+}
+
+.left {
+  float: left;
+  width: 33%;
+}
+
+.middle {
+  /* text-align: center; */
+  width: 33%;
+}

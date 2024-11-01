@@ -1,0 +1,22 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+<<<<<<< HEAD
+=======
+*.zip
+elevators-laravel.zip
+>>>>>>> 1ebb111 (Maintenance Part)
+.env
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
+.cursorrules
+

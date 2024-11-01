@@ -1,0 +1,63 @@
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #2c9e99;
+    color: #fff;
+  }
+  .center-title {
+    margin: auto;
+    width: 60%;
+    padding: 1px;
+    border: 1px solid #5a0909;
+    border-radius: 9px;
+    text-align: center;
+  }
+  .pdf table,
+  .pdf th,
+  .pdf td {
+    border: 1px solid black;
+    text-align: center;
+  }
+  
+  .pdf td,
+  .pdf th {
+    padding: 0.75rem;
+    vertical-align: top;
+  }
+  
+  .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  .estate-title {
+    background: #343a40;
+    width: 100%;
+    color: white;
+  }
+  
+  .estate-title .paragraph {
+    padding: 5px;
+    font-size: 16pt;
+  }
+  
+  div.polaroid {
+    width: 80%;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 25px;
+  }
+  li {
+    text-align: justify;
+  }
+  @media all {
+    .page-break {
+      display: none;
+    }
+  }
+  
+  @media print {
+    .page-break {
+      display: block;
+      page-break-before: always;
+    }
+  }
+  
