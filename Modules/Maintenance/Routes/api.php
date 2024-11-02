@@ -149,6 +149,7 @@ Route::prefix('maintenance')->group(function () {
     // deep anlysis
     Route::get('/analysis/deep-analysis/{analysisType}', [AnalysisController::class, 'deepAnalysis']);
 
+    
     // CustomerLifetimeValue
     Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
     Route::get('/analysis/{param}/{year?}', [AnalysisController::class, 'index']);
