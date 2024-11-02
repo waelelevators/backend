@@ -136,6 +136,7 @@ Route::prefix('maintenance')->group(function () {
 
     // MaintenanceVisit
     Route::get('/visits', [MaintenanceVisitController::class, 'index']);
+    
     Route::get('/visits/{id}', [MaintenanceVisitController::class, 'show']);
     Route::post('/visits', [MaintenanceVisitController::class, 'store']);
 
@@ -149,7 +150,7 @@ Route::prefix('maintenance')->group(function () {
     // deep anlysis
     Route::get('/analysis/deep-analysis/{analysisType}', [AnalysisController::class, 'deepAnalysis']);
 
-    
+
     // CustomerLifetimeValue
     Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
     Route::get('/analysis/{param}/{year?}', [AnalysisController::class, 'index']);
