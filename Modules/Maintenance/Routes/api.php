@@ -12,10 +12,7 @@ use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 use Modules\Maintenance\Http\Controllers\LoginController;
 use Modules\Maintenance\Http\Controllers\AnalysisController;
-<<<<<<< HEAD
-=======
 use Modules\Maintenance\Http\Controllers\MaintenanceController;
->>>>>>> 1ebb111 (Maintenance Part)
 
 /*
 |--------------------------------------------------------------------------
@@ -40,10 +37,7 @@ Route::prefix('maintenance')->group(function () {
     // logout
     Route::post('/logout', [LoginController::class, 'logout']);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 1ebb111 (Maintenance Part)
     // otp
     Route::post('/otp', [LoginController::class, 'otp']);
     // verify otp
@@ -100,7 +94,6 @@ Route::prefix('maintenance')->group(function () {
 
 
 
-<<<<<<< HEAD
     Route::get('maintenance_data', function () {
         $data = [];
 
@@ -125,9 +118,7 @@ Route::prefix('maintenance')->group(function () {
 
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
     });
-=======
     Route::get('maintenance-data', [MaintenanceController::class, 'maintenance']);
->>>>>>> 1ebb111 (Maintenance Part)
 
     // upgrades
     Route::get('/upgrades', [UpgradeElevatorController::class, 'index']);
@@ -152,7 +143,6 @@ Route::prefix('maintenance')->group(function () {
     // البحث عن عميل من جدول العملاء باستخدم
     Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
     // clients/:id
-<<<<<<< HEAD
 
     // CustomerRetentionRate
     Route::get('/analysis/customer-retention-rate', [AnalysisController::class, 'CustomerRetentionRate']);
@@ -161,9 +151,5 @@ Route::prefix('maintenance')->group(function () {
 
     // CustomerLifetimeValue
     Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
-    // analysis
     Route::get('/analysis/{param}/{year?}', [AnalysisController::class, 'index']);
 });
-=======
-});
->>>>>>> 1ebb111 (Maintenance Part)

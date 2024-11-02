@@ -17,21 +17,12 @@ class InstallationLocationDetection extends Model
         'door_sizes' => 'array',
         'user_id' => 'integer',
     ];
-<<<<<<< HEAD
-    // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
-
-    protected $appends = [
-        'city',
-        'region',
-        'neighborhood',
-=======
     protected $with = ['city', 'region', 'neighborhood'];
 
     // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
 
     protected $appends = [
 
->>>>>>> 1ebb111 (Maintenance Part)
         'elevatorType',
         'doorOpingDirection',
         'stopsNumber',
@@ -93,7 +84,7 @@ class InstallationLocationDetection extends Model
         return ElevatorTrip::where('id', $this->well_data['elevator_trips_id'])->first();
     }
 
-<<<<<<< HEAD
+
     public function getRegionAttribute()
     {
         return Region::where('id', $this->location_data['region'] ?? 0)->first();
@@ -103,37 +94,19 @@ class InstallationLocationDetection extends Model
     {
         return City::where('id', $this->location_data['city'] ?? 0)->first();
     }
-    public function getNeighborhoodAttribute()
-    {
-        return Neighborhood::where('id', $this->location_data['neighborhood'] ?? 0)->first();
-    }
-
-=======
-    public function region()
-    {
-        return $this->belongsTo(Region::class);
-    }
-
-    public function city()
-    {
-        return $this->belongsTo(City::class);
-    }
     public function neighborhood()
     {
         return $this->belongsTo(Neighborhood::class);
     }
 
 
->>>>>>> 1ebb111 (Maintenance Part)
+
     public function getFloorAttribute()
     {
         return Floor::get();
     }
-<<<<<<< HEAD
- 
-=======
 
->>>>>>> 1ebb111 (Maintenance Part)
+
     public function getFloorDataAttribute($value)
     {
         // Decode the JSON string into an associative array

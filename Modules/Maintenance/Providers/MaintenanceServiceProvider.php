@@ -28,10 +28,7 @@ class MaintenanceServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
-<<<<<<< HEAD
-=======
         $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'maintenance');
->>>>>>> 1ebb111 (Maintenance Part)
     }
 
     /**
@@ -114,8 +111,4 @@ class MaintenanceServiceProvider extends ServiceProvider
         }
         return $paths;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1ebb111 (Maintenance Part)

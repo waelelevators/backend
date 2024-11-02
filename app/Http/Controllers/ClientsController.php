@@ -21,32 +21,6 @@ class ClientsController extends Controller
     {
         $clientType = $request['clientType'];
 
-<<<<<<< HEAD
-        $client =  new Client;
-        $client->type = $clientType;
-
-        switch ($clientType) {
-            case 1:
-
-                if (
-                    !empty($request['firstName']) &&
-                    !empty($request['secondName']) &&
-                    !empty($request['thirdName']) &&
-                    !empty($request['forthName'])
-                ) {
-                    $client->name = "{$request['firstName']}
-                    {$request['secondName']}
-                    {$request['thirdName']}
-                    {$request['forthName']}";
-                } elseif (!empty($request['firstName']) && !empty($request['forthName'])) {
-                    $client->name = "{$request['firstName']} {$request['forthName']}";
-                }
-
-                if (!empty($request['idNumber'])) {
-                    $client->id_number = $request['idNumber'];
-                }
-
-=======
         $client = new Client();
         $client->type = $clientType;
 
@@ -55,12 +29,10 @@ class ClientsController extends Controller
             case 1:
                 $client->name = $this->formatClientName($request);
                 $client->id_number = $request['idNumber'] ?? null;
->>>>>>> 1ebb111 (Maintenance Part)
                 $client->first_name = $request['firstName'];
                 $client->second_name = $request['secondName'] ?? '';
                 $client->third_name = $request['thirdName'] ?? '';
                 $client->last_name = $request['forthName'];
-<<<<<<< HEAD
 
                 break;
             case 2:
@@ -82,34 +54,9 @@ class ClientsController extends Controller
                     $client->id_number = $request['idNumber'];
                 }
                 $client->owner_name = $request['represents']; // يمثلها
-=======
-                break;
 
-            case 2:
-                $client->name = $request['companyName'];
-                $client->owner_name = $request['represents'];
-                $client->id_number = $request['commercialRegistrationNo'] ?? null;
-                $client->tax_number = $request['taxNo'] ?? null;
-                break;
-
-            case 3:
-                $client->name = $request['entityName'];
-                $client->id_number = $request['idNumber'] ?? null;
-                $client->owner_name = $request['represents'];
->>>>>>> 1ebb111 (Maintenance Part)
-                break;
         }
 
-        $client->phone = $request['phone'];
-        $client->phone2 = $request['phone2'];
-        $client->whatsapp = $request['whatsapp'];
-        $client->save();
-
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم اضافة العميل بنجاح',
-        ]);
 
 
 
@@ -120,78 +67,6 @@ class ClientsController extends Controller
     }
 
     // public function update(Request $request, $id)
-<<<<<<< HEAD
-    function update(ClientUpdateResquest $request, $id)
-    {
-
-        $clientType = $request['clientType'];
-
-        // $response = $this->checkClientId($clientType, $request['idNumber'], $id); //  بحث عن عميل برقم الهوية
-        // if ($response) {
-
-        $client = Client::findOrFail($id);
-
-        if (isset($request['image'])) $image = $this->uploadBase64Image($request['image'], 'client');
-        else $image = '';
-
-        $client->type = $clientType;
-
-        if ($clientType == 1) {
-            $client->data = [
-                'first_name' => $request['firstName'],
-                'second_name' => $request['secondName'],
-                'third_name' => $request['thirdName'],
-                'last_name' => $request['forthName'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'id_number' => $request['idNumber'],
-                'image' => $image,
-            ];
-        } elseif ($clientType == 2) {
-
-            $client->data = [
-                'name' => $request['companyName'],
-                'owner_name' => $request['represents'],
-                'commercial_register' => $request['commercial_register'],
-                'tax_number' => $request['taxNo'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'id_number' => $request['idNumber'],
-                'image' => $image,
-            ];
-        } elseif ($clientType == 3) {
-            $client->data = [
-                'name' => $request['entityName'],
-                'id_number' => $request['idNumber'],
-                'phone' => $request['phone'],
-                'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone'],
-                'image' => $image,
-            ];
-        }
-
-        $client->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم تعديل العميل بنجاح',
-        ]);
-
-        // } else {
-
-        //     return response()->json([
-        //         'status' => 'failed',
-        //         'errors' => [
-        //             'idNumber' =>  'رقم الهوية مستخدم من قبل عميل اخر'
-        //         ],
-        //         //'error' => 'رقم الهوية مستخدم من قبل عميل اخر'
-        //     ]);
-        // }
-    }
-
-=======
     // function update(ClientUpdateResquest $request, $id)
 
     public function update(ClientUpdateResquest $request, $id)
@@ -200,7 +75,7 @@ class ClientsController extends Controller
         $client = Client::findOrFail($id);
 
         $clientType = $request['clientType'];
-       // $client->type = $clientType;
+        // $client->type = $clientType;
         // Handle different client types
         switch ($clientType) {
             case 1:
@@ -255,7 +130,6 @@ class ClientsController extends Controller
     // }
     //   }
 
->>>>>>> 1ebb111 (Maintenance Part)
     public function SearchPhone($type, $phone)
     {
         return Client::where('phone', $phone)
@@ -317,22 +191,6 @@ class ClientsController extends Controller
     {
         return Client::orderByDesc('created_at')->get();
     }
-<<<<<<< HEAD
-    private function uploadBase64Image($base64Image, $path = 'logos')
-    {
-        // Decode the base64-encoded image
-        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64Image));
-
-        // Generate a unique filename
-        $filename = uniqid() . '.png'; // You can adjust the extension based on the image format
-
-        // Save the image to the storage directory
-        Storage::disk('public')->put($path . '/' . $filename, $imageData);
-
-        $fullPath = asset('storage/' . $path . '/' . $filename);
-
-        return $fullPath;
-=======
     private function formatClientName($request)
     {
         if (
@@ -347,6 +205,5 @@ class ClientsController extends Controller
         }
 
         return null;
->>>>>>> 1ebb111 (Maintenance Part)
     }
 }

@@ -14,15 +14,10 @@ class AddNoteToCabinManufacturesTable extends Migration
     public function up()
     {
         Schema::table('cabin_manufactures', function (Blueprint $table) {
-<<<<<<< HEAD
-            //
-            $table->text('notes')->nullable(); // Adjust 'some_column' as needed
-=======
             // Check if the 'notes' column exists before adding it
             if (!Schema::hasColumn('cabin_manufactures', 'notes')) {
                 $table->text('notes')->nullable();
             }
->>>>>>> 1ebb111 (Maintenance Part)
         });
     }
 
@@ -34,15 +29,10 @@ class AddNoteToCabinManufacturesTable extends Migration
     public function down()
     {
         Schema::table('cabin_manufactures', function (Blueprint $table) {
-<<<<<<< HEAD
-            //
-            $table->dropColumn('notes');
-=======
             // Drop the 'notes' column if it exists
             if (Schema::hasColumn('cabin_manufactures', 'notes')) {
                 $table->dropColumn('notes');
             }
->>>>>>> 1ebb111 (Maintenance Part)
         });
     }
 }

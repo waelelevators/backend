@@ -7,10 +7,7 @@ use App\Models\Contract;
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
 use App\Models\Employee;
-<<<<<<< HEAD
-=======
 use App\Models\InstallationClientLocation;
->>>>>>> 1ebb111 (Maintenance Part)
 use App\Models\Status;
 use App\Models\TechniciansWorkOrder;
 use App\Models\WorkOrder;
@@ -22,14 +19,10 @@ use Modules\Installation\Http\Controllers\CabinManufactureController;
 use Modules\Installation\Http\Controllers\ContractController;
 use Modules\Installation\Http\Controllers\ExternalDoorManufactureController;
 use Modules\Installation\Http\Controllers\HandOverController;
-<<<<<<< HEAD
-=======
 
-use Modules\Installation\Http\Controllers\InstallationClientLocationController;
->>>>>>> 1ebb111 (Maintenance Part)
+
 use Modules\Installation\Http\Controllers\InstallationController;
 use Modules\Installation\Http\Controllers\InternalDoorManufactureController;
-use Modules\Installation\Http\Controllers\LocationAssignmentController;
 use Modules\Installation\Http\Controllers\LocationDetectionController;
 use Modules\Installation\Http\Controllers\LocationDetectionTechController;
 use Modules\Installation\Http\Controllers\LocationStatusController;
@@ -104,8 +97,6 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::delete('quotations/{id?}', [QuotationController::class, 'destroy']);
 
 
-<<<<<<< HEAD
-=======
 
     //  زيارة المناديب  اليومية
     Route::get('location-clients', [InstallationClientLocationController::class, 'index']);
@@ -115,7 +106,6 @@ Route::middleware('auth:sanctum')->prefix('installation')->group(function () {
     Route::delete('location-clients/{id?}', [InstallationClientLocationController::class, 'destroy']);
 
 
->>>>>>> 1ebb111 (Maintenance Part)
     Route::get('payments', [PaymentController::class, 'index']);
     Route::post('payments', [PaymentController::class, 'store']);
 

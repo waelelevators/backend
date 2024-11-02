@@ -17,15 +17,16 @@ class MaintenanceContract extends Model
         'latitude',
         'longitude',
     ];
-<<<<<<< HEAD
-=======
 
     public function region()
     {
         return $this->belongsTo(Region::class);
     }
+    public function elevatorType()
+    {
+        return $this->belongsTo(ElevatorType::class);
+    }
 
->>>>>>> 1ebb111 (Maintenance Part)
     public function city()
     {
         return $this->belongsTo(City::class);
@@ -34,39 +35,20 @@ class MaintenanceContract extends Model
     {
         return $this->belongsTo(Neighborhood::class);
     }
-<<<<<<< HEAD
-=======
 
     public function buildingType()
     {
         return $this->belongsTo(BuildingType::class);
     }
->>>>>>> 1ebb111 (Maintenance Part)
     public function area()
     {
         return $this->belongsTo(Area::class);
     }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 1ebb111 (Maintenance Part)
-    public function elevatorType()
-    {
-        return $this->belongsTo(ElevatorType::class);
-    }
-<<<<<<< HEAD
-
-=======
     public function machineType()
     {
         return $this->belongsTo(MachineType::class, 'machine_type_id');
     }
     public function machineSpeed()
-    {
-        return $this->belongsTo(MachineSpeed::class, 'machine_speed_id');
-    }
-    public function doorSize()
     {
         return $this->belongsTo(DoorSize::class, 'door_size_id');
     }
@@ -84,7 +66,6 @@ class MaintenanceContract extends Model
     {
         return $this->belongsTo(DriveTypes::class, 'drive_type_id');
     }
->>>>>>> 1ebb111 (Maintenance Part)
     // contract details
     public function contractDetails()
     {

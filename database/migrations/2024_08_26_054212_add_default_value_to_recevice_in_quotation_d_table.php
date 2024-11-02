@@ -15,13 +15,8 @@ class AddDefaultValueToReceviceInQuotationDTable extends Migration
     {
         Schema::table('quotation_d', function (Blueprint $table) {
             //
-<<<<<<< HEAD
-            $table->integer('received')->default(0)->change();
-            $table->unsignedBigInteger('rfq_id')->nullable()->change();
-=======
             $table->integer('received')->default(0);
             $table->unsignedBigInteger('rfq_id')->nullable();
->>>>>>> 1ebb111 (Maintenance Part)
         });
     }
 

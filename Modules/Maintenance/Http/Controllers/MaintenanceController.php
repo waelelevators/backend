@@ -10,9 +10,7 @@ use Illuminate\Contracts\Support\Renderable;
 class MaintenanceController extends Controller
 {
 
-<<<<<<< HEAD
 
-=======
     public function maintenance()
     {
 
@@ -38,7 +36,6 @@ class MaintenanceController extends Controller
 
         return response()->json(['elevator' => $data]);
     }
->>>>>>> 1ebb111 (Maintenance Part)
     /**
      * Show the form for creating a new resource.
      * @return Renderable
@@ -48,18 +45,12 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
-<<<<<<< HEAD
-            "elevator_types", "machine_types", "machine_speeds", "door_sizes", "control_cards",
-            "stops_numbers", 'users'
-=======
-            "elevator_types",
             "machine_types",
             "machine_speeds",
             "door_sizes",
             "control_cards",
             "stops_numbers",
             'users'
->>>>>>> 1ebb111 (Maintenance Part)
         ];
 
         $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
@@ -78,12 +69,9 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
-<<<<<<< HEAD
-            'malfunction_types', 'malfunction_statuses'
-=======
+         
             'malfunction_types',
             'malfunction_statuses'
->>>>>>> 1ebb111 (Maintenance Part)
         ];
 
         $tables2 = [

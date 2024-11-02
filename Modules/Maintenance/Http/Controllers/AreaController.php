@@ -39,11 +39,7 @@ class AreaController extends Controller
 
         $model = new Area();
         $model->name = $request['name'];
-<<<<<<< HEAD
         $model->description = $request['description'];
-=======
-        $model->descripation = $request['description'];
->>>>>>> 1ebb111 (Maintenance Part)
         $model->save();
 
         return response()->json([

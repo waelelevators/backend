@@ -31,10 +31,6 @@ class LocationAssignmentsLog extends Model
      */
     public function representative()
     {
-<<<<<<< HEAD
-        return $this->belongsTo(User::class, 'representative_by');
-=======
         return $this->belongsTo(Employee::class, 'representative_by');
->>>>>>> 1ebb111 (Maintenance Part)
     }
 }

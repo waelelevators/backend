@@ -18,13 +18,9 @@ use App\Http\Controllers\RfqSupplierLineItemController;
 use App\Http\Controllers\SignedContractsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\contractQuotationsController;
-<<<<<<< HEAD
 use App\Http\Controllers\SettingsController;
-=======
 use App\Http\Controllers\OneColumnController;
-use App\Http\Controllers\SettingsController;
 use App\Models\BuildingType;
->>>>>>> 1ebb111 (Maintenance Part)
 use App\Models\Client;
 use App\Models\Employee;
 use App\Models\Industry;
@@ -448,7 +444,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return DB::table('industries')->get();
     });
 
-<<<<<<< HEAD
     Route::post('update_elevator_data', function (Request $request) {
         // Validate the request
         $validator = Validator::make($request->all(), [
@@ -493,7 +488,6 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 500);
         }
     });
-=======
 
     Route::get(
         'clients-data',
@@ -576,7 +570,6 @@ Route::middleware('auth:sanctum')->group(function () {
     //     return DB::table($type)->get();
     // });
 
->>>>>>> 1ebb111 (Maintenance Part)
 
 
     Route::post('logout', [AuthController::class, 'logout']);
@@ -617,7 +610,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('templateSettings', [SettingsController::class, 'getTemplate']);
     // Route::post('templateSettings', [SettingsController::class, 'updateTemplate']);
 
-<<<<<<< HEAD
     // elevator_types
     Route::get('elevator_types', function () {
         return [
@@ -633,7 +625,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('get_elevator_data/{type}', function ($type) {
         return DB::table($type)->get();
     });
-=======
 
 
     // Route::post('{table}/names', [OneColumnController::class, 'store']);
@@ -641,7 +632,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::put('{table}/names/{id}', [OneColumnController::class, 'update']);
     // Route::delete('{table}/names/{id}', [OneColumnController::class, 'destroy']);
 
->>>>>>> 1ebb111 (Maintenance Part)
 
 
 
@@ -786,23 +776,14 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-<<<<<<< HEAD
 
 Route::post('login', [AuthController::class, 'login']);
 
-=======
-Route::post('login', [AuthController::class, 'login']);
 
-
->>>>>>> 1ebb111 (Maintenance Part)
 Route::get('test', function () {
     return response()->json(['data' => ['message' => 'Hello, world!']]);
 });
 
 
 
-<<<<<<< HEAD
 /************************************** quotations  ***************************************************************/
-=======
-/************************************** quotations  ***************************************************************/
->>>>>>> 1ebb111 (Maintenance Part)

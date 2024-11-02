@@ -12,21 +12,14 @@ class MaintenanceContractResource extends JsonResource
         return [
             'id' => $this->id,
             'contract_number' => $this->contract_number,
-<<<<<<< HEAD
-            'area' => $this->area,
             'user_id' => $this->user_id,
-            'contract_type' => $this->contract_type,
-            'total' => $this->total,
-=======
             'contract_type' => $this->contract_type,
             'region' => $this->region,
             'city' => $this->city,
             'neighborhood' => $this->neighborhood,
             'area' => $this->area,
-            'user_id' => $this->user_id,
             'total' => $this->total,
             'region_id' => $this->region_id,
->>>>>>> 1ebb111 (Maintenance Part)
             'city_id' => $this->city_id,
             'neighborhood_id' => $this->neighborhood_id,
             'latitude' => $this->latitude,
@@ -43,21 +36,12 @@ class MaintenanceContractResource extends JsonResource
             'client' => $this->client,
             'elevatorType' => $this->elevatorType,
             'machineType' =>  $this->machineType,
-<<<<<<< HEAD
             'contracts' => $this->contractDetails,
             'active_contract' =>  MaintenanceContractDetailResource::make($this->activeContract),
-            'city' => $this->city,
-            'neighborhood' => $this->neighborhood,
-=======
             'machineSpeed' =>  $this->machineSpeed,
-            'doorSize' => $this->doorSize,
             'stopCount' => $this->stopCount,
             'controlCard' => $this->controlCard,
             'driveType' => $this->driveType,
-            'contracts' => $this->contractDetails,
-            'active_contract' =>  MaintenanceContractDetailResource::make($this->activeContract),
-
->>>>>>> 1ebb111 (Maintenance Part)
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

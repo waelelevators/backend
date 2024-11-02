@@ -3,15 +3,9 @@
 namespace Modules\Maintenance\Http\Controllers;
 
 use App\Models\Client;
-<<<<<<< HEAD
-use App\Models\MaintenanceContract;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-=======
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Models\MaintenanceContract;
->>>>>>> 1ebb111 (Maintenance Part)
 use Modules\Maintenance\Http\Requests\MaintenanceContractStoreRequest;
 use Modules\Maintenance\Services\MaintenanceContractService;
 use Modules\Maintenance\Transformers\MaintenanceContractResource;
@@ -28,11 +22,6 @@ class MaintenanceContractController extends Controller
     public function index($type = null)
     {
         if ($type == 'draft') {
-<<<<<<< HEAD
-            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'draft')->paginate(10);
-        } else {
-            $contracts = MaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'contract')->paginate(10);
-=======
             $contracts = MaintenanceContract::with('region', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'draft')
                 ->orderByDesc('id')
                 ->paginate(10);
@@ -40,7 +29,6 @@ class MaintenanceContractController extends Controller
             $contracts = MaintenanceContract::with('region', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'contract')
                 ->orderByDesc('id')
                 ->paginate(10);
->>>>>>> 1ebb111 (Maintenance Part)
         }
         return MaintenanceContractResource::collection($contracts);
     }
@@ -48,14 +36,6 @@ class MaintenanceContractController extends Controller
     public function store(MaintenanceContractStoreRequest $request)
     {
         if ($request->has('contract_id') && $request->contract_id > 0) {
-<<<<<<< HEAD
-            $contract = $this->maintenanceContractService->convertDraftToContract($request->all());
-        } else {
-            $contract = $this->maintenanceContractService->createContract($request->all());
-        }
-
-        return new MaintenanceContractResource($contract);
-=======
             $this->maintenanceContractService->convertDraftToContract($request->all());
         } else {
             $this->maintenanceContractService->createContract($request->all());
@@ -67,7 +47,6 @@ class MaintenanceContractController extends Controller
         ]);
 
         //  return new MaintenanceContractResource($contract);
->>>>>>> 1ebb111 (Maintenance Part)
     }
 
     public function show($id)
@@ -85,23 +64,6 @@ class MaintenanceContractController extends Controller
             'elevator_type_id' => 'nullable',
             'phone' => 'nullable',
         ]);
-<<<<<<< HEAD
-        $client_id = Client::where('phone', $request->phone)->first()->id;
-        $maintenance_contracts = MaintenanceContract::where('elevator_type_id', $request->elevator_type_id)
-            ->where('client_id', $client_id)
-            ->where('contract_type', 'draft')
-            ->with('area', 'city', 'neighborhood', 'elevatorType')
-            ->get();
-
-        // ahmed hmed
-
-        return MaintenanceContractResource::collection($maintenance_contracts);
-
-        $data = [
-            'maintenance_contracts' => MaintenanceContractResource::collection($maintenance_contracts),
-            'client' => $client,
-        ];
-=======
         $client = Client::where('phone', $request->phone)->firstOrFail();
 
         if ($client) {
@@ -121,7 +83,6 @@ class MaintenanceContractController extends Controller
             // For example, return a response or log a message
             return response()->json(['error' => 'client not found'], 404);
         }
->>>>>>> 1ebb111 (Maintenance Part)
     }
 
 
@@ -139,8 +100,4 @@ class MaintenanceContractController extends Controller
     }
 
     // convertDraftToContract
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1ebb111 (Maintenance Part)

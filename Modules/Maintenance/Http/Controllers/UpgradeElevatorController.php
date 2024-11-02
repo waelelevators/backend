@@ -36,14 +36,7 @@ class UpgradeElevatorController extends Controller
 
     public function store(Request $request)
     {
-<<<<<<< HEAD
-        // dd($request->all());
-=======
-<<<<<<< HEAD
-=======
-        // dd($request->all());
->>>>>>> d2bf305c0ed65f619ac4b3659223ee169042aa1a
->>>>>>> 1ebb111 (Maintenance Part)
+
         $upgrade = $this->upgradeService->createUpgrade($request->all());
 
         return new MaintenanceUpgradeResource($upgrade);

@@ -184,11 +184,7 @@ class ApiHelper
         $r->contract_type = $contract_type;
         $r->how_did_you_get_to_us = $request['reachUs'];
 
-<<<<<<< HEAD
-        switch ($request->reachUs) {
-=======
         switch ($request['reachUs']) {
->>>>>>> 1ebb111 (Maintenance Part)
 
             case 1: // موقع الكتروني
                 $r->representativeable_id = 0;
@@ -341,13 +337,10 @@ class ApiHelper
         }
 
         $client->phone = $request['phone'];
-<<<<<<< HEAD
         $client->phone2 = $request['phone2'];
         $client->whatsapp = $request['whatsapp'];
-=======
         $client->phone2 = $request['anotherPhone'] ?? '';
         $client->whatsapp = $request['whatsappPhone'] ?? '';
->>>>>>> 1ebb111 (Maintenance Part)
         $client->save();
         return $client;
     }
@@ -583,8 +576,4 @@ class ApiHelper
         $client->save();
         return $client;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1ebb111 (Maintenance Part)

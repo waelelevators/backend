@@ -18,18 +18,11 @@ class UpgradeElevatorService
     {
         $user = auth('sanctum')->user();
         return DB::transaction(function () use ($data, $user) {
-<<<<<<< HEAD
-            $client = ApiHelper::handleClientData($data);
-            $client_id = $client->id;
-
-            $taxValue = 0.15;
-=======
 
             $client = ApiHelper::handleClientData($data);
             $client_id = $client->id;
 
             $taxValue = $data['tax'];
->>>>>>> 1ebb111 (Maintenance Part)
             $total = $data['total'];
             $discount = $data['discount'] ?? 0;
             $netPrice = $total - $discount;

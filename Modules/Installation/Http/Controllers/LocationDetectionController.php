@@ -26,14 +26,9 @@ class LocationDetectionController extends Controller
 
         // return InstallationLocationDetectionResource::collection($models);
 
-<<<<<<< HEAD
-        $perPage = $request->input('per_page', 5);
-        $models =  InstallationLocationDetection::orderByDesc('created_at')->paginate($perPage);
-=======
         $perPage = $request->input('per_page', default: 10);
         $models =  InstallationLocationDetection::orderBy('created_at', 'desc')
             ->paginate($perPage);
->>>>>>> 1ebb111 (Maintenance Part)
 
         return InstallationLocationDetectionResource::collection($models);
     }
@@ -81,31 +76,19 @@ class LocationDetectionController extends Controller
 
             $locationModel->client_id = $client->id;
 
-<<<<<<< HEAD
             $locationModel->location_data = [
                 'region'         => intval($request['region']) ?? '',
                 'city'           => intval($request['city']) ?? '',
-                'neighborhood'   => intval($request['neighborhood']) ?? '',
-                'street'         => $request['street'] ?? '',
-                'building_image' => $building_image ?? '',
-                'location_url'   => $request['locationBuilding'] ?? '',
-                'lat'            => $request['lat'] ?? '',
-                'long'           => $request['long'] ?? ''
+                'neighborhood'   => intval($request['neighborhood']) ?? ''
             ];
-=======
-            $locationModel->region_id = intval($request['region']);
-            $locationModel->city_id = intval($request['city']);
-            $locationModel->neighborhood_id = intval($request['neighborhood']);
-            $locationModel->building_image = $building_image;
-            $locationModel->location_url = $request['locationBuilding'];
-            $locationModel->lat = $request['lat'];
-            $locationModel->long = $request['long'];
->>>>>>> 1ebb111 (Maintenance Part)
+            
+            // $locationModel->lat = $request['lat'];
+            // $locationModel->long = $request['long'];
+
 
             $locationModel->well_data = [
                 'well_image'                   =>  $location_image ?? '',
                 'well_height'                  =>  $request['wellHeight'] ?? '',
-                'well_depth'                   =>  $request['wellDepth'] ?? '',
                 'well_width'                   =>  $request['wellWidth'] ?? '',
                 'last_floor_height'            =>  $request['lastFloorHeight'] ?? '',
                 'bottom_the_elevator'          =>  $request['bottomTheElevator'] ?? '',

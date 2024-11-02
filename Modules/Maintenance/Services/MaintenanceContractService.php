@@ -29,15 +29,6 @@ class MaintenanceContractService
 
     public function createContract(array $data)
     {
-<<<<<<< HEAD
-        $client = ApiHelper::handleAddClient($data);
-        // return ($client);
-        $data['client_id'] = $client->id;
-        // return auth('sanctum')->user();
-        $user_id = auth('sanctum')->user()->id;
-
-
-=======
         $user_id = auth('sanctum')->user()->id;
 
 
@@ -46,7 +37,6 @@ class MaintenanceContractService
         $data['client_id'] = $client->id;
 
 
->>>>>>> 1ebb111 (Maintenance Part)
         $contractData = array_diff_key($data, array_flip([
             // 'start_date',
             // 'end_date',
@@ -60,24 +50,6 @@ class MaintenanceContractService
         ]));
 
 
-<<<<<<< HEAD
-        $contractData['contract_type'] = $data['isDraft'] ? 'draft' : 'contract';
-        $contractData['user_id'] = $user_id;
-
-        // dd($contractData);
-
-        $contract = $this->maintenanceContractRepository->create($contractData);
-
-        $this->generalLogService::log($contract,  'create', 'Contract created', ['contract' => $contract, 'data' => $contractData, 'user_id' => 1]);
-
-
-
-
-        $detailData = array_intersect_key($data, array_flip([
-            // 'start_date',
-            // 'end_date',
-            'visits_count',
-=======
 
         // if (isset($data['site_images']) && is_array($data['site_images'])) {
         //     $imagesPaths = [];
@@ -103,7 +75,6 @@ class MaintenanceContractService
             'visits_count',
             'visits_count',
             'maintenance_type',
->>>>>>> 1ebb111 (Maintenance Part)
             'cost',
             'notes',
             'cancellation_allowance',
@@ -120,24 +91,14 @@ class MaintenanceContractService
 
         // dd($detailData);
         // رقم الكوتيشن
-<<<<<<< HEAD
-        $quotation_number = "Q-" . date('Y-m-d') . "-" . rand(1000, 9999);
-=======
         $quotation_number = "Q-" . date('Y') . "-" . rand(1000, 9999);
->>>>>>> 1ebb111 (Maintenance Part)
 
         if ($data['isDraft'] !== true) {
 
             $detail = $this->maintenanceContractDetailRepository->create($detailData);
-<<<<<<< HEAD
-            $contract->update(['active_contract_id' => $detail->id, 'quotation_number' => $quotation_number]);
-            $this->createVisits($detail);
-            $this->generalLogService::log($detail, 'create', 'Contract detail created', ['data' => $detailData, 'user_id' => 1]);
-=======
             $contract->update(['active_contract_id' => $detail->id]);
             $this->createVisits($detail);
             $this->generalLogService::log($detail, 'create', 'Contract detail created', ['data' => $detailData, 'user_id' => auth('sanctum')->user()->id]);
->>>>>>> 1ebb111 (Maintenance Part)
         }
 
 
@@ -214,8 +175,4 @@ class MaintenanceContractService
         ];
         return MaintenanceContractDetail::create($contractData);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1ebb111 (Maintenance Part)

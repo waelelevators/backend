@@ -686,11 +686,7 @@ class ContractController extends Controller
      * @param int $id
      * @return Renderable
      */
-<<<<<<< HEAD
-    public function update(ContractStoreRequest $request, $id)
-=======
     public function update(ContractUpdateRequest $request, $id)
->>>>>>> 1ebb111 (Maintenance Part)
     {
         $contract = Contract::findOrFail($id);
 
@@ -734,21 +730,12 @@ class ContractController extends Controller
         $contract->note                                        = $request['notes'];
         $contract->save();
 
-<<<<<<< HEAD
         $dataArrss = is_array($request['paymentStages']) ?
             $request['paymentStages'] :
             array($request['paymentStages']);
 
 
-=======
-        // $dataArrss = is_array($request['paymentStages']) ?
-        //     $request['paymentStages'] :
-        //     array($request['paymentStages']);
->>>>>>> 1ebb111 (Maintenance Part)
-
-
         return response()->json([
-            'status' => 'success',
             'message' => 'تم تعديل بيانات العقد بنجاح'
         ]);
     }
@@ -760,11 +747,7 @@ class ContractController extends Controller
      */
     public function store(ContractUpdateRequest $request)
     {
-<<<<<<< HEAD
 
-=======
->>>>>>> 1ebb111 (Maintenance Part)
-        // Check if idNumber exists for a different client
         if (!empty($request['idNumber'])) {
             $idNumberExists = Client::where('id_number', $request['idNumber'])
                 ->where('id', '!=', $request['clientId'])
@@ -812,25 +795,6 @@ class ContractController extends Controller
 
             $contract = new Contract();
 
-<<<<<<< HEAD
-            $data = [
-                'region'          => $request['region'] ?? null,
-                'city'            => $request['city'] ?? null,
-                'neighborhood'    => $request['neighborhood'] ?? null,
-                'location_url'    => $request['location_url'] ?? null,
-                'lat'             => $request['lat'] ?? null,
-                'long'            => $request['long'] ?? null
-            ];
-
-            // Remove null values from the data array
-            $data = array_filter($data, function ($value) {
-                return !is_null($value);
-            });
-
-            InstallationLocationDetection::where('id', $request['locationId'])
-                ->update([
-                    'location_data' => $data
-=======
             InstallationLocationDetection::where('id', $request['locationId'])
                 ->update([
                     'city_id' => $request['city'],
@@ -839,7 +803,6 @@ class ContractController extends Controller
                     'location_url' => $request['location_url'],
                     'lat' => $request['lat'],
                     'long' => $request['long']
->>>>>>> 1ebb111 (Maintenance Part)
                 ]); //   [المنطقة - المدينة - الحي]تحديث بيانات كشف الموقع
 
             $contract->project_name                                = $request['projectName'] ?? '';
@@ -971,10 +934,7 @@ class ContractController extends Controller
 
         $model = Contract::with([
             'stage',
-<<<<<<< HEAD
-            'stage',
-=======
->>>>>>> 1ebb111 (Maintenance Part)
+        
             'elevatorRoom',
             'template',
             'representatives',
@@ -991,10 +951,6 @@ class ContractController extends Controller
             'EntrancesNumber',
             'branch',
             'elevatorType',
-            'elevatorTrip',
-            'elevatorRail',
-            'elevatorRoom',
-            'elevatorWeight',
             'machineType',
             'machineLoad',
             'controlCard',

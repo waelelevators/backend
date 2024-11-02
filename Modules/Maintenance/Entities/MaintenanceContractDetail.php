@@ -14,10 +14,7 @@ class MaintenanceContractDetail extends Model
         'start_date',
         'end_date',
         'visits_count',
-<<<<<<< HEAD
-=======
         'maintenance_type',
->>>>>>> 1ebb111 (Maintenance Part)
         'cost',
         'notes',
         'remaining_visits',

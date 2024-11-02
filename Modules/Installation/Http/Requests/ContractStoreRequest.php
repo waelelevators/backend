@@ -39,13 +39,8 @@ class ContractStoreRequest extends FormRequest
 
             'idNumber' => 'nullable|required_if:clientType,1|integer|unique:clients,id_number',
 
-<<<<<<< HEAD
-            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|digits:10',
-            'taxNo' => 'nullable|required_if:clientType,2|integer|digits:10',
-=======
             'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer',
             'taxNo' => 'nullable|required_if:clientType,2|integer',
->>>>>>> 1ebb111 (Maintenance Part)
             'building_image' => 'nullable|string',
             'region' => 'required|integer|exists:regions,id',
             'city' => 'required|integer|exists:cities,id',

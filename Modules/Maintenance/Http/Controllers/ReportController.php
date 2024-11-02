@@ -36,16 +36,13 @@ class ReportController extends Controller
     public function show($id)
     {
 
-<<<<<<< HEAD
         $report = MaintenanceReport::with('requiredProducts', 'requiredProducts.product', 'technician', 'user')->find($id);
-=======
         $report = MaintenanceReport::with(
             'requiredProducts',
             'requiredProducts.product',
             'technician',
             'user'
         )->find($id);
->>>>>>> 1ebb111 (Maintenance Part)
         return new ReportResource($report);
     }
 
