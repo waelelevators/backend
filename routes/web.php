@@ -6,13 +6,16 @@ use App\Http\Controllers\PdfExchangeProductController;
 use App\Http\Controllers\PdfInstallationLDController;
 use App\Http\Controllers\PdfQuotationController;
 use App\Models\Client;
+use App\Models\Employee;
 use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceReport;
 use App\Models\MaintenanceUpgrade;
 use App\Models\MaintenanceVisit;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Modules\Maintenance\Entities\MaintenanceContract;
+use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 // use PDF;
 
@@ -30,6 +33,43 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 
 Route::get('maintenance-contract-logs', function () {
+
+
+    $contract =  MaintenanceContract::find(138)->driveType;
+    return $contract;
+    return MaintenanceContractResource::make($contract);
+    return Employee::whereHas('visits', function ($query) {
+        $query->where('status', 'completed');
+    })
+        ->with('user.area')
+        ->with('visits', function ($query) {
+            $query->with('maintenanceContract', 'maintenanceContract.client', 'maintenanceContract.city', 'maintenanceContract.neighborhood', 'maintenanceContract.area');
+        })
+        ->get();
+
+    // اجلب ال technician_id بدون تكرار من جدول الزيارات
+    $technicianIds = MaintenanceVisit::where("status", "completed")
+        ->with(
+            'technician',
+            'maintenanceContractDetail',
+            'maintenanceContractDetail.client',
+            'maintenanceContract.city',
+            'maintenanceContract.neighborhood',
+            'maintenanceContract.area'
+        )
+        ->get();
+
+
+
+    return $technicianIds;
+
+
+    $user =  User::find(1);
+
+    $user->otp = 123456;
+    $user->save();
+
+    return $user;
 
     $years = MaintenanceContractDetail::selectRaw('YEAR(start_date) as year')
         ->distinct()

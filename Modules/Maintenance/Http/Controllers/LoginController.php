@@ -36,11 +36,13 @@ class LoginController extends Controller
                     'name' => $client->name,
                     'phone' => $client->phone,
                     'level' => 'customer',
-                    'otp' => 123456,
+                    'otp' => null,
+                    // 'otp' => 123456,
                     'token' => $clientToken
                 ]
             ]]);
         }
+        
 
         $userToken = $user->createToken('user-token')->plainTextToken;
 
@@ -51,7 +53,8 @@ class LoginController extends Controller
                 // 'level' => 'customer',
                 'level' => 'technician',
                 'completedJobs' => 10,
-                'otp' => 123456,
+                'otp' => null,
+                // 'otp' => 123456,
                 'rating' => 4.8,
                 'token' => $userToken
             ]
@@ -67,10 +70,6 @@ class LoginController extends Controller
         $user->otp = 123456;
         $user->save();
 
-
-
-
-
         return [
             'data' => [
                 'otp' => 123456,
@@ -85,27 +84,47 @@ class LoginController extends Controller
         $request->validate([
             'otp' => 'required|numeric',
         ]);
-        if (auth('sanctum')->user()->otp != $request->otp) {
+
+        $user = auth('sanctum')->user();
+
+        if ($user->otp != $request->otp) {
             throw ValidationException::withMessages([
                 'otp' => ['كود التحقق غير صحيح.'],
             ]);
-        } else {
-            auth('sanctum')->user()->otp = null;
-            auth('sanctum')->user()->save();
-            return [
-                'data' => [
-                    'user' => auth('sanctum')->user()
-                ]
-            ];
-        }
-        // append phone to request
-        // $request->merge(['phone' => auth('sanctum')->user()->phone]);
-        // $this->login($request);
+        } 
+        $user->otp = null;
+        // $user->save();
+        
+        return $this->formatUserResponse($user);
+        
     }
 
     public function logout(Request $request)
     {
         auth('sanctum')->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
+    }
+
+    private function formatUserResponse($user)
+    {
+        $userData = [
+            'name' => $user->name,
+            'phone' => $user->phone,
+            'level' => $user->level ?? 'technician',
+            'token' => $user->currentAccessToken()->token ?? $user->tokens->last()->token,
+            'otp' => $user->otp
+        ];
+
+        // إضافة الحقول الإضافية للفني
+        if ($userData['level'] === 'technician') {
+            $userData['completedJobs'] = 10;
+            $userData['rating'] = 4.8;
+        }
+
+        return response()->json([
+            'data' => [
+                'user' => $userData
+            ]
+        ]);
     }
 }

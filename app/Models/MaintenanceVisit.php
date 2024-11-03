@@ -25,6 +25,7 @@ class MaintenanceVisit extends Model
         'visit_date'
     ];
 
+
     // relations
     public function maintenanceContract()
     {

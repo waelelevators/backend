@@ -104,4 +104,10 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Rule::class, UserRule::class, 'user_id', 'id', 'id', 'rule_id');
     }
+
+    // area_id	1
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
 }

@@ -15,14 +15,14 @@ class MaintenanceContractStoreRequest extends FormRequest
     {
         return [
             // 'contract_number' => 'required|unique:maintenance_contracts,contract_number',
-            'area_id' => 'required|exists:areas,id',
+            'area_id' => 'exists:areas,id',
             'contract_type' => 'in:contract,draft',
             'total' => 'numeric',
-            'city_id' => 'required|exists:cities,id',
+            'city_id' => 'exists:cities,id',
             'neighborhood_id' => 'required|exists:neighborhoods,id',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'exists:clients,id',
             'elevator_type_id' => 'required|exists:elevator_types,id',
             'building_type_id' => 'required|exists:building_types,id',
             'stops_count' => 'required|integer',

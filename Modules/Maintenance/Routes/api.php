@@ -12,6 +12,7 @@ use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 use Modules\Maintenance\Http\Controllers\LoginController;
 use Modules\Maintenance\Http\Controllers\AnalysisController;
+use Modules\Maintenance\Http\Controllers\VisitisAnalysisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,18 +30,9 @@ use Modules\Maintenance\Http\Controllers\AnalysisController;
 // });
 
 // prefix maintenance
-Route::prefix('maintenance')->group(function () {
-
-    // login
-    Route::post('/login', [LoginController::class, 'login']);
-    // logout
-    Route::post('/logout', [LoginController::class, 'logout']);
+Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
 
-    // otp
-    Route::post('/otp', [LoginController::class, 'otp']);
-    // verify otp
-    Route::post('/verify-otp', [LoginController::class, 'verifyOtp']);
 
     Route::get('/reports', [ReportController::class, 'index']); // جلب كل البلاغات
     Route::get('/reports/{id}', [ReportController::class, 'show']); // جلب بلاغ معين
@@ -66,12 +58,12 @@ Route::prefix('maintenance')->group(function () {
     // convert report to upgrade'
     Route::post('/reports/convert-to-upgrade/{reportId}', [ReportController::class, 'convertReportToUpgrade']);
 
+    Route::get('/contracts/show/{id}', [MaintenanceContractController::class, 'show']);
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
     // convert draft to contract
     Route::post('/contracts/convert-to-contract', [MaintenanceContractController::class, 'convertDraftToContract']);
     // contracts/:id
-    Route::get('/contracts/{id}', [MaintenanceContractController::class, 'show']);
 
 
     // technicians
@@ -98,6 +90,33 @@ Route::prefix('maintenance')->group(function () {
 
         $tables = [
             "elevator_types",
+            'branches',
+            "machine_types",
+            "machine_speeds",
+            "door_sizes",
+            "stops_numbers",
+            "control_cards",
+            "drive_types",
+            "maintenance_types",
+            "building_types"
+        ];
+
+        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
+
+        foreach ($tables as $table) {
+            // get name and id for each table
+            $data[$table] = DB::table($table)->get();
+        }
+
+        return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
+    });
+
+    Route::get('maintenance-data', function () {
+        $data = [];
+
+        $tables = [
+            "elevator_types",
+            "branches",
             "machine_types",
             "machine_speeds",
             "door_sizes",
@@ -139,7 +158,7 @@ Route::prefix('maintenance')->group(function () {
 
 
     // البحث عن عميل من جدول العملاء باستخدم
-    Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
+    Route::post('/clients/search', [MaintenanceContractController::class, 'searchClients']);
     // clients/:id
 
     // CustomerRetentionRate
@@ -151,4 +170,9 @@ Route::prefix('maintenance')->group(function () {
     Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
     // analysis
     Route::get('/analysis/{param}/{year?}', [AnalysisController::class, 'index']);
+
+    // VisitisAnalysis
+    Route::get('VisitisAnalysis', [VisitisAnalysisController::class, 'index']);
 });
+
+// MaintenanceVisit

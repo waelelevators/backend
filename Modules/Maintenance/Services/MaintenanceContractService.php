@@ -33,19 +33,25 @@ class MaintenanceContractService
     public function createContract(array $data)
     {
         $client = ApiHelper::handleAddClient($data);
+
         // return ($client);
         $data['client_id'] = $client->id;
-        // return auth('sanctum')->user();
+
         $user_id = auth('sanctum')->user()->id;
+        $representative_id =  ApiHelper::handleGetUsData($data, 'maintenances');
 
 
         $contractData = array_diff_key($data, array_flip([
             // 'start_date',
             // 'end_date',
-            'visits_count',
-            'cost',
+            // 'visits_count',
+            // 'machine_type_id',
+            // 'machine_speed_id',
+            // 'door_size_id',
+            // 'control_card_id',
+            // 'branch_id',
+            // 'cost',
             'notes',
-            'representative_id',
             'cancellation_allowance',
             'payment_status',
             'receipt_attachment',
@@ -54,8 +60,15 @@ class MaintenanceContractService
 
 
         $contractData['contract_type'] = $data['isDraft'] ? 'draft' : 'contract';
-        $contractData['contract_number'] = $this->contractCode($data['maintenance_type'], $data['branch_id']);
+        $contractData['contract_number'] = $this->contractCode($data['maintenance_type'] ?? 1, $data['branch_id']) ?? '';
         $contractData['user_id'] = $user_id;
+        $contractData['control_type_id'] = $data['control_card_id'];
+        $contractData['elevator_type_id'] = $data['elevator_type_id'];
+        $contractData['total'] = $data['cost'] ?? 0;
+        $contractData['representative_id'] = $representative_id ?? 0;
+        $contractData['stops_count'] = $data['stops_count'];
+        $contractData['machine_type_id'] = $data['machine_type_id'];
+        $contractData['drive_type_id'] = $data['drive_type_id'];
 
         // dd($contractData);
 
@@ -83,7 +96,7 @@ class MaintenanceContractService
         $detailData['client_id'] = $data['client_id'];
         $detailData['user_id'] = $contract->user_id;
         $detailData['remaining_visits'] = $detailData['visits_count'];
-        $detailData['maintenance_type'] = $this->maintenance_type[$data['maintenance_type'] - 1] ?? 'free';
+        $detailData['maintenance_type'] = $this->maintenance_type[($data['maintenance_type'] ?? 1) - 1] ?? 'free';
 
         // dd($detailData);
         // رقم الكوتيشن
@@ -100,6 +113,7 @@ class MaintenanceContractService
 
         return $contract->load('contractDetail');
     }
+
 
 
 

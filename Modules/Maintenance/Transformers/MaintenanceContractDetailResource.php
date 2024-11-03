@@ -25,6 +25,7 @@ class MaintenanceContractDetailResource extends JsonResource
             'payment_status' => $this->payment_status,
             'receipt_attachment' => $this->receipt_attachment,
             'contract_attachment' => $this->contract_attachment,
+            'maintenance_type' => $this->maintenance_type,
 
             'visits' => $this->when($this->relationLoaded('visits'), MaintenanceVisitResource::collection($this->visits)),
 

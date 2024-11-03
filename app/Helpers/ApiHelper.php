@@ -184,7 +184,7 @@ class ApiHelper
         $r->contract_type = $contract_type;
         $r->how_did_you_get_to_us = $request['reachUs'];
 
-        switch ($request->reachUs) {
+        switch ($request['reachUs']) {
 
             case 1: // موقع الكتروني
                 $r->representativeable_id = 0;
@@ -337,8 +337,8 @@ class ApiHelper
         }
 
         $client->phone = $request['phone'];
-        $client->phone2 = $request['phone2'];
-        $client->whatsapp = $request['whatsapp'];
+        $client->phone2 = $request['anotherPhone'];
+        $client->whatsapp = $request['whatsappPhone'];
         $client->save();
         return $client;
     }

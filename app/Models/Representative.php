@@ -19,9 +19,7 @@ class Representative extends Model
 
     //   protected $with = ['representativeable'];
 
-    protected $appends = [
-        'names'
-    ];
+    protected $appends = ['names'];
 
     public function getNamesAttribute()
     {
