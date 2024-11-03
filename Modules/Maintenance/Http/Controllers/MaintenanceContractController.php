@@ -7,6 +7,7 @@ use App\Models\MaintenanceContract;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Maintenance\Entities\MaintenanceContract as EntitiesMaintenanceContract;
+use Modules\Maintenance\Entities\MaintenanceContractDetail;
 use Modules\Maintenance\Http\Requests\MaintenanceContractStoreRequest;
 use Modules\Maintenance\Services\MaintenanceContractService;
 use Modules\Maintenance\Transformers\MaintenanceContractResource;
@@ -51,10 +52,26 @@ class MaintenanceContractController extends Controller
         return new MaintenanceContractResource($contract);
     }
 
+    function update(Request $request)
+    {
+        $request->validate([
+            'isDraft' => 'required|boolean',
+            'contract_id' => 'required|exists:maintenance_contracts,id',
+        ]);
+        if ($request->isDraft  == true) {
+            $this->maintenanceContractService->updateDraftContract($request->all());
+        } else {
+            $contract = $this->maintenanceContractService->updateContract($request->all());
+        }
+        return response([
+            'message' => 'Contract updated successfully',
+            'status' => 'success',
+        ]);
+    }
+
     public function show($id)
     {
         $contract = EntitiesMaintenanceContract::findOrFail($id);
-        // return $contract;
         return new MaintenanceContractResource($contract);
     }
 
@@ -104,5 +121,22 @@ class MaintenanceContractController extends Controller
         return new MaintenanceContractResource($contract);
     }
 
-    // convertDraftToContract
+    // endContract
+
+    public function endContract($id)
+    {
+        $this->maintenanceContractService->endContract($id);
+        return response([
+            'message' => 'Contract ended successfully',
+            'status' => 'success',
+        ]);
+    }
+
+    // getExpiredContracts
+
+    public function getExpiredContracts()
+    {
+        $ex = new MaintenanceContractDetail();
+        return $ex->getExpiredContracts();
+    }
 }

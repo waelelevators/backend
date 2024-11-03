@@ -11,6 +11,7 @@ use App\Service\GeneralLogService;
 use Modules\Maintenance\Repositories\MaintenanceContractRepository;
 use Modules\Maintenance\Repositories\MaintenanceContractDetailRepository;
 use Carbon\Carbon;
+use Modules\Maintenance\Entities\MaintenanceContract as EntitiesMaintenanceContract;
 
 class MaintenanceContractService
 {
@@ -80,25 +81,26 @@ class MaintenanceContractService
 
 
         $detailData = array_intersect_key($data, array_flip([
-            'start_date',
-            'end_date',
-            'visits_count',
-            'cost',
-            'notes',
-            'cancellation_allowance',
-            'payment_status',
-            'receipt_attachment',
-            'contract_attachment'
+            // 'start_date',
+            // 'end_date',
+            // 'visits_count',
+            // 'cost',
+            // 'notes',
+            // 'cancellation_allowance',
+            // 'payment_status',
+            // 'receipt_attachment',
+            // 'contract_attachment'
         ]));
 
+        $detailData = [];
         $detailData['maintenance_contract_id'] = $contract->id;
         // $detailData['installation_contract_id'] = $contract->installation_contract_id;
         $detailData['client_id'] = $data['client_id'];
         $detailData['user_id'] = $contract->user_id;
-        $detailData['remaining_visits'] = $detailData['visits_count'];
+        $detailData['remaining_visits'] = $data['visits_count'] ?? 12;
         $detailData['maintenance_type'] = $this->maintenance_type[($data['maintenance_type'] ?? 1) - 1] ?? 'free';
 
-        // dd($detailData);
+
         // رقم الكوتيشن
         $quotation_number = "Q-" . date('Y-m-d') . "-" . rand(1000, 9999);
 
@@ -206,5 +208,58 @@ class MaintenanceContractService
         $barch->last_maintenance_id = $last_id + 1; // increment last id by 1 for next contract
         $barch->save();
         return $contractCode;
+    }
+
+
+    // updateDraftContract
+    public function updateDraftContract($data)
+    {
+        $data['total'] = $data['cost'];
+        $contract = MaintenanceContract::findOrFail($data['contract_id']);
+
+        $contract->update($data);
+        return $contract;
+    }
+
+    // updateContract
+    public function updateContract($data)
+    {
+
+        $data['total'] = $data['cost'] ?? 0;
+
+        $contract = EntitiesMaintenanceContract::findOrFail($data['contract_id']);
+
+        $contract->update($data);
+
+        $this->generalLogService::log($contract, 'update', 'Contract updated', ['contract' => $contract, 'data' => $data, 'user_id' => auth('sanctum')->user()->id]);
+
+        $contractDetail = $contract->activeContract();
+        // update contract detail
+        $detailData = [
+            'installation_contract_id' => $data['installation_contract_id'] ?? $contract->installation_contract_id ?? null,
+            'maintenance_contract_id' => $data['maintenance_contract_id'] ?? $contract->maintenance_contract_id ?? null,
+            'maintenance_type' => $data['maintenance_type'] ?? $contract->maintenance_type ?? null,
+            'client_id' => $data['client_id'] ?? $contract->client_id ?? null,
+            'start_date' => $data['start_date'] ?? $contract->start_date ?? null,
+            'end_date' => $data['end_date'] ?? $contract->end_date ?? null,
+            'visits_count' => $data['visits_count'] ?? $contract->visits_count ?? null,
+            'cost' => $data['cost'] ?? $contract->cost ?? null,
+            'notes' => $data['notes'] ?? $contract->notes ?? null,
+            'remaining_visits' => $data['remaining_visits'] ?? $contract->remaining_visits ?? null,
+            'cancellation_allowance' => $data['cancellation_allowance'] ?? $contract->cancellation_allowance ?? null,
+        ];
+
+
+
+        $contractDetail->update($detailData);
+        return $contract;
+    }
+
+    // endContract
+    public function endContract($id)
+    {
+        $contract = MaintenanceContract::findOrFail($id);
+        $contract->activeContract()->update(['status' => 'expired', 'end_date' => Carbon::now(), 'remaining_visits' => 0]);
+        return $contract;
     }
 }

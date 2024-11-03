@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Modules\Maintenance\Entities\MaintenanceContract;
+use Modules\Maintenance\Entities\MaintenanceContractDetail as EntitiesMaintenanceContractDetail;
 use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 // use PDF;
@@ -34,8 +35,10 @@ use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 Route::get('maintenance-contract-logs', function () {
 
+    $ex = new EntitiesMaintenanceContractDetail();
+    return $ex->getExpiredContracts(); // EntitiesMaintenanceContractDetail::getExpiredContracts();
 
-    $contract =  MaintenanceContract::find(138)->driveType;
+    $contract =  MaintenanceContract::find(144)->logs;
     return $contract;
     return MaintenanceContractResource::make($contract);
     return Employee::whereHas('visits', function ($query) {

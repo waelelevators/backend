@@ -2,7 +2,10 @@
 
 namespace Modules\Mobile\Services;
 
+use App\Models\MaintenanceContract;
+use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceVisit;
+use Carbon\Carbon;
 use Modules\Mobile\Http\Resources\VisitsResource;
 
 class VisitService
@@ -51,6 +54,8 @@ class VisitService
     {
 
         $visit = MaintenanceVisit::findOrFail($id);
+        $this->checkContractStatus($visit->maintenance_contract_detail_id);
+
         if (isset($data['updateStatus']) && $data['updateStatus'] == true) {
             if ($data['status'] == 'ongoing') {
                 $visit->update(['visit_start_date' => now(), 'status' => 'ongoing']);
@@ -63,6 +68,7 @@ class VisitService
             $visit->notes = $data['notes'];
         }
         $visit->save();
+
         return $visit;
     }
 
@@ -99,5 +105,25 @@ class VisitService
         $distance = $earthRadius * $c;
 
         return $distance;
+    }
+
+
+    private function checkContractStatus($contract_id)
+    {
+        $contract = MaintenanceContractDetail::find($contract_id);
+
+        // Get current date
+        $now = Carbon::now();
+
+        // Check if contract has ended
+        $contractEnded = $contract->end_date && Carbon::parse($contract->end_date)->lt($now);
+
+        // Count remaining visits
+        $remainingVisits = $contract->remaining_visits;
+
+        // If contract has ended or no remaining visits, mark as expired
+        if ($contractEnded || $remainingVisits <= 0) {
+            $contract->update(['status' => 'expired', 'remaining_visits' => 0]);
+        }
     }
 }

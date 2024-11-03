@@ -11,11 +11,31 @@ class MaintenanceContract extends Model
     protected $table = 'maintenance_contracts';
     protected $fillable = [
         'contract_number',
-        'area',
+        'area_id',
+        'user_id',
+        'contract_type',
+        'total',
         'city_id',
+        'raigon_id',
         'neighborhood_id',
         'latitude',
         'longitude',
+        'client_id',
+        'elevator_type_id',
+        'building_type_id',
+        'stops_count',
+        'has_window',
+        'has_stairs',
+        'site_images',
+        'active_contract_id',
+        'door_direction_id',
+        'control_type_id',
+        'door_size_id',
+        'machine_type_id',
+        'drive_type_id',
+        'machine_speed_id',
+        'representative_id',
+        'branch_id'
     ];
     public function city()
     {

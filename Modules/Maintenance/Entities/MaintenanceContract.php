@@ -2,9 +2,11 @@
 
 namespace Modules\Maintenance\Entities;
 
+use App\Models\Area;
 use App\Models\Branch;
 use App\Models\BuildingType;
 use App\Models\City;
+use App\Models\Client;
 use App\Models\ControlCard;
 use App\Models\DoorSize;
 use App\Models\DriveTypes;
@@ -14,6 +16,7 @@ use App\Models\MachineSpeed;
 use App\Models\MachineType;
 use App\Models\Neighborhood;
 use App\Models\Region;
+use App\Models\Representative;
 use App\Models\StopNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -126,12 +129,6 @@ class MaintenanceContract extends Model
         return $this->hasMany(MaintenanceContractDetail::class, 'maintenance_contract_id');
     }
 
-    // buildingType
-    public function buildingType()
-    {
-        return $this->belongsTo(BuildingType::class, 'building_type_id');
-    }
-
     // speed
     public function machineSpeed()
     {
@@ -142,5 +139,32 @@ class MaintenanceContract extends Model
     public function driveType()
     {
         return $this->belongsTo(DriveTypes::class, 'drive_type_id');
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
+
+
+
+    // buildingType
+    public function buildingType()
+    {
+        return $this->belongsTo(BuildingType::class, 'building_type_id');
+    }
+
+
+
+    // client
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    // representatives
+    public function representatives()
+    {
+        return $this->belongsTo(Representative::class, 'representative_id');
     }
 }
