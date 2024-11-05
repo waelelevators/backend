@@ -18,6 +18,8 @@ class AreaController extends Controller
     {
         return Area::get();
     }
+
+    
     /**
      * Store a newly created resource in storage.
      * @param Request $request
