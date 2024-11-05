@@ -4,8 +4,11 @@ namespace Modules\Maintenance\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\MaintenanceContract;
+use App\Models\MaintenanceContractDetail as ModelsMaintenanceContractDetail;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Modules\Maintenance\Entities\MaintenanceContract as EntitiesMaintenanceContract;
 use Modules\Maintenance\Entities\MaintenanceContractDetail;
 use Modules\Maintenance\Http\Requests\MaintenanceContractStoreRequest;
@@ -32,7 +35,9 @@ class MaintenanceContractController extends Controller
                 ->latest()
                 ->paginate(10);
         } else {
-            $contracts = EntitiesMaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'contract')->latest()->paginate(10);
+            $contracts = EntitiesMaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')
+
+                ->where('contract_type', 'contract')->latest()->paginate(10);
         }
         return MaintenanceContractResource::collection($contracts);
     }
@@ -40,9 +45,12 @@ class MaintenanceContractController extends Controller
     public function store(MaintenanceContractStoreRequest $request)
     {
 
+        // ahmed hmed
+
         if ($request->has('contract_id') && $request->contract_id > 0) {
             $contract = $this->maintenanceContractService->convertDraftToContract($request->all());
         } else {
+
             $contract = $this->maintenanceContractService->createContract($request->all());
         }
         return response([
@@ -52,6 +60,8 @@ class MaintenanceContractController extends Controller
         return new MaintenanceContractResource($contract);
     }
 
+
+    // call api and sow how can you do that
     function update(Request $request)
     {
         $request->validate([
@@ -61,7 +71,7 @@ class MaintenanceContractController extends Controller
         if ($request->isDraft  == true) {
             $this->maintenanceContractService->updateDraftContract($request->all());
         } else {
-            $contract = $this->maintenanceContractService->updateContract($request->all());
+            $this->maintenanceContractService->updateContract($request->all());
         }
         return response([
             'message' => 'Contract updated successfully',
@@ -136,7 +146,112 @@ class MaintenanceContractController extends Controller
 
     public function getExpiredContracts()
     {
+
+
+
         $ex = new MaintenanceContractDetail();
-        return $ex->getExpiredContracts();
+        $maintenanceContractsIds =  $ex->getExpiredContracts()->whereNotNull('maintenance_contract_id')->pluck('maintenance_contract_id');
+
+        $contracts = MaintenanceContract::whereIn('id', $maintenanceContractsIds)->get();
+
+
+        return MaintenanceContractResource::collection($contracts);
+    }
+
+
+
+    function renewContract(Request $request, $id)
+    {
+
+        return  $this->maintenanceContractService->renewContract($request->all(), $id);
+        return response([
+            'message' => 'Contract renewed successfully',
+            'status' => 'success',
+        ]);
+    }
+
+
+    // getUnpaidContracts
+
+    public function getUnpaidContracts()
+    {
+        $maintenanceContractsIds = ModelsMaintenanceContractDetail::where('paid_amount', '<', 'cost')
+            ->where('status', 'active')
+            ->whereNotNull('maintenance_contract_id')->pluck('maintenance_contract_id');
+
+
+        $contracts = MaintenanceContract::whereIn('id', $maintenanceContractsIds)->get();
+
+
+        return MaintenanceContractResource::collection($contracts);
+    }
+
+
+
+    public function uploadFiles(Request $request)
+    {
+
+        $request->validate([
+            'maintenance_contract_id' => 'required|exists:maintenance_contract_details,id',
+            'attachment' => 'required|file',
+            'cost' => 'required_if:attachment_type,receipt_attachment',
+            'attachment_type' => 'required',
+        ]);
+
+
+        $contractDetails = MaintenanceContractDetail::findOrFail($request->maintenance_contract_id);
+
+        $reminingAmount =  $contractDetails->cost - $contractDetails->paid_amount;
+
+
+
+
+
+
+        if ($request->hasFile('attachment')) {
+            $filePath = $this->storeFile($contractDetails->id, $request->file('attachment'));
+
+            if ($request->attachment_type == 'contract_attachment') {
+                $contractDetails->contract_attachment = $filePath;
+                $contractDetails->save();
+            } else {
+                // if $request->const > $reminingAmount return error
+                if ($request->cost > $reminingAmount) {
+                    return response()->json([
+                        'success' => 'error',
+                        'message' => 'المبلغ المدفوع اكبر من المبلغ المتبقي للعقد'
+                    ], 400);
+                }
+                $contractDetails->receipt_attachment  = $filePath;
+                $contractDetails->save();
+
+
+                // if remaining amount not zero add $request->const to paid_amount and payment sataus partially paid
+                if ($reminingAmount != 0) {
+
+                    $contractDetails->paid_amount += $request->const;
+                    $contractDetails->payment_status = 'partial';
+                    $contractDetails->save();
+                } else {
+                    $contractDetails->paid_amount += $request->const;
+                    $contractDetails->payment_status = 'paid';
+                    $contractDetails->save();
+                }
+            }
+
+            return response([
+                'status' => 'success',
+                'message' => 'تم رفع المرفق بنجاح',
+            ]);
+        }
+    }
+
+
+    private function storeFile($contractId, $file)
+    {
+        $filename = $file->getClientOriginalName();
+        $directory = 'public/contracts/' . $contractId;
+        Storage::makeDirectory($directory);
+        return $file->storeAs($directory, $filename);
     }
 }

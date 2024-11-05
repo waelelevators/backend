@@ -12,6 +12,7 @@ use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 use Modules\Maintenance\Http\Controllers\LoginController;
 use Modules\Maintenance\Http\Controllers\AnalysisController;
+use Modules\Maintenance\Http\Controllers\AreaController;
 use Modules\Maintenance\Http\Controllers\VisitisAnalysisController;
 
 /*
@@ -53,10 +54,18 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
         ];
     });
 
+
+
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
     // convert report to upgrade'
     Route::post('/reports/convert-to-upgrade/{reportId}', [ReportController::class, 'convertReportToUpgrade']);
+    // renew contract
+    Route::post('/contracts/renew-contract/{id}', [MaintenanceContractController::class, 'renewContract']);
+    // getExpiredContracts
+    Route::post('/contracts/upload-files', [MaintenanceContractController::class, 'uploadFiles']);
+    Route::get('/contracts/get-expired-contracts', [MaintenanceContractController::class, 'getExpiredContracts']);
+    Route::get('/contracts/unpaid-contracts', [MaintenanceContractController::class, 'getUnpaidContracts']);
 
     Route::get('/contracts/show/{id}', [MaintenanceContractController::class, 'show']);
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
@@ -65,9 +74,11 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     // end contract
     Route::post('/contracts/end-contract/{id}', [MaintenanceContractController::class, 'endContract']);
 
+
     // contract update
 
     // convert draft to contract
+    Route::post('/area', [AreaController::class, 'index']);
     Route::post('/contracts/convert-to-contract', [MaintenanceContractController::class, 'convertDraftToContract']);
     // contracts/:id
 
@@ -167,8 +178,9 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
     // rescheduled visits
     Route::post('/visits/reschedule', [MaintenanceVisitController::class, 'reschedule']);
-    // getExpiredContracts
-    Route::get('/contracts/get-expired-contracts', [MaintenanceContractController::class, 'getExpiredContracts']);
+    // filiter visits by date range
+    Route::post('/visits/filter', [MaintenanceVisitController::class, 'filterVisitsByDateRange']);
+
 
 
     // البحث عن عميل من جدول العملاء باستخدم

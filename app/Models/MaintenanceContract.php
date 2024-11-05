@@ -30,6 +30,7 @@ class MaintenanceContract extends Model
         'active_contract_id',
         'door_direction_id',
         'control_type_id',
+        'control_card_id',
         'door_size_id',
         'machine_type_id',
         'drive_type_id',

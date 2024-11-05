@@ -7,6 +7,7 @@ use Modules\Maintenance\Http\Resources\MaintenanceVisitResource;
 
 class MaintenanceContractResource extends JsonResource
 {
+
     public function toArray($request)
     {
         return [
@@ -45,6 +46,7 @@ class MaintenanceContractResource extends JsonResource
             'driveType' => $this->driveType,
             'branch' => $this->branch,
             'buildingType' => $this->buildingType,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

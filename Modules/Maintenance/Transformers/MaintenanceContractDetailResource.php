@@ -9,6 +9,7 @@ class MaintenanceContractDetailResource extends JsonResource
 {
     public function toArray($request)
     {
+
         return [
             'id' => $this->id,
             'installation_contract_id' => $this->installation_contract_id,
@@ -19,6 +20,8 @@ class MaintenanceContractDetailResource extends JsonResource
             'visits_count' => $this->visits_count,
             'visit_start_date' => $this->visit_start_date,
             'cost' => $this->cost,
+            'reming_cost' => $this->cost - $this->paid_amount,
+            'paid_amount' => $this->paid_amount,
             'notes' => $this->notes,
             'remaining_visits' => $this->remaining_visits,
             'cancellation_allowance' => $this->cancellation_allowance,
@@ -26,6 +29,7 @@ class MaintenanceContractDetailResource extends JsonResource
             'receipt_attachment' => $this->receipt_attachment,
             'contract_attachment' => $this->contract_attachment,
             'maintenance_type' => $this->maintenance_type,
+            'status' => $this->status,
 
             'visits' => $this->when($this->relationLoaded('visits'), MaintenanceVisitResource::collection($this->visits)),
 

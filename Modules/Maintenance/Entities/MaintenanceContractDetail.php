@@ -42,6 +42,6 @@ class MaintenanceContractDetail extends Model
     public function getExpiredContracts()
     {
         // if end date is less than now and remaining visits is less than 1
-        return $this->where('end_date', '<', now())->where('remaining_visits', '<', 1)->get();
+        return $this->where('status',  'expired')->get();
     }
 }
