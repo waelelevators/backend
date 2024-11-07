@@ -30,9 +30,7 @@ class MaintenanceContractDetailResource extends JsonResource
             'contract_attachment' => $this->contract_attachment,
             'maintenance_type' => $this->maintenance_type,
             'status' => $this->status,
-
             'visits' => $this->when($this->relationLoaded('visits'), MaintenanceVisitResource::collection($this->visits)),
-
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

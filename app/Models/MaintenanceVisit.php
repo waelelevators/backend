@@ -9,10 +9,10 @@ class MaintenanceVisit extends Model
 {
     use HasFactory;
 
+    // ahmed hmed
     // fillable
     protected $fillable = [
         'maintenance_contract_id',
-        'maintenance_contract_detail_id',
         'visit_start_date',
         'visit_end_date',
         'status',
@@ -22,9 +22,12 @@ class MaintenanceVisit extends Model
         'notes',
         'test_checklist',
         'client_approval',
-        'visit_date'
+        'visit_date',
+        'maintenance_contract_detail_id'
     ];
 
+    // timestamps
+    public $timestamps = true;
 
     // relations
     public function maintenanceContract()

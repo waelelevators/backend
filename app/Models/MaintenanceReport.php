@@ -65,4 +65,16 @@ class MaintenanceReport extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    // city
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    // neighborhood
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class);
+    }
 }

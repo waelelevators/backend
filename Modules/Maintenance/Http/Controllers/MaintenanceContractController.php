@@ -5,6 +5,7 @@ namespace Modules\Maintenance\Http\Controllers;
 use App\Models\Client;
 use App\Models\MaintenanceContract;
 use App\Models\MaintenanceContractDetail as ModelsMaintenanceContractDetail;
+use App\Service\Base64FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
@@ -28,24 +29,22 @@ class MaintenanceContractController extends Controller
 
 
 
-    public function index($type = null)
+    public function index(string $type = null)
     {
-        if ($type == 'draft') {
-            $contracts = EntitiesMaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')->where('contract_type', 'draft')
-                ->latest()
-                ->paginate(10);
-        } else {
-            $contracts = EntitiesMaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')
 
-                ->where('contract_type', 'contract')->latest()->paginate(10);
-        }
-        return MaintenanceContractResource::collection($contracts);
+        $area_id = request()->query('area_id');
+
+        $contractsQuery = EntitiesMaintenanceContract::with('area', 'city', 'neighborhood', 'elevatorType')
+            ->where('contract_type', $type ?? 'contract')
+            ->when($area_id, fn($query) => $query->where('area_id', $area_id));
+
+        return MaintenanceContractResource::collection($contractsQuery->latest()->paginate(10));
     }
+
+
 
     public function store(MaintenanceContractStoreRequest $request)
     {
-
-        // ahmed hmed
 
         if ($request->has('contract_id') && $request->contract_id > 0) {
             $contract = $this->maintenanceContractService->convertDraftToContract($request->all());
@@ -131,24 +130,22 @@ class MaintenanceContractController extends Controller
         return new MaintenanceContractResource($contract);
     }
 
-    // endContract
 
-    public function endContract($id)
+
+    public function endContract(Request $request)
     {
-        $this->maintenanceContractService->endContract($id);
+        $this->maintenanceContractService->endContract($request->all());
         return response([
             'message' => 'Contract ended successfully',
             'status' => 'success',
         ]);
     }
 
+
     // getExpiredContracts
 
     public function getExpiredContracts()
     {
-
-
-
         $ex = new MaintenanceContractDetail();
         $maintenanceContractsIds =  $ex->getExpiredContracts()->whereNotNull('maintenance_contract_id')->pluck('maintenance_contract_id');
 
@@ -159,16 +156,17 @@ class MaintenanceContractController extends Controller
     }
 
 
-
     function renewContract(Request $request, $id)
     {
 
-        return  $this->maintenanceContractService->renewContract($request->all(), $id);
+        $this->maintenanceContractService->renewContract($request->all(), $id);
         return response([
             'message' => 'Contract renewed successfully',
             'status' => 'success',
         ]);
     }
+
+
 
 
     // getUnpaidContracts

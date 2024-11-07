@@ -27,6 +27,8 @@ class MaintenanceContractDetail extends Model
         'payment_status',
         'receipt_attachment',
         'contract_attachment',
+        'cancellation_attachment',
+        'cancellation_note',
         'status'
     ];
 

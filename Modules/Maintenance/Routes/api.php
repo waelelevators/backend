@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Region;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Modules\Maintenance\Http\Controllers\UpgradesAnalyticsController;
 use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
@@ -55,7 +56,6 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     });
 
 
-
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
     // convert report to upgrade'
@@ -66,19 +66,24 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     Route::post('/contracts/upload-files', [MaintenanceContractController::class, 'uploadFiles']);
     Route::get('/contracts/get-expired-contracts', [MaintenanceContractController::class, 'getExpiredContracts']);
     Route::get('/contracts/unpaid-contracts', [MaintenanceContractController::class, 'getUnpaidContracts']);
+    Route::post('/contracts/end-contract', [MaintenanceContractController::class, 'endContract']);
 
     Route::get('/contracts/show/{id}', [MaintenanceContractController::class, 'show']);
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
     Route::put('/contracts', [MaintenanceContractController::class, 'update']);
     // end contract
-    Route::post('/contracts/end-contract/{id}', [MaintenanceContractController::class, 'endContract']);
 
 
     // contract update
 
     // convert draft to contract
-    Route::post('/area', [AreaController::class, 'index']);
+    Route::get('/area', [AreaController::class, 'index']);
+    Route::post('/area/change-contract-area', [AreaController::class, 'changeContractArea']);
+
+
+
+
     Route::post('/contracts/convert-to-contract', [MaintenanceContractController::class, 'convertDraftToContract']);
     // contracts/:id
 
@@ -182,7 +187,6 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     Route::post('/visits/filter', [MaintenanceVisitController::class, 'filterVisitsByDateRange']);
 
 
-
     // البحث عن عميل من جدول العملاء باستخدم
     Route::post('/clients/search', [MaintenanceContractController::class, 'searchClients']);
     // clients/:id
@@ -199,6 +203,13 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
     // VisitisAnalysis
     Route::get('VisitisAnalysis', [VisitisAnalysisController::class, 'index']);
-});
 
-// MaintenanceVisit
+
+
+    Route::prefix('analytics/upgrades')->group(function () {
+        Route::get('overview', [UpgradesAnalyticsController::class, 'getUpgradesOverview']);
+        Route::get('neighborhood/{id}', [UpgradesAnalyticsController::class, 'getNeighborhoodUpgradesAnalysis']);
+        Route::get('financial-efficiency', [UpgradesAnalyticsController::class, 'getFinancialEfficiencyAnalysis']);
+        Route::get('trends', [UpgradesAnalyticsController::class, 'getUpgradeTrendsAnalysis']);
+    });
+});

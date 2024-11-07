@@ -121,6 +121,5 @@ Route::prefix('mobile')->group(function () {
     });
 
 
-
     Route::post('login', [LoginController::class, 'login'])->name('login');
 });

@@ -3,6 +3,7 @@
 namespace Modules\Maintenance\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\MaintenanceContract;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -19,7 +20,7 @@ class AreaController extends Controller
         return Area::get();
     }
 
-    
+
     /**
      * Store a newly created resource in storage.
      * @param Request $request
@@ -92,6 +93,32 @@ class AreaController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'تم الحذف بنجاح البيانات بنجاح',
+        ]);
+    }
+
+    // changeContractArea
+    function changeContractArea(Request $request)
+    {
+        $request->validate(
+            [
+                'maintenance_contract_ids' => 'required|array',
+                'maintenance_contract_ids.*' => 'required|exists:maintenance_contracts,id',
+                'area_id' => 'required|exists:areas,id',
+            ],
+            [
+                'contract_id.required' => 'رقم العقد مطلوب',
+                'contract_id.exists' => 'رقم العقد غير موجود',
+                'area_id.required' => 'رقم المنطقة مطلوب',
+                'area_id.exists' => 'رقم المنطقة غير موجود',
+            ]
+        );
+
+        MaintenanceContract::whereIn('id', $request->maintenance_contract_ids)
+            ->update(['area_id' => $request->area_id]);
+
+        return response([
+            'message' => 'Contract updated successfully',
+            'status' => 'success',
         ]);
     }
 }

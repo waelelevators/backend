@@ -41,6 +41,7 @@ class MaintenanceVisitController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'maintenance_contract_detail_id' => 'required',
             'technician_id' => 'required',
@@ -94,7 +95,7 @@ class MaintenanceVisitController extends Controller
             'visit_date' => 'required|date|after_or_equal:today|date_format:"Y-m-d"',
         ]);
 
-        $visit = MaintenanceVisit::whereIn('id', $request->visit_id)->update(
+        $visit = MaintenanceVisit::whereIn('id', $request->visit_ids)->update(
             [
                 'status' => 'scheduled',
                 'visit_date' => Carbon::parse($request->visit_date)
@@ -123,26 +124,29 @@ class MaintenanceVisitController extends Controller
         $visits = MaintenanceVisit::with(['maintenanceContract', 'maintenanceContract.client', 'maintenanceContract.city', 'maintenanceContract.neighborhood', 'maintenanceContract.area', 'maintenanceContractDetail', 'technician', 'user', 'logs'])
             ->whereBetween('visit_date', [$startDate, $endDate])
             ->where('status', 'scheduled')
-            ->whereHas('maintenanceContract', function ($query) use ($request) {
-                $query->where('area_id', $request->area_id);
-            })->get();
+            ->orderBy('visit_date', 'asc')
+            ->get()
+            ->groupBy('visit_date');
 
-
-        return $visits->map(function ($visit) {
+        return $visits->map(function ($visits, $key) {
             return [
-                'visit_id' => $visit->id,
-                'technician' => $visit->technician->name ?? null,
-                'visit_date' => $visit->visit_date,
-                'status' => $visit->status,
-                'visit_start_date' => $visit->visit_start_date,
-                'visit_end_date' => $visit->visit_end_date,
-                'notes' => $visit->notes,
-                'visit_contract_id' => $visit->maintenanceContract->id,
-                'contract_number' => $visit->maintenanceContract->contract_number,
-                'client_name' => $visit->maintenanceContract->client->name ?? null,
-                'city' => $visit->maintenanceContract->city->name,
-                'neighborhood' => $visit->maintenanceContract->neighborhood->name ?? null,
-                'area' => $visit->maintenanceContract->area->name,
+                'visit_date' => $key,
+                'visits' => $visits->map(function ($visit) {
+                    return [
+                        'visit_id' => $visit->id,
+                        'technician' => $visit->technician->name ?? null,
+                        'status' => $visit->status,
+                        'visit_start_date' => $visit->visit_start_date,
+                        'visit_end_date' => $visit->visit_end_date,
+                        'notes' => $visit->notes,
+                        'visit_contract_id' => $visit->maintenanceContract->id,
+                        'contract_number' => $visit->maintenanceContract->contract_number,
+                        'client_name' => $visit->maintenanceContract->client->name ?? null,
+                        'city' => $visit->maintenanceContract->city->name,
+                        'neighborhood' => $visit->maintenanceContract->neighborhood->name ?? null,
+                        'area' => $visit->maintenanceContract->area->name,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
     }
