@@ -36,7 +36,7 @@ class ReportController extends Controller
     public function show($id)
     {
 
-        $report = MaintenanceReport::with('requiredProducts', 'requiredProducts.product', 'technician', 'user')->find($id);
+        $report = MaintenanceReport::with('requiredProducts', 'requiredProducts.product', 'technician', 'user')->findOrFail($id);
         return new ReportResource($report);
     }
 
@@ -49,10 +49,13 @@ class ReportController extends Controller
         $request->validate([
             'maintenance_contract_id' => 'required',
             'notes' => 'required|string',
-            'technician_id' => 'required|exists:employees,id',
+            'technician_id' => 'exists:employees,id',
         ]);
         $report = $this->reportService->createInitialReport($request->all());
-        return new ReportResource($report);
+        return response()->json([
+            'message' => 'Report created successfully',
+            'status' => 'success',
+        ]);
     }
 
     /**
@@ -128,27 +131,18 @@ class ReportController extends Controller
         return new ReportResource($report);
     }
 
-
     public function convertReportToUpgrade(Request $request, $reportId)
     {
-        // التحقق من صحة البيانات المدخلة
-        $validator = $request->validate([
-            'elevator_type_id' => 'required|exists:elevator_types,id',
-            'building_type_id' => 'required|exists:building_types,id',
-            'stops_count' => 'required|integer|min:2',
-            'has_window' => 'required|boolean',
-            'has_stairs' => 'required|boolean',
-            'site_images' => 'nullable|array',
-            'site_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'speed_id' => 'required|exists:machine_speeds,id',
-        ]);
+
+
+
+
+        $report = MaintenanceReport::findOrFail($reportId);
+        $maintenanceContract = $report->maintenanceContract;
+
 
         try {
             DB::beginTransaction();
-
-            $report = MaintenanceReport::findOrFail($reportId);
-
-
 
             $upgrade = new MaintenanceUpgrade();
             $upgrade->maintenance_contract_id = $report->maintenance_contract_id;
@@ -156,15 +150,15 @@ class ReportController extends Controller
             $upgrade->city_id = $report->maintenanceContract->city_id;
             $upgrade->user_id = auth()->id();
             $upgrade->neighborhood_id = $report->maintenanceContract->neighborhood_id;
-            $upgrade->latitude = $request->latitude ?? $report->maintenanceContract->latitude;
-            $upgrade->longitude = $request->longitude ?? $report->maintenanceContract->longitude;
+            $upgrade->latitude = $maintenanceContract->latitude ?? $report->maintenanceContract->latitude;
+            $upgrade->longitude = $maintenanceContract->longitude ?? $report->maintenanceContract->longitude;
             $upgrade->client_id = $report->maintenanceContract->client_id;
-            $upgrade->elevator_type_id = $request->elevator_type_id;
-            $upgrade->building_type_id = $request->building_type_id;
-            $upgrade->stops_count = $request->stops_count;
-            $upgrade->has_window = $request->has_window;
-            $upgrade->has_stairs = $request->has_stairs;
-            $upgrade->speed_id = $request->speed_id;
+            $upgrade->elevator_type_id = $maintenanceContract->elevator_type_id;
+            $upgrade->building_type_id = $maintenanceContract->building_type_id;
+            $upgrade->stops_count = $maintenanceContract->stops_count;
+            $upgrade->has_window = $maintenanceContract->has_window;
+            $upgrade->has_stairs = $maintenanceContract->has_stairs;
+            $upgrade->speed_id = $maintenanceContract->speed_id;
             $upgrade->total = 0;
             $upgrade->tax = $report->tax ?? 0;
             $upgrade->net_price = $report->price_without_tax;
@@ -182,6 +176,8 @@ class ReportController extends Controller
                     ]);
                 }
             }
+
+
 
             $report->status = 'converted_to_upgrade';
             $report->save();
@@ -204,12 +200,8 @@ class ReportController extends Controller
             DB::commit();
 
             return response()->json([
-                'status' => true,
+                'status' => 'success',
                 'message' => 'تم تحويل البلاغ إلى مقايسة بنجاح',
-                'data' => [
-                    'upgrade_id' => $upgrade->id,
-                    'report_id' => $report->id
-                ]
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();

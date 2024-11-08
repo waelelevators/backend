@@ -24,7 +24,7 @@ class UpgradeElevatorController extends Controller
 
     public function index()
     {
-        $upgrades = MaintenanceUpgrade::with('city', 'neighborhood', 'speed', 'elevatorType', 'buildingType', 'user', 'client', 'logs')->get();
+        $upgrades = MaintenanceUpgrade::with('city', 'neighborhood', 'speed', 'elevatorType', 'buildingType', 'user', 'client', 'logs')->paginate();
         return MaintenanceUpgradeResource::collection($upgrades);
     }
 
@@ -39,7 +39,10 @@ class UpgradeElevatorController extends Controller
         // dd($request->all());
         $upgrade = $this->upgradeService->createUpgrade($request->all());
 
-        return new MaintenanceUpgradeResource($upgrade);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم انشاء الترقية بنجاح',
+        ]);
         try {
         } catch (\Exception $e) {
             return response()->json(['error' => 'حدث خطأ أثناء إنشاء الترقية.'], 500);

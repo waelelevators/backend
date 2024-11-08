@@ -20,8 +20,14 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
-            "elevator_types", "machine_types", "machine_speeds", "door_sizes", "control_cards",
-            "stops_numbers", 'users'
+            "elevator_types",
+            "machine_types",
+            "machine_speeds",
+            "door_sizes",
+            "control_cards",
+            "stops_numbers",
+            'users',
+            'templates'
         ];
 
         $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
@@ -40,7 +46,8 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
-            'malfunction_types', 'malfunction_statuses'
+            'malfunction_types',
+            'malfunction_statuses'
         ];
 
         $tables2 = [

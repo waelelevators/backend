@@ -36,7 +36,7 @@ class MaintenanceContractService
 
     public function createContract(array $data)
     {
-        dd($data);
+
         $client = ApiHelper::handleAddClient($data);
 
         $data['client_id'] = $client->id;
@@ -104,10 +104,9 @@ class MaintenanceContractService
     }
 
 
-    // create visit
+    // ahmed hmed yousif
     public function createVisits($data)
     {
-
 
         $startDate = Carbon::parse($data['start_date']);
         $visitData = [];
@@ -133,6 +132,7 @@ class MaintenanceContractService
 
         $contract = MaintenanceContract::findOrFail($data['contract_id']);
         $data['contract_type'] = 'contract';
+        $data['quotation_to_contract_date'] = now();
 
 
         $contract->update(['contract_type' => 'contract']);
@@ -142,33 +142,32 @@ class MaintenanceContractService
 
         // create visits
         $this->createVisits([
-            'id' => $contractDetail->id,
-            'maintenance_contract_id' => $contract->id,
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'visits_count' => $data['visits_count'],
+            'id'                       => $contractDetail->id,
+            'maintenance_contract_id'  => $contract->id,
+            'start_date'               => $data['start_date'],
+            'end_date'                 => $data['end_date'],
+            'visits_count'             => $data['visits_count'],
         ]);
 
         return $contract;
     }
-
 
     public function createContractDetail($contract, $data)
     {
         $user_id = auth('sanctum')->user()->id;
 
         $contractData = [
-            'maintenance_contract_id' => $contract->id,
-            'installation_contract_id' => $contract->installation_contract_id,
-            'client_id' => $contract->client_id,
-            'user_id' => $user_id,
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'visits_count' => $data['visits_count'],
-            'cost' => $contract->cost,
-            'remaining_visits' => $data['visits_count'],
-            'cancellation_allowance' => 1,
-            'const' => $data['cost'],
+            'maintenance_contract_id'         => $contract->id,
+            'installation_contract_id'        => $contract->installation_contract_id,
+            'client_id'                       => $contract->client_id,
+            'user_id'                         => $user_id,
+            'start_date'                      => $data['start_date'],
+            'end_date'                        => $data['end_date'],
+            'visits_count'                    => $data['visits_count'],
+            'cost'                            => $contract->cost,
+            'remaining_visits'                => $data['visits_count'],
+            'cancellation_allowance'          => 1,
+            'const'                           => $data['cost'],
         ];
         return MaintenanceContractDetail::create($contractData);
     }
@@ -220,19 +219,19 @@ class MaintenanceContractService
         $this->generalLogService::log($contract, 'update', 'Contract updated', ['contract' => $contract, 'data' => $data, 'user_id' => auth('sanctum')->user()->id]);
 
         $contractDetail = $contract->activeContract();
-        // update contract detail
+
         $detailData = [
-            'installation_contract_id' => $data['installation_contract_id'] ?? $contract->installation_contract_id ?? null,
-            'maintenance_contract_id' => $data['maintenance_contract_id'] ?? $contract->maintenance_contract_id ?? null,
-            'maintenance_type' => $data['maintenance_type'] ?? $contract->maintenance_type ?? null,
-            'client_id' => $data['client_id'] ?? $contract->client_id ?? null,
-            'start_date' => $data['start_date'] ?? $contract->start_date ?? null,
-            'end_date' => $data['end_date'] ?? $contract->end_date ?? null,
-            'visits_count' => $data['visits_count'] ?? $contract->visits_count ?? null,
-            'cost' => $data['cost'] ?? $contract->cost ?? null,
-            'notes' => $data['notes'] ?? $contract->notes ?? null,
-            'remaining_visits' => $data['remaining_visits'] ?? $contract->remaining_visits ?? null,
-            'cancellation_allowance' => $data['cancellation_allowance'] ?? $contract->cancellation_allowance ?? null,
+            'installation_contract_id'   => $data['installation_contract_id'] ?? $contract->installation_contract_id ?? null,
+            'maintenance_contract_id'    => $data['maintenance_contract_id'] ?? $contract->maintenance_contract_id ?? null,
+            'maintenance_type'           => $data['maintenance_type'] ?? $contract->maintenance_type ?? null,
+            'client_id'                  => $data['client_id'] ?? $contract->client_id ?? null,
+            'start_date'                 => $data['start_date'] ?? $contract->start_date ?? null,
+            'end_date'                   => $data['end_date'] ?? $contract->end_date ?? null,
+            'visits_count'               => $data['visits_count'] ?? $contract->visits_count ?? null,
+            'cost'                       => $data['cost'] ?? $contract->cost ?? null,
+            'notes'                      => $data['notes'] ?? $contract->notes ?? null,
+            'remaining_visits'           => $data['remaining_visits'] ?? $contract->remaining_visits ?? null,
+            'cancellation_allowance'     => $data['cancellation_allowance'] ?? $contract->cancellation_allowance ?? null,
         ];
 
         // contract_cancellation_attachment
@@ -260,7 +259,8 @@ class MaintenanceContractService
 
             $contract_data['cancellation_attachment'] = $attchment;
             $contract_data['cancellation_note'] = $data['note'] ?? '';
-
+            $contract_data['cancellation_allowance'] = $data['allowance'] ?? 0;
+            $contract_data['status'] = 'expired';
 
             $contract->update($contract_data);
             $this->generalLogService::log($contract, 'cancel', 'Contract cancelled', ['contract' => $contract, 'data' => $contract_data, 'user_id' => auth('sanctum')->user()->id]);

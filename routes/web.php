@@ -40,7 +40,7 @@ use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 
 Route::get('maintenance-contract-logs', function () {
-
+    return MaintenanceContractDetail::with('logs')->find(1045);
     return \DB::statement("
     UPDATE maintenance_upgrades
     SET created_at = DATE_ADD(
@@ -52,8 +52,6 @@ Route::get('maintenance-contract-logs', function () {
 
     $productsIds = Product::all()->pluck('id')->toArray();
     $clientIds = Client::all()->pluck('id')->toArray();
-
-
 
 
     $cities =  [

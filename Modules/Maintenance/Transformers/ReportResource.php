@@ -14,6 +14,8 @@ class ReportResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $maintenanceContract = $this->maintenanceContract;
         return [
             'id' => $this->id,
             'maintenance_contract_id' => $this->maintenance_contract_id,
@@ -32,6 +34,18 @@ class ReportResource extends JsonResource
             'products' => $this->requiredProducts ?? [],
             'user' => $this->user ?? [],
             'technician' => $this->technician ?? [],
+            'maintenance_contract_number' => $maintenanceContract->contract_number ?? '',
+            'client_name' => $maintenanceContract->client->name ?? '',
+            'client_phone' => $maintenanceContract->client->phone ?? '',
+            'city_name' => $maintenanceContract->city->name ?? '',
+            'neighborhood_name' => $maintenanceContract->neighborhood->name ?? '',
+            'elevator_type_name' => $maintenanceContract->elevatorType->name ?? '',
+            'stops_count' => $maintenanceContract->stops_count ?? '',
+            'end_date' => $maintenanceContract->activeContract->end_date ?? '',
+            'cost' => $maintenanceContract->activeContract->cost ?? '',
+            'contract_type' => $maintenanceContract->activeContract->type ?? '',
+            'contract_status' => $maintenanceContract->activeContract->status ?? '',
+
         ];
     }
 }

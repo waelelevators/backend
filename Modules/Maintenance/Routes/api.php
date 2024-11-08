@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     });
 
 
+
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
     // convert report to upgrade'
@@ -67,6 +68,9 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     Route::get('/contracts/get-expired-contracts', [MaintenanceContractController::class, 'getExpiredContracts']);
     Route::get('/contracts/unpaid-contracts', [MaintenanceContractController::class, 'getUnpaidContracts']);
     Route::post('/contracts/end-contract', [MaintenanceContractController::class, 'endContract']);
+    // البحث فى العقد
+    Route::get('/contracts/search-contract', [MaintenanceContractController::class, 'searchContract']);
+
 
     Route::get('/contracts/show/{id}', [MaintenanceContractController::class, 'show']);
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
@@ -74,15 +78,11 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     Route::put('/contracts', [MaintenanceContractController::class, 'update']);
     // end contract
 
-
     // contract update
 
     // convert draft to contract
     Route::get('/area', [AreaController::class, 'index']);
     Route::post('/area/change-contract-area', [AreaController::class, 'changeContractArea']);
-
-
-
 
     Route::post('/contracts/convert-to-contract', [MaintenanceContractController::class, 'convertDraftToContract']);
     // contracts/:id
@@ -173,6 +173,7 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     Route::post('/upgrades/add-required-products', [UpgradeElevatorController::class, 'addRequiredProducts']);
 
 
+    Route::get('/visits/filter', [MaintenanceVisitController::class, 'filterVisitsByDateRange']);
     // MaintenanceVisit
     Route::get('/visits', [MaintenanceVisitController::class, 'index']);
     Route::get('/visits/{id}', [MaintenanceVisitController::class, 'show']);
@@ -184,7 +185,6 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     // rescheduled visits
     Route::post('/visits/reschedule', [MaintenanceVisitController::class, 'reschedule']);
     // filiter visits by date range
-    Route::post('/visits/filter', [MaintenanceVisitController::class, 'filterVisitsByDateRange']);
 
 
     // البحث عن عميل من جدول العملاء باستخدم

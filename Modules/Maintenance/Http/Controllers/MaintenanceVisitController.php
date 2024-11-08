@@ -112,6 +112,7 @@ class MaintenanceVisitController extends Controller
     // filterVisitsByDateRange
     function filterVisitsByDateRange(Request $request)
     {
+
         $request->validate([
             'start_date' => 'required|date|before_or_equal:end|date_format:"Y-m-d"',
             'end_date' => 'required|date|after_or_equal:start|date_format:"Y-m-d"',

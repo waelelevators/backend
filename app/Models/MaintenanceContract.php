@@ -25,11 +25,16 @@ class MaintenanceContract extends Model
         'cancellation_allowance',
         'payment_status',
         'receipt_attachment',
+        'quotation_to_contract_date',
         'contract_attachment',
         'cancellation_attachment',
         'cancellation_note',
         'status'
     ];
+
+    // ahmed hmed
+
+
     public function city()
     {
         return $this->belongsTo(City::class);
@@ -106,6 +111,12 @@ class MaintenanceContract extends Model
     public function logs()
     {
         return $this->morphMany(GeneralLog::class, 'loggable');
+    }
+
+    // machineSpeed
+    public function machineSpeed()
+    {
+        return $this->belongsTo(MachineSpeed::class, 'machine_speed_id');
     }
 
     // client

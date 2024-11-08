@@ -96,6 +96,8 @@ class AreaController extends Controller
         ]);
     }
 
+    // vertion and more for maintenance contracts
+
     // changeContractArea
     function changeContractArea(Request $request)
     {

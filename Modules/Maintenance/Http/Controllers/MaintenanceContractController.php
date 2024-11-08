@@ -28,7 +28,6 @@ class MaintenanceContractController extends Controller
     }
 
 
-
     public function index(string $type = null)
     {
 
@@ -41,7 +40,52 @@ class MaintenanceContractController extends Controller
         return MaintenanceContractResource::collection($contractsQuery->latest()->paginate(10));
     }
 
+    // searchContract
 
+    public function searchContract(Request $request)
+    {
+
+        $search = $request->input('search');
+        $query = EntitiesMaintenanceContract::query()
+            ->with([
+                'city',
+                'neighborhood',
+                'elevatorType',
+                'machineType',
+                'doorSize',
+                'stopsNumber',
+                'controlCard',
+                'branch',
+                'region',
+                'machineSpeed',
+                'driveType',
+                'area',
+                'buildingType',
+                'client',
+                'representatives'
+            ]);
+
+        $query->where(function ($q) use ($search) {
+            $q->where('contract_number', 'LIKE', "%{$search}%")
+                ->orWhere('latitude', 'LIKE', "%{$search}%")
+                ->orWhere('longitude', 'LIKE', "%{$search}%");
+
+            $q->orWhereHas('city', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+
+            $q->orWhereHas('neighborhood', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+
+
+            $q->orWhereHas('region', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+        });
+
+        return MaintenanceContractResource::collection($query->paginate(10));
+    }
 
     public function store(MaintenanceContractStoreRequest $request)
     {
