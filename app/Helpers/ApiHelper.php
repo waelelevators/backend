@@ -339,6 +339,7 @@ class ApiHelper
         $client->phone = $request['phone'];
         $client->phone2 = $request['anotherPhone'];
         $client->whatsapp = $request['whatsappPhone'];
+
         $client->save();
         return $client;
     }
