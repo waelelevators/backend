@@ -2,6 +2,7 @@
 
 use Modules\Maintenance\Http\Controllers\PdfContractController;
 use Modules\Maintenance\Http\Controllers\PdfQuotationController;
+use Modules\Maintenance\Http\Controllers\PdfUpgradeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,7 @@ Route::prefix('maintenance')->group(function () {
     Route::get('/', 'MaintenanceController@index');
 
     Route::get('quotation-pdf/{id}', [PdfQuotationController::class, 'pdf']); // عرض السعر
-    Route::get('contract-pdf/{id}', [PdfContractController::class, 'pdf']); // عرض السعر
+    Route::get('contract-pdf/{id}', [PdfContractController::class, 'pdf']); //عقد صيانة
+    Route::get('upgrade-pdf/{id}', [PdfUpgradeController::class, 'pdf']); //  مقايسة - تحديث
 
 });

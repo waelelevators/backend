@@ -50,8 +50,14 @@ class MaintenanceContract extends Model
     }
     public function machineSpeed()
     {
+        return $this->belongsTo(MachineSpeed::class, 'machine_speed_id');
+    }
+
+    public function doorSize()
+    {
         return $this->belongsTo(DoorSize::class, 'door_size_id');
     }
+
     public function stopCount()
     {
         return $this->belongsTo(StopNumber::class, 'stops_count');

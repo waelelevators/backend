@@ -27,6 +27,7 @@ class UpgradeElevatorController extends Controller
         $upgrades = MaintenanceUpgrade::with('city', 'neighborhood', 'speed', 'elevatorType', 'buildingType', 'user', 'client', 'logs')->get();
         return MaintenanceUpgradeResource::collection($upgrades);
     }
+    
 
     public function show($id)
     {

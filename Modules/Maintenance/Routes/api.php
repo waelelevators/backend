@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Region;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Modules\Maintenance\Http\Controllers\AreaController;
 use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
@@ -36,6 +37,13 @@ Route::prefix('maintenance')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     // logout
     Route::post('/logout', [LoginController::class, 'logout']);
+
+
+    // Area
+    Route::get('/area', [AreaController::class, 'index']);
+    Route::post('/area', [AreaController::class, 'store']);
+    Route::put('/area', [AreaController::class, 'update']);
+
 
 
     // otp
@@ -136,13 +144,13 @@ Route::prefix('maintenance')->group(function () {
 
     // MaintenanceVisit
     Route::get('/visits', [MaintenanceVisitController::class, 'index']);
-    
+
     Route::get('/visits/{id}', [MaintenanceVisitController::class, 'show']);
     Route::post('/visits', [MaintenanceVisitController::class, 'store']);
 
 
     // البحث عن عميل من جدول العملاء باستخدم
-    Route::get('/clients/search', [MaintenanceContractController::class, 'searchClients']);
+    Route::post('/clients/search', [MaintenanceContractController::class, 'searchClients']);
     // clients/:id
 
     // CustomerRetentionRate

@@ -6,6 +6,8 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Models\MaintenanceContract;
+use Illuminate\Support\Facades\Log;
+
 use Modules\Maintenance\Http\Requests\MaintenanceContractStoreRequest;
 use Modules\Maintenance\Services\MaintenanceContractService;
 use Modules\Maintenance\Transformers\MaintenanceContractResource;
@@ -61,12 +63,15 @@ class MaintenanceContractController extends Controller
     {
 
         $request->validate([
-            'elevator_type_id' => 'nullable',
-            'phone' => 'nullable',
+            'elevator_type_id' => 'required|integer',
+            'phone' => 'required|digits:10',  // Checks for exactly 10 digits
         ]);
-        $client = Client::where('phone', $request->phone)->firstOrFail();
+
+        // Step 2: Attempt to find the client by phone
+        $client = Client::where('phone', $request->phone)->first();
 
         if ($client) {
+
             $clientId = $client->id;
             $maintenance_contracts = MaintenanceContract::where(
                 'elevator_type_id',
@@ -74,10 +79,15 @@ class MaintenanceContractController extends Controller
             )
                 ->where('client_id', $clientId)
                 ->where('contract_type', 'draft')
-                ->with('area', 'city', 'neighborhood', 'elevatorType')
+                ->with('area', 'city', 'neighborhood', 'elevatorType', 'client')
                 ->get();
 
-            return MaintenanceContractResource::collection($maintenance_contracts);
+            //   return MaintenanceContractResource::collection($maintenance_contracts);
+            // return response()->json(['status' => success], 404);
+            return response()->json([
+                'status' => 'success',
+                'data' => $maintenance_contracts
+            ]);
         } else {
             // Handle the case when no client is found
             // For example, return a response or log a message
