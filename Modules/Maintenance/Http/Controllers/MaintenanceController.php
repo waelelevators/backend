@@ -11,6 +11,34 @@ class MaintenanceController extends Controller
 {
 
 
+<<<<<<< HEAD
+=======
+    public function maintenance()
+    {
+
+        $data = [];
+
+        $tables = [
+            "elevator_types",
+            "machine_types",
+            "machine_speeds",
+            "door_sizes",
+            "stops_numbers",
+            "control_cards",
+            "drive_types",
+            "maintenance_types",
+            "branches"
+        ];
+
+
+        foreach ($tables as $table) {
+            // get name and id for each table
+            $data[$table] = DB::table($table)->get();
+        }
+
+        return response()->json(['elevator' => $data]);
+    }
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
     /**
      * Show the form for creating a new resource.
      * @return Renderable
@@ -20,14 +48,21 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
+<<<<<<< HEAD
             "elevator_types",
+=======
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             "machine_types",
             "machine_speeds",
             "door_sizes",
             "control_cards",
             "stops_numbers",
+<<<<<<< HEAD
             'users',
             'templates'
+=======
+            'users'
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
         ];
 
         $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
@@ -46,6 +81,10 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
+<<<<<<< HEAD
+=======
+         
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             'malfunction_types',
             'malfunction_statuses'
         ];
@@ -65,4 +104,8 @@ class MaintenanceController extends Controller
 
         return response()->json(['elevator' => $data]);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7

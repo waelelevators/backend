@@ -42,7 +42,7 @@ class LoginController extends Controller
                 ]
             ]]);
         }
-        
+
 
         $userToken = $user->createToken('user-token')->plainTextToken;
 
@@ -91,12 +91,11 @@ class LoginController extends Controller
             throw ValidationException::withMessages([
                 'otp' => ['كود التحقق غير صحيح.'],
             ]);
-        } 
+        }
         $user->otp = null;
         // $user->save();
-        
+
         return $this->formatUserResponse($user);
-        
     }
 
     public function logout(Request $request)

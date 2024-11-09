@@ -91,7 +91,18 @@ class EmployeeController extends Controller
             'status' => 'success',
             'message' => 'تم تعديل البيانات بنجاح',
         ]);
+
+
+        $employee->save();
+        $user = User::find($employee->user_id);
+
+        $user->rule_category_id = $request['rule_category_id'];
+        $user->email = $request['email'];
+        $user->name = $request['name'];
+        $user->save();
     }
+
+
 
 
     function show(Employee $employee)

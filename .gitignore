@@ -3,6 +3,14 @@
 /public/storage
 /storage/*.key
 /vendor
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+*.zip
+elevators-laravel.zip
+>>>>>>> 1ebb111 (Maintenance Part)
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
 .env
 .env.backup
 .phpunit.result.cache

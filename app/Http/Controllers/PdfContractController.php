@@ -338,6 +338,10 @@ class PdfContractController extends Controller
         $technical_specs = $this->buildTechnicalSpecs($contract);
 
         // Extract client information
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
         $client = $contract->locationDetection->client;
 
         // return $client;
@@ -352,6 +356,12 @@ class PdfContractController extends Controller
                     $client->last_name
                 ]
             );
+<<<<<<< HEAD
+=======
+=======
+        $client = $contract->client;
+>>>>>>> 1ebb111 (Maintenance Part)
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
 
         $id_number = ($client->type == 2 ? 'رقم السجل التجاري: ' : 'رقم الهوية: ') .
             ($client->type == 2 ? $client->commercial_register : $client->id_number);
@@ -359,7 +369,15 @@ class PdfContractController extends Controller
 
         // Prepare the final data set
         $data = [
+<<<<<<< HEAD
             'FIRST_NAME' => $client_name,
+=======
+<<<<<<< HEAD
+            'FIRST_NAME' => $client_name,
+=======
+            'FIRST_NAME' => $client->name,
+>>>>>>> 1ebb111 (Maintenance Part)
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             'PHONE' => $phone,
             'DATE' => $contract->created_at->format('Y-m-d'),
             'CARD_NUMBER' => $id_number,

@@ -95,10 +95,7 @@ class LocationDetectionController extends Controller
                 'bottom_the_elevator'          =>  $request['bottomTheElevator'] ?? '',
                 'stop_number_id'               =>  $request['stopsNumber'] ?? '',
                 'elevator_trips_id'            =>  $request['elevatorTrips'] ?? '', // مشوار المصعد
-                'elevator_type_id'             =>  $request['elevatorType'] ?? '', // نوع المصعد
                 'entrances_number_id'          =>  $request['entrancesNumber'] ?? '', // عدد المداخل
-                'well_type'                    =>  $request['wellType'] ?? '', // نوع البئر
-                'door_open_direction_id'       =>  $request['doorOpenDirection'] ?? '', // اتجاه فتح الباب الخارجي
                 'elevator_weight_location_id'  =>  $request['elevatorWeightLocation'] ?? '',  // موقع الثقل
                 'weight_cantilever_size_guide' =>  $request['weightCantileverSizeGuide'] ?? '',
                 'cabin_cantilever_size_guide'  =>  $request['cabinCantileverSizeGuide'] ?? '',

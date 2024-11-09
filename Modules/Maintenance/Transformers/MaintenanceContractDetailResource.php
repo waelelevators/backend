@@ -9,7 +9,6 @@ class MaintenanceContractDetailResource extends JsonResource
 {
     public function toArray($request)
     {
-
         return [
             'id' => $this->id,
             'installation_contract_id' => $this->installation_contract_id,

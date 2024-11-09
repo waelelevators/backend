@@ -18,6 +18,7 @@ class ContractResource extends JsonResource
         return [
 
             'id' => $this->id,
+<<<<<<< HEAD
             'isCompleteStage' => $this->is_complete_stage ?? null,
             'contractNumber' => $this->contract_number ?? null,
             'clientName' => $this->locationDetection->client->name ?? null,
@@ -34,6 +35,24 @@ class ContractResource extends JsonResource
             'discount' => $this->discount ?? null,
             'tax' => $this->tax ?? null,
             'createdAt' => $this->created_at ?? null,
+=======
+            'isCompleteStage' => $this->is_complete_stage,
+            'contractNumber' => $this->contract_number,
+            'clientName' => $this->locationDetection->client->name,
+            'idNumber' => $this->locationDetection->client->id_number,
+            'phone' => $this->locationDetection->client->phone,
+            'elevatorType' => $this->elevatorType->name,
+            'stopsNumber' => $this->stopsNumbers->name,
+            'contractStatus' => $this->contract_status,
+            'city' => $this->locationDetection->city->name,
+            'neighborhood' => $this->locationDetection->neighborhood->name,
+            'stage' => $this->stage->name,
+            'total' => $this->total,
+            'remainingCost' => $this->remaining_cost,
+            'discount' => $this->discount,
+            'tax' => $this->tax,
+            'createdAt' => $this->created_at,
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
 
 
             // 'locationDetection' => $this->locationDetection,

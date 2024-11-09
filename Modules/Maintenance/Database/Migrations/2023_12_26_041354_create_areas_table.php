@@ -16,7 +16,11 @@ class CreateAreasTable extends Migration
         Schema::create('areas', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+<<<<<<< HEAD
             $table->string('descripation')->nullable();
+=======
+            $table->string('description')->nullable();
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             $table->timestamps();
         });
     }

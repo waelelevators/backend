@@ -19,10 +19,13 @@ class InstallationLocationDetection extends Model
     ];
     // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
 
+
+    protected $with = ['city', 'region', 'neighborhood'];
+
+    // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
+
     protected $appends = [
-        'city',
-        'region',
-        'neighborhood',
+
         'elevatorType',
         'doorOpingDirection',
         'stopsNumber',
@@ -102,7 +105,7 @@ class InstallationLocationDetection extends Model
     {
         return Floor::get();
     }
- 
+
     public function getFloorDataAttribute($value)
     {
         // Decode the JSON string into an associative array

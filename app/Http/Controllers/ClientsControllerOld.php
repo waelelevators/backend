@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ClientsController extends Controller
 {
-
     function show($id)
     {
         return Client::findOrFail($id);

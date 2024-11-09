@@ -10,7 +10,6 @@ use Illuminate\Routing\Controller;
 
 class AreaController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      * @return Renderable

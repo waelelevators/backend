@@ -3,7 +3,6 @@
 namespace Modules\Maintenance\Http\Controllers;
 
 use App\Helpers\ApiHelper;
-use App\Models\MaintenanceContract;
 use App\Models\MaintenanceUpgrade;
 use App\Models\MaintenanceVisit;
 use App\Service\GeneralLogService;
@@ -41,7 +40,6 @@ class MaintenanceVisitController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'maintenance_contract_detail_id' => 'required',
             'technician_id' => 'required',

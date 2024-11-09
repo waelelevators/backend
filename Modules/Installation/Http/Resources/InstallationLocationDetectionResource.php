@@ -15,6 +15,7 @@ class InstallationLocationDetectionResource extends JsonResource
      */
     public function toArray($request)
     {
+<<<<<<< HEAD
         return [
             'id' => $this->id,
             'client' => $this->client ?? null,
@@ -30,3 +31,21 @@ class InstallationLocationDetectionResource extends JsonResource
         ];
     }
 }
+=======
+
+        return [
+            'id' => $this->id,
+            'client' => $this->client,
+            'stopsNumber' => $this->stopsNumber,
+            'elevatorType' => $this->elevatorType,
+            'city' => $this->city,
+            'neighborhood' => $this->neighborhood,
+            'createdBy' => $this->user->name,
+            'detectionBy' => $this->detectionBy->name,
+            'contractStatus' => $this->contractStatus,
+            'status' => $this->status,
+            'created_at' => $this->created_at ?? '',
+        ];
+    }
+}
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
