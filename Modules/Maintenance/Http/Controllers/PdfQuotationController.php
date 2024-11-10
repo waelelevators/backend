@@ -19,34 +19,34 @@ class PdfQuotationController extends Controller
             'MachineTYPE',
             'MachineSpeed',
             'doorSize',
-            'StopCount',
+            'stopsNumber',
             'ControlCard',
             'DriveType'
         ])->findOrFail($id);
 
-        $Setting = Template::findOrFail(10);
+        $Setting = Template::findOrFail(1);
         $template = $Setting->data['contract'];
+
 
         $name = optional($quotation->createdBy)->name;
 
         $doneBy = __('pdf.Export By') . ($name ?? '');
-
         $mpdf =   PdfHelper::generateContractPDF($name, $doneBy);
 
         $payment_table = "
-      
+
             <table  class='pdf'>
                 <tbody>
                     <tr style='background:#20536b:white; text-align:center;'>
                        <td style='text-align:center;color:white' width='33.33%'>المبلغ</td>
                        <td style='text-align:center;color:white' width='33.33%'>ضريبة القيمة المضافة</td>
                        <td style='text-align:center;color:white' width='33.33%'>الاجمالي</td>
-    
+
                     </tr>
                     <tr>
-                        <td style='text-align:center;color:red' width='33.33%'>{$quotation->activeContract->cost}</td>
+                        <td style='text-align:center;color:red' width='33.33%'>{$quotation->total}</td>
                         <td style='text-align:center;color:red' width='33.33%'>شامل الضريبة</td>
-                        <td style='text-align:center;color:red' width='33.33%'>{$quotation->activeContract->cost}</td>
+                        <td style='text-align:center;color:red' width='33.33%'>{$quotation->total}</td>
 
                     </tr>
 
@@ -71,6 +71,10 @@ class PdfQuotationController extends Controller
 
             //   'VISIT_NUMBERS' => $quotation->visits_number,
         ];
+
+
+
+
         // Generate the PDF
         $mpdf->WriteHTML(view(
             'maintenance::pdf.quotation',

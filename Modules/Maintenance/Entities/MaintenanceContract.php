@@ -54,6 +54,7 @@ class MaintenanceContract extends Model
         'machine_speed_id',
         'representative_id',
         'region_id',
+        'template_id',
         'branch_id'
     ];
 

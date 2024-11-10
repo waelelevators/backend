@@ -63,8 +63,4 @@ class ReportService
     {
         return $this->reportRepository->addProductsToReport($data);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7

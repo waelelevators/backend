@@ -7,6 +7,7 @@ use App\Models\Template;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
+
 class TemplateController extends Controller
 {
     /**
@@ -29,7 +30,7 @@ class TemplateController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'templateName' => 'required|string|unique:templates,name',
-            'content' => 'required|string',
+            'content' => 'nullable',
         ]);
 
         if ($validator->fails()) {

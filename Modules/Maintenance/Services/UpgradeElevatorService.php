@@ -32,6 +32,7 @@ class UpgradeElevatorService
                 // 'latitude' => $data['latitude'],
                 // 'longitude' => $data['longitude'],
                 'client_id' => $client_id,
+                'template_id' => $data['template_id'],
                 'elevator_type_id' => $data['elevator_type_id'],
                 'stops_count' => $data['stops_count'],
                 // 'has_window' => $data['has_window'],

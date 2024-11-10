@@ -57,20 +57,21 @@ class MaintenanceContractService
 
         $contract_number = $this->contractCode($data['maintenance_type'] ?? 1, $data['branch_id']) ?? '';
 
-        $contractData['contract_type'] = $data['isDraft'] ? 'draft' : 'contract';
-        $contractData['contract_number'] = $contract_number;
-        $contractData['user_id'] = $user_id;
-        $contractData['control_card_id'] = $data['control_card_id'];
-        $contractData['elevator_type_id'] = $data['elevator_type_id'];
-        $contractData['total'] = $data['cost'] ?? 0;
-        $contractData['representative_id'] = $representative_id ?? 0;
-        $contractData['stops_count'] = $data['stops_count'];
-        $contractData['machine_type_id'] = $data['machine_type_id'];
-        $contractData['drive_type_id'] = $data['drive_type_id'];
-        $contractData['machine_speed_id'] = $data['machine_speed_id'];
-        $contractData['door_size_id'] = $data['door_size_id'];
-        $contractData['branch_id'] = $data['branch_id'];
-        $contractData['region_id'] = $data['region_id'];
+        $contractData['contract_type']              = $data['isDraft'] ? 'draft' : 'contract';
+        $contractData['contract_number']            = $contract_number;
+        $contractData['user_id']                    = $user_id;
+        $contractData['template_id']                = $data['template_id'];
+        $contractData['control_card_id']            = $data['control_card_id'];
+        $contractData['elevator_type_id']           = $data['elevator_type_id'];
+        $contractData['total']                      = $data['cost'] ?? 0;
+        $contractData['representative_id']          = $representative_id ?? 0;
+        $contractData['stops_count']                = $data['stops_count'];
+        $contractData['machine_type_id']            = $data['machine_type_id'];
+        $contractData['drive_type_id']              = $data['drive_type_id'];
+        $contractData['machine_speed_id']           = $data['machine_speed_id'];
+        $contractData['door_size_id']               = $data['door_size_id'];
+        $contractData['branch_id']                  = $data['branch_id'];
+        $contractData['region_id']                  = $data['region_id'];
 
 
 

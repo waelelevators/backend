@@ -7,9 +7,12 @@ use App\Models\Fault;
 use App\Models\MaintenanceContract;
 use App\Models\Product;
 use App\Models\RequiredProduct;
+use App\Service\GeneralLogService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Modules\Maintenance\Transformers\ReportResource;
 
 class ReportController extends Controller
@@ -22,14 +25,25 @@ class ReportController extends Controller
             'maintenanceContract.client',
             'maintenanceContract.city',
             'maintenanceContract.neighborhood',
-            'requiredProducts'
+            'requiredProducts',
+            'logs'
         )
             ->orderBy('id', 'desc')
             ->where('technician_id', auth()->user()->id)
             ->where('status', '!=', 'completed')
             ->get();
 
+
         $reports = $reports->map(function ($report) {
+            $logs = $report->logs->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'comment' => $log->comment,
+                    'action' => $log->action,
+                    'date' => $log->created_at ? $log->created_at : null,
+                    'user' => $log->user->name ?? null,
+                ];
+            });
             return [
                 'id' => $report->id,
                 'notes' => $report->notes,
@@ -38,6 +52,7 @@ class ReportController extends Controller
                 'products' => $report->requiredProducts,
                 'city' => $report->maintenanceContract->city->name ?? null,
                 'neighborhood' => $report->maintenanceContract->neighborhood->name ?? null,
+                'logs' => $logs ?? [],
                 'client' => [
                     'name' => $report->maintenanceContract->client->name ?? null,
                     'phone' => $report->maintenanceContract->client->phone ?? null,
@@ -47,30 +62,6 @@ class ReportController extends Controller
             ];
         });
         return ['data' => $reports];
-
-
-        return $reports->map(function ($report) {
-            return [
-                'id' => $report->id,
-                'status' => $report->status,
-                'client' => [
-                    'id' => $report->maintenanceContract->client->id,
-                    'name' => $report->maintenanceContract->client->name,
-                    'phone' => $report->maintenanceContract->client->phone,
-                ],
-                'faults' => $report->faults->map(function ($fault) {
-                    return [
-                        'id' => $fault->id,
-                        'name' => $fault->name,
-                        'description' => $fault->description,
-                    ];
-                }),
-                'active_contract' => [
-                    'start_date' => $report->maintenanceContract->activeContract->start_date,
-                    'end_date' => $report->maintenanceContract->activeContract->end_date,
-                ],
-            ];
-        });
     }
 
     // store
@@ -88,20 +79,31 @@ class ReportController extends Controller
             'maintenanceContract.client',
             'maintenanceContract.city',
             'maintenanceContract.neighborhood',
-            'requiredProducts'
+            'requiredProducts',
+            'logs'
         )
             ->find($id);
 
-
+        $logs = $report->logs->map(function ($log) {
+            return [
+                'id' => $log->id,
+                'comment' => $log->comment,
+                'action' => $log->action,
+                'date' => $log->created_at ? $log->created_at : null,
+                'user' => $log->user->name ?? null,
+            ];
+        });
         $data =  [
             'id' => $report->id,
             'notes' => $report->notes,
             'faults' => $report->faults,
             'status' => $report->status,
+            'images' => $report->images,
             'created_at' => $report->created_at,
             'products' => $report->requiredProducts,
             'city' => $report->maintenanceContract->city->name ?? null,
             'neighborhood' => $report->maintenanceContract->neighborhood->name ?? null,
+            'logs' => $logs,
             'client' => [
                 'name' => $report->maintenanceContract->client->name ?? null,
                 'phone' => $report->maintenanceContract->client->phone ?? null,
@@ -167,7 +169,14 @@ class ReportController extends Controller
         $report->problems = $currentFaults;
         $report->save();
 
+        $faults = Fault::find($fault_id);
 
+        GeneralLogService::log($report, 'faults_updated', "تمت اضافة مشكله جديده " .
+            $faults->name ?? null . ' ' . $faults->description ?? null . "
+        ", [
+            'faults' => $currentFaults,
+
+        ]);
         return response()->json([
             'message' => 'Faults updated successfully',
             'faults' => Fault::whereIn('id', $currentFaults)->get()
@@ -208,6 +217,11 @@ class ReportController extends Controller
             }
         }
 
+
+        GeneralLogService::log($report,  'report_products_added', 'تم اضافة المنتجات للبلاغ', [
+            'report_id' => $report->id,
+        ]);
+
         return response()->json([
             'message' => 'Products updated successfully',
             'products' => $report->required_products
@@ -222,5 +236,34 @@ class ReportController extends Controller
         $report->save();
 
         return $this->show($request->id);
+    }
+
+
+    public function removeImage(Request $request)
+    {
+        $request->validate([
+            'image_url' => 'required|string',
+            'report_id' => 'required|integer',
+        ]);
+
+        $report = MaintenanceReport::findOrFail($request->report_id);
+        $report->images = array_filter($report->images, function ($image) use ($request) {
+            return $image !== $request->image_url;
+        });
+        $report->save();
+
+        if ($request->image_url && Storage::exists($request->image_url)) {
+            try {
+                Storage::delete($request->image_url);
+            } catch (\Exception $e) {
+                Log::error('Failed to delete file: ' . $e->getMessage());
+                // Handle the error as needed, e.g., return an error response
+            }
+        }
+
+        return response()->json([
+            'message' => 'Image removed successfully',
+            'images' => $report->images,
+        ], 200);
     }
 }

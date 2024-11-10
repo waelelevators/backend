@@ -76,6 +76,12 @@ class MaintenanceContract extends Model
         return $this->belongsTo(ControlCard::class, 'control_type_id');
     }
 
+    // drive_type
+    public function driveType()
+    {
+        return $this->belongsTo(DriveTypes::class, 'drive_type_id');
+    }
+
     // Branch
     public function branch()
     {

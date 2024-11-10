@@ -2,14 +2,10 @@
 
 namespace Modules\Mobile\Services;
 
-<<<<<<< HEAD
 use App\Models\MaintenanceContract;
 use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceVisit;
 use Carbon\Carbon;
-=======
-use App\Models\MaintenanceVisit;
->>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
 use Modules\Mobile\Http\Resources\VisitsResource;
 
 class VisitService
@@ -58,11 +54,8 @@ class VisitService
     {
 
         $visit = MaintenanceVisit::findOrFail($id);
-<<<<<<< HEAD
         $this->checkContractStatus($visit->maintenance_contract_detail_id);
 
-=======
->>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
         if (isset($data['updateStatus']) && $data['updateStatus'] == true) {
             if ($data['status'] == 'ongoing') {
                 $visit->update(['visit_start_date' => now(), 'status' => 'ongoing']);
@@ -75,10 +68,6 @@ class VisitService
             $visit->notes = $data['notes'];
         }
         $visit->save();
-<<<<<<< HEAD
-
-=======
->>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
         return $visit;
     }
 
@@ -116,7 +105,6 @@ class VisitService
 
         return $distance;
     }
-<<<<<<< HEAD
 
 
     private function checkContractStatus($contract_id)
@@ -137,6 +125,4 @@ class VisitService
             $contract->update(['status' => 'expired', 'remaining_visits' => 0]);
         }
     }
-=======
->>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
 }

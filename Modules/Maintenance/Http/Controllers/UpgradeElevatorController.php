@@ -24,7 +24,7 @@ class UpgradeElevatorController extends Controller
 
     public function index()
     {
-        $upgrades = MaintenanceUpgrade::with('city', 'neighborhood', 'speed', 'elevatorType', 'buildingType', 'user', 'client', 'logs')->paginate();
+        $upgrades = MaintenanceUpgrade::with('city', 'neighborhood', 'speed', 'elevatorType', 'buildingType', 'user', 'client', 'logs')->paginate(10);
         return MaintenanceUpgradeResource::collection($upgrades);
     }
 

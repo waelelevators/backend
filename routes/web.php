@@ -40,6 +40,10 @@ use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 
 Route::get('maintenance-contract-logs', function () {
+
+    return Client::where('name', "LIKE", '%هاني%')
+        // ->update(['name' => 'هاني عبد الوهاب سليمان عزالدين'])
+        ->get();
     return MaintenanceContractDetail::with('logs')->find(1045);
     return \DB::statement("
     UPDATE maintenance_upgrades

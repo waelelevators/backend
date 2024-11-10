@@ -74,12 +74,51 @@ class MaintenanceContractController extends Controller
                 $query->where('name', 'LIKE', "%{$search}%");
             });
 
+            $q->orWhereHas('area', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+
             $q->orWhereHas('neighborhood', function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%{$search}%");
             });
 
+// area
 
             $q->orWhereHas('region', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+
+
+            $q->orWhereHas('branch', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+
+
+            $q->orWhereHas('client', function ($query) use ($search) {
+                // `tax_number`, `id_number`, `whatsapp`, `phone2`, `phone`, `last_name`, `third_name`, `second_name`, `first_name`, `owner_name`, `name`, `created_at`
+                $query->where('name', 'LIKE', "%{$search}%")
+
+                    ->orWhere('name', 'LIKE', "%{$search}%")
+                    ->orWhere('id_number', 'LIKE', "%{$search}%")
+                    ->orWhere('whatsapp', 'LIKE', "%{$search}%")
+                    ->orWhere('phone2', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('third_name', 'LIKE', "%{$search}%")
+                    ->orWhere('second_name', 'LIKE', "%{$search}%")
+                    ->orWhere('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('owner_name', 'LIKE', "%{$search}%")
+                    ->orWhere('name', 'LIKE', "%{$search}%");
+            });
+
+            // $q->orWhereHas('representatives', function ($query) use ($search) {
+            //     $query->where('name', 'LIKE', "%{$search}%")
+            //         ->orWhere('email', 'LIKE', "%{$search}%")
+            //         ->orWhere('phone_number', 'LIKE', "%{$search}%")
+            //         ->orWhere('id_number', 'LIKE', "%{$search}%");
+            // });
+
+            $q->orWhereHas('elevatorType', function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%{$search}%");
             });
         });

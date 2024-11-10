@@ -69,7 +69,7 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
     Route::get('/contracts/unpaid-contracts', [MaintenanceContractController::class, 'getUnpaidContracts']);
     Route::post('/contracts/end-contract', [MaintenanceContractController::class, 'endContract']);
     // البحث فى العقد
-    Route::get('/contracts/search-contract', [MaintenanceContractController::class, 'searchContract']);
+    Route::get('/search-contract', [MaintenanceContractController::class, 'searchContract']);
 
 
     Route::get('/contracts/show/{id}', [MaintenanceContractController::class, 'show']);
@@ -107,31 +107,7 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
 
 
-    Route::get('maintenance_data', function () {
-        $data = [];
 
-        $tables = [
-            "elevator_types",
-            'branches',
-            "machine_types",
-            "machine_speeds",
-            "door_sizes",
-            "stops_numbers",
-            "control_cards",
-            "drive_types",
-            "maintenance_types",
-            "building_types"
-        ];
-
-        $regionsWithCity =  Region::whereHas('cities')->with('cities')->get();
-
-        foreach ($tables as $table) {
-            // get name and id for each table
-            $data[$table] = DB::table($table)->get();
-        }
-
-        return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
-    });
 
     Route::get('maintenance-data', function () {
         $data = [];
@@ -145,6 +121,7 @@ Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
             "stops_numbers",
             "control_cards",
             "drive_types",
+            'templates',
             "maintenance_types",
             "building_types"
         ];

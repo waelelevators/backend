@@ -27,6 +27,7 @@ class MaintenanceReport extends Model
     // problems hidden in the database
     protected $hidden = ['problems'];
     protected $casts = [
+        'images' => 'array',
         'problems' => 'array',
     ];
 
