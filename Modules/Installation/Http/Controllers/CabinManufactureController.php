@@ -14,7 +14,7 @@ use Modules\Installation\Http\Requests\CabinManufactureUpdateRequest;
 use Modules\Installation\Http\Resources\CabinManufacturerResource;
 
 class CabinManufactureController extends Controller
-{
+{ 
     /**
      * Display a listing of the resource.
      * @return Renderable
