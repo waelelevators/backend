@@ -9,12 +9,13 @@ class MaintenanceContractDetail extends Model
 {
     protected $fillable = [
         'installation_contract_id',
+        'maintenance_contract_id',
+        'maintenance_type',
         'client_id',
         'user_id',
         'start_date',
         'end_date',
         'visits_count',
-        'maintenance_type',
         'cost',
         'notes',
         'remaining_visits',
@@ -22,7 +23,7 @@ class MaintenanceContractDetail extends Model
         'payment_status',
         'receipt_attachment',
         'contract_attachment',
-        'maintenance_contract_id'
+        'status'
     ];
 
     public function contract()
@@ -33,5 +34,14 @@ class MaintenanceContractDetail extends Model
     public function visits()
     {
         return $this->hasMany(MaintenanceVisit::class);
+    }
+
+
+    // getExpiredContracts
+
+    public function getExpiredContracts()
+    {
+        // if end date is less than now and remaining visits is less than 1
+        return $this->where('status',  'expired')->get();
     }
 }

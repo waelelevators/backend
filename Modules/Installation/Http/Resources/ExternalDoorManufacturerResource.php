@@ -17,6 +17,10 @@ class ExternalDoorManufacturerResource extends JsonResource
         return [
             'id' => $this->id,
             'contract_id' => $this->contract->id,
+<<<<<<< HEAD
+            'contract' => $this->contract->location_data,
+=======
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             'client' => $this->contract->locationDetection->client,
             'city' => $this->contract->locationDetection->city,
             'neighborhood' => $this->contract->locationDetection->neighborhood,

@@ -26,15 +26,32 @@ class ClientUpdateResquest extends FormRequest
      */
     public function rules()
     {
+<<<<<<< HEAD
+        return [
+            'clientType' =>  'required', 'integer',
+=======
         $id = $this->route('id'); // Get the client ID from the route
 
         return [
             'clientType' =>  'required',
             'integer',
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             'firstName' => 'nullable|required_if:clientType,1|string',
             'secondName' => 'nullable|required_if:clientType,1|string',
             'thirdName' => 'nullable|required_if:clientType,1|string',
             'forthName' => 'nullable|required_if:clientType,1|string',
+<<<<<<< HEAD
+            'phone' => 'nullable|required|integer|digits:10',
+            'anotherPhone' => 'nullable|required|integer|digits:10',
+            'whatsappPhone' => 'nullable|required|integer|digits:10',
+            'idNumber' => 'required|integer|digits:10',
+            'companyName' => 'required_if:clientType,2|string',
+            'entityName' => 'required_if:clientType,3|string',
+            'represents' => 'nullable|required_if:clientType,2|string',
+            'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer|digits:10',
+            'taxNo' => 'nullable|required_if:clientType,2|integer|digits:10',
+            'image' => 'nullable|string',
+=======
             'phone' => 'nullable|required|integer|digits:9,' . $id,
             'anotherPhone' => 'nullable|required|integer|digits:9',
             'whatsappPhone' => 'nullable|required|integer|digits:9',
@@ -44,6 +61,7 @@ class ClientUpdateResquest extends FormRequest
             'represents' => 'nullable|required_if:clientType,2|string',
             'commercialRegistrationNo' => 'nullable|required_if:clientType,2|integer',
             'taxNo' => 'nullable|required_if:clientType,2|integer',
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
         ];
     }
 

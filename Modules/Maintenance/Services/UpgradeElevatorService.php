@@ -18,11 +18,10 @@ class UpgradeElevatorService
     {
         $user = auth('sanctum')->user();
         return DB::transaction(function () use ($data, $user) {
-
-            $client = ApiHelper::handleClientData($data);
+            $client = ApiHelper::handleAddClient($data);
             $client_id = $client->id;
 
-            $taxValue = $data['tax'];
+            $taxValue = 0.15;
             $total = $data['total'];
             $discount = $data['discount'] ?? 0;
             $netPrice = $total - $discount;
@@ -30,22 +29,21 @@ class UpgradeElevatorService
             $upgrade = new MaintenanceUpgrade();
             $upgrade->fill([
                 'maintenance_contract_id' => 0,
-                'latitude' => $data['latitude'],
-                'longitude' => $data['longitude'],
+                // 'latitude' => $data['latitude'],
+                // 'longitude' => $data['longitude'],
                 'client_id' => $client_id,
+                'template_id' => $data['template_id'],
                 'elevator_type_id' => $data['elevator_type_id'],
                 'stops_count' => $data['stops_count'],
-                'has_window' => $data['has_window'],
-                'has_stairs' => $data['has_stairs'],
+                // 'has_window' => $data['has_window'],
+                // 'has_stairs' => $data['has_stairs'],
                 'total' => $data['total'],
                 'discount' => $data['discount'] ?? null,
-                'speed' => $data['speed'] ?? null,
                 'net_price' => $data['net_price'],
                 'user_id' => $user->id,
-                'city_id' => $data['city'],
-                'speed_id' => $data['speed'],
-                'neighborhood_id' => $data['neighborhood'],
-                'speed_id' => $data['speed'],
+                'city_id' => $data['city_id'],
+                'neighborhood_id' => $data['neighborhood_id'],
+                'speed_id' => $data['machine_speed_id'],
                 'building_type_id' => $data['building_type_id'],
                 'status' => MaintenanceUpgradeStatus::PENDING,
                 'tax' => $tax,

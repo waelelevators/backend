@@ -12,7 +12,8 @@ class ReportRepository
 {
     public function getAllReports()
     {
-        return MaintenanceReport::all();
+        // order by newst first get latest reports
+        return MaintenanceReport::latest()->paginate(5);
     }
 
     public function getReportById($id)

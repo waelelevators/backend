@@ -53,4 +53,9 @@ class Employee extends Model
     {
         return $this->hasMany(TechniciansWorkOrder::class, 'technician_id');
     }
+
+    public function visits()
+    {
+        return $this->hasMany(MaintenanceVisit::class, 'technician_id');
+    }
 }

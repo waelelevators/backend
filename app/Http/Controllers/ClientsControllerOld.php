@@ -95,6 +95,8 @@ class ClientsController extends Controller
 
         $client = Client::findOrFail($id);
 
+        if (isset($request['image'])) $image = $this->uploadBase64Image($request['image'], 'client');
+        else $image = '';
 
         $client->type = $clientType;
 
@@ -108,14 +110,20 @@ class ClientsController extends Controller
                 'phone2' => $request['anotherPhone'],
                 'whatsapp' => $request['whatsappPhone'],
                 'id_number' => $request['idNumber'],
+                'image' => $image,
+            ];
+        } elseif ($clientType == 2) {
 
+            $client->data = [
+                'name' => $request['companyName'],
                 'owner_name' => $request['represents'],
                 'commercial_register' => $request['commercial_register'],
                 'tax_number' => $request['taxNo'],
                 'phone' => $request['phone'],
                 'phone2' => $request['anotherPhone'],
                 'whatsapp' => $request['whatsappPhone'],
-                'id_number' => $request['idNumber']
+                'id_number' => $request['idNumber'],
+                'image' => $image,
             ];
         } elseif ($clientType == 3) {
             $client->data = [
@@ -123,7 +131,8 @@ class ClientsController extends Controller
                 'id_number' => $request['idNumber'],
                 'phone' => $request['phone'],
                 'phone2' => $request['anotherPhone'],
-                'whatsapp' => $request['whatsappPhone']
+                'whatsapp' => $request['whatsappPhone'],
+                'image' => $image,
             ];
         }
 

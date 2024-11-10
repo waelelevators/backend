@@ -5,14 +5,24 @@ use App\Http\Controllers\PdfContractController;
 use App\Http\Controllers\PdfExchangeProductController;
 use App\Http\Controllers\PdfInstallationLDController;
 use App\Http\Controllers\PdfQuotationController;
+use App\Models\BuildingType;
+use App\Models\City;
 use App\Models\Client;
+use App\Models\ElevatorType;
+use App\Models\Employee;
+use App\Models\MachineSpeed;
 use App\Models\MaintenanceContractDetail;
 use App\Models\MaintenanceReport;
 use App\Models\MaintenanceUpgrade;
 use App\Models\MaintenanceVisit;
+use App\Models\Neighborhood;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Modules\Maintenance\Entities\MaintenanceContract;
+use Modules\Maintenance\Entities\MaintenanceContractDetail as EntitiesMaintenanceContractDetail;
+use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 // use PDF;
 
@@ -30,6 +40,194 @@ use Modules\Maintenance\Entities\MaintenanceContract;
 
 
 Route::get('maintenance-contract-logs', function () {
+
+    return Client::where('name', "LIKE", '%هاني%')
+        // ->update(['name' => 'هاني عبد الوهاب سليمان عزالدين'])
+        ->get();
+    return MaintenanceContractDetail::with('logs')->find(1045);
+    return \DB::statement("
+    UPDATE maintenance_upgrades
+    SET created_at = DATE_ADD(
+        '2020-01-01',
+        INTERVAL FLOOR(RAND() * TIMESTAMPDIFF(DAY, '2020-01-01', '2024-12-31')) DAY
+    )
+");
+    return [];
+
+    $productsIds = Product::all()->pluck('id')->toArray();
+    $clientIds = Client::all()->pluck('id')->toArray();
+
+
+    $cities =  [
+        2,
+        11,
+        36,
+        67
+    ];
+
+    $statuss = ['pending', 'accepted'];
+
+    $elevator_type_ids = ElevatorType::all()->pluck('id')->toArray();
+    $building_type_ids = BuildingType::all()->pluck('id')->toArray();
+    $stops_counts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    $speed_ids = MachineSpeed::all()->pluck('id')->toArray();
+
+    for ($i = 0; $i < 1000; $i++) {
+        // maintenance_upgrades `status`, `city_id`, `user_id`, `maintenance_contract_id`, `neighborhood_id`,
+        // `latitude`, `longitude`, `client_id`, `elevator_type_id`, `building_type_id`, `stops_count`, `has_window`,
+        // `has_stairs`, `site_images`, `total`
+        $city_id = $cities[array_rand($cities)];
+        $neighborhoods = Neighborhood::all()->pluck('id')->toArray();
+        $upgrade_total = 0;
+        $upgrade_tax = 0;
+        $upgrade_discount = 0;
+
+        $maintenanceUpgrade = MaintenanceUpgrade::create([
+            'status' => $statuss[array_rand($statuss)],
+            'city_id' => $city_id,
+            'user_id' => 1,
+            'maintenance_contract_id' => 1,
+            'neighborhood_id' => $neighborhoods[array_rand($neighborhoods)],
+            'latitude' => 1,
+            'longitude' => 1,
+            'client_id' => $clientIds[array_rand($clientIds)],
+            'elevator_type_id' => $elevator_type_ids[array_rand($elevator_type_ids)],
+            'building_type_id' => $building_type_ids[array_rand($building_type_ids)],
+            'stops_count' => $stops_counts[array_rand($stops_counts)],
+            'has_window' => rand(0, 1),
+            'has_stairs' => rand(0, 1),
+            'speed_id' => $speed_ids[array_rand($speed_ids)],
+            'site_images' => '[]',
+            'total' => $upgrade_total,
+            'tax' => $upgrade_tax,
+            'discount' => $upgrade_discount,
+            'net_price' => $upgrade_total - $upgrade_tax - $upgrade_discount,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        // `id`, `productable_type`, `productable_id`, `product_id`, `quantity`, `price`, `tax`, `subtotal`, `status`, `notes`, `created_at`, `updated_at`
+        for ($i = 0; $i < rand(4, 10); $i++) {
+            $quantity = rand(1, 10);
+            $price = rand(100, 1000);
+            $subtotal = $quantity * $price;
+            $tax = $subtotal * 0.15;
+            $maintenanceUpgrade->requiredProducts()->create([
+                'product_id' => $productsIds[array_rand($productsIds)],
+                'quantity' => $quantity,
+                'price' => $price,
+                'tax' => $tax,
+                'subtotal' => $subtotal
+
+            ]);
+
+            $upgrade_total += $subtotal;
+            $upgrade_tax += $tax;
+        }
+
+        $maintenanceUpgrade->total = $upgrade_total;
+        $maintenanceUpgrade->tax = $upgrade_tax;
+        $maintenanceUpgrade->discount = $upgrade_discount;
+        $maintenanceUpgrade->net_price = $upgrade_total - $upgrade_tax - $upgrade_discount;
+        $maintenanceUpgrade->save();
+    }
+
+    $data = MaintenanceUpgrade::with('requiredProducts.product', 'city', 'neighborhood')
+        ->get()
+        ->groupBy('city.name') // تجميع البيانات حسب اسم المدينة
+        ->map(function ($items, $cityName) {
+            return [
+                'city_name' => $cityName,
+                'neighborhoods' => $items->groupBy('neighborhood.name')->map(function ($neighborhoodItems, $neighborhoodName) {
+                    return [
+                        'name' => $neighborhoodName,
+                        'products' => $neighborhoodItems->flatMap(function ($maintenanceUpgrade) {
+                            return $maintenanceUpgrade->requiredProducts->map(function ($requiredProduct) {
+                                return [
+                                    'name' => $requiredProduct->product->name,
+                                    'count' => 1, // يمكنك تخصيص العدد حسب الحاجة
+                                ];
+                            });
+                        })->values(),
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+    return $data;
+
+
+
+    // $result = MaintenanceUpgrade::with('requiredProducts.product')
+    $resultss = MaintenanceReport::with('requiredProducts.product')
+        ->get()
+        ->groupBy('city_id')
+        ->map(function ($group) {
+            return $group->groupBy('neighborhood_id')
+                ->map(function ($neighborhoodGroup) {
+                    $products = $neighborhoodGroup->flatMap->requiredProducts->groupBy('product_id')
+                        ->map(function ($productGroup) {
+                            return [
+                                'product_name' => $productGroup->first()->product->name,
+                                'count' => $productGroup->sum('quantity'),
+                            ];
+                        });
+                    return $products;
+                });
+        });
+
+    return ($result);
+    dd($result);
+
+    // required_products `id`, `productable_type`, `productable_id`, `product_id`, `quantity`, `price`, `tax`, `subtotal`, `status`, `notes`, `created_at`, `updated_at`
+    // `id`, `status`, `city_id`, `user_id`, `maintenance_contract_id`, `neighborhood_id`, `latitude`, `longitude`, `client_id`, `elevator_type_id`, `building_type_id`, `stops_count`, `has_window`, `has_stairs`, `site_images`, `total`, `tax`, `discount`, `net_price`, `attachment_contract`, `attachment_receipt`, `speed_id`, `rejection_reason`, `created_at`, `updated_at`
+    return MaintenanceUpgrade::with('requiredProducts.product')
+        ->get()
+        ->groupBy('city_id')
+        ->map(function ($group) {
+            return $group->groupBy('neighborhood_id');
+        });
+
+    return (Client::find(5122));
+
+    $ex = new EntitiesMaintenanceContractDetail();
+    return $ex->getExpiredContracts(); // EntitiesMaintenanceContractDetail::getExpiredContracts();
+
+    $contract =  MaintenanceContract::find(144)->logs;
+    return $contract;
+    return MaintenanceContractResource::make($contract);
+    return Employee::whereHas('visits', function ($query) {
+        $query->where('status', 'completed');
+    })
+        ->with('user.area')
+        ->with('visits', function ($query) {
+            $query->with('maintenanceContract', 'maintenanceContract.client', 'maintenanceContract.city', 'maintenanceContract.neighborhood', 'maintenanceContract.area');
+        })
+        ->get();
+
+    // اجلب ال technician_id بدون تكرار من جدول الزيارات
+    $technicianIds = MaintenanceVisit::where("status", "completed")
+        ->with(
+            'technician',
+            'maintenanceContractDetail',
+            'maintenanceContractDetail.client',
+            'maintenanceContract.city',
+            'maintenanceContract.neighborhood',
+            'maintenanceContract.area'
+        )
+        ->get();
+
+
+
+    return $technicianIds;
+
+
+    $user =  User::find(1);
+
+    $user->otp = 123456;
+    $user->save();
+
+    return $user;
 
     $years = MaintenanceContractDetail::selectRaw('YEAR(start_date) as year')
         ->distinct()

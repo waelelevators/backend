@@ -337,10 +337,9 @@ class ApiHelper
         }
 
         $client->phone = $request['phone'];
-        $client->phone2 = $request['phone2'];
-        $client->whatsapp = $request['whatsapp'];
-        $client->phone2 = $request['anotherPhone'] ?? '';
-        $client->whatsapp = $request['whatsappPhone'] ?? '';
+        $client->phone2 = $request['anotherPhone'];
+        $client->whatsapp = $request['whatsappPhone'];
+
         $client->save();
         return $client;
     }
@@ -479,13 +478,14 @@ class ApiHelper
         $client->save();
         return $client;
     }
+
+
     public static  function handleClientData($request)
     {
 
-
         $clientType = $request['clientType'];
 
-        if ($clientType == 1 &&  $request->has('idNumber') && $request['idNumber'] !== '') {
+        if ($clientType == 1 &&  key_exists('idNumber', $request) && $request['idNumber'] !== '') {
 
             $findClient = Client::whereJsonContains(
                 'data->id_number',

@@ -32,7 +32,11 @@ class LocationStatusResource extends JsonResource
             'openingDirection' => $contract?->outerDoorDirections?->name,
             'neighborhood' => $contract->locationDetection->neighborhood->name,
             'financialStatus' => $contract->getRemainingAmountInStage($this->assignment->stage->id),
+<<<<<<< HEAD
+            'representative' => $this->assignment->representative->name,
+=======
             'representative' => $this?->assignment?->representative?->name,
+>>>>>>> c4980aa6f1d813202d514b551d0dd13643970ca7
             'cost' => $contract->total,
             'status' => $this->assignment->status,
             'locationStatus' => $this->status,

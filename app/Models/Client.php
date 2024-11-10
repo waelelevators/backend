@@ -21,6 +21,9 @@ class Client extends Model
         'data',
     ];
 
+    protected $appends = ['full_name'];
+
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -72,5 +75,11 @@ class Client extends Model
     {
         return $this->hasManyThrough(Contract::class, Representative::class, 'representativeable_id', 'id', 'id', 'contract_id')
             ->where('representativeable_type', 'App\Models\Client');
+    }
+
+    public function getFullNameAttribute()
+    {
+
+        return "{$this->first_name} {$this->second_name} {$this->third_name} {$this->last_name}";
     }
 }

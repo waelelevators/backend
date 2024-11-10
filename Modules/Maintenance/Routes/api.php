@@ -6,14 +6,15 @@ use App\Models\Product;
 use App\Models\Region;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use Modules\Maintenance\Http\Controllers\AreaController;
+use Modules\Maintenance\Http\Controllers\UpgradesAnalyticsController;
 use Modules\Maintenance\Http\Controllers\UpgradeElevatorController;
 use Modules\Maintenance\Http\Controllers\ReportController;
 use Modules\Maintenance\Http\Controllers\MaintenanceContractController;
 use Modules\Maintenance\Http\Controllers\MaintenanceVisitController;
 use Modules\Maintenance\Http\Controllers\LoginController;
 use Modules\Maintenance\Http\Controllers\AnalysisController;
-use Modules\Maintenance\Http\Controllers\MaintenanceController;
+use Modules\Maintenance\Http\Controllers\AreaController;
+use Modules\Maintenance\Http\Controllers\VisitisAnalysisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,25 +32,9 @@ use Modules\Maintenance\Http\Controllers\MaintenanceController;
 // });
 
 // prefix maintenance
-Route::prefix('maintenance')->group(function () {
-
-    // login
-    Route::post('/login', [LoginController::class, 'login']);
-    // logout
-    Route::post('/logout', [LoginController::class, 'logout']);
+Route::middleware('auth:sanctum')->prefix('maintenance')->group(function () {
 
 
-    // Area
-    Route::get('/area', [AreaController::class, 'index']);
-    Route::post('/area', [AreaController::class, 'store']);
-    Route::put('/area', [AreaController::class, 'update']);
-
-
-
-    // otp
-    Route::post('/otp', [LoginController::class, 'otp']);
-    // verify otp
-    Route::post('/verify-otp', [LoginController::class, 'verifyOtp']);
 
     Route::get('/reports', [ReportController::class, 'index']); // جلب كل البلاغات
     Route::get('/reports/{id}', [ReportController::class, 'show']); // جلب بلاغ معين
@@ -70,21 +55,41 @@ Route::prefix('maintenance')->group(function () {
         ];
     });
 
+
+
     // add products to report
     Route::post('/reports/add-required-products', [ReportController::class, 'addProductsToReport']);
     // convert report to upgrade'
     Route::post('/reports/convert-to-upgrade/{reportId}', [ReportController::class, 'convertReportToUpgrade']);
+    // renew contract
+    Route::post('/contracts/renew-contract/{id}', [MaintenanceContractController::class, 'renewContract']);
+    // getExpiredContracts
+    Route::post('/contracts/upload-files', [MaintenanceContractController::class, 'uploadFiles']);
+    Route::get('/contracts/get-expired-contracts', [MaintenanceContractController::class, 'getExpiredContracts']);
+    Route::get('/contracts/unpaid-contracts', [MaintenanceContractController::class, 'getUnpaidContracts']);
+    Route::post('/contracts/end-contract', [MaintenanceContractController::class, 'endContract']);
+    // البحث فى العقد
+    Route::get('/search-contract', [MaintenanceContractController::class, 'searchContract']);
 
+
+    Route::get('/contracts/show/{id}', [MaintenanceContractController::class, 'show']);
     Route::get('/contracts/{type?}', [MaintenanceContractController::class, 'index']);
     Route::post('/contracts', [MaintenanceContractController::class, 'store']);
+    Route::put('/contracts', [MaintenanceContractController::class, 'update']);
+    // end contract
+
+    // contract update
+
     // convert draft to contract
+    Route::get('/area', [AreaController::class, 'index']);
+    Route::post('/area/change-contract-area', [AreaController::class, 'changeContractArea']);
+
     Route::post('/contracts/convert-to-contract', [MaintenanceContractController::class, 'convertDraftToContract']);
     // contracts/:id
-    Route::get('/contracts/{id}', [MaintenanceContractController::class, 'show']);
-
 
     // technicians
     Route::get('/technicians', function () {
+
         $technicians = Employee::all();
         return [
             'data' => $technicians
@@ -102,17 +107,21 @@ Route::prefix('maintenance')->group(function () {
 
 
 
-    Route::get('maintenance_data', function () {
+
+
+    Route::get('maintenance-data', function () {
         $data = [];
 
         $tables = [
             "elevator_types",
+            "branches",
             "machine_types",
             "machine_speeds",
             "door_sizes",
             "stops_numbers",
             "control_cards",
             "drive_types",
+            'templates',
             "maintenance_types",
             "building_types"
         ];
@@ -126,7 +135,6 @@ Route::prefix('maintenance')->group(function () {
 
         return response()->json(['elevator' => $data, 'regionsWithCities' => $regionsWithCity]);
     });
-    Route::get('maintenance-data', [MaintenanceController::class, 'maintenance']);
 
     // upgrades
     Route::get('/upgrades', [UpgradeElevatorController::class, 'index']);
@@ -142,11 +150,18 @@ Route::prefix('maintenance')->group(function () {
     Route::post('/upgrades/add-required-products', [UpgradeElevatorController::class, 'addRequiredProducts']);
 
 
+    Route::get('/visits/filter', [MaintenanceVisitController::class, 'filterVisitsByDateRange']);
     // MaintenanceVisit
     Route::get('/visits', [MaintenanceVisitController::class, 'index']);
-
     Route::get('/visits/{id}', [MaintenanceVisitController::class, 'show']);
     Route::post('/visits', [MaintenanceVisitController::class, 'store']);
+
+    // get visits with reange
+    Route::post('/visits/range', [MaintenanceVisitController::class, 'getVisitsWithRange']);
+
+    // rescheduled visits
+    Route::post('/visits/reschedule', [MaintenanceVisitController::class, 'reschedule']);
+    // filiter visits by date range
 
 
     // البحث عن عميل من جدول العملاء باستخدم
@@ -158,8 +173,20 @@ Route::prefix('maintenance')->group(function () {
     // deep anlysis
     Route::get('/analysis/deep-analysis/{analysisType}', [AnalysisController::class, 'deepAnalysis']);
 
-
     // CustomerLifetimeValue
     Route::get('/analysis/customer-lifetime-value', [AnalysisController::class, 'CustomerLifetimeValue']);
+    // analysis
     Route::get('/analysis/{param}/{year?}', [AnalysisController::class, 'index']);
+
+    // VisitisAnalysis
+    Route::get('VisitisAnalysis', [VisitisAnalysisController::class, 'index']);
+
+
+
+    Route::prefix('analytics/upgrades')->group(function () {
+        Route::get('overview', [UpgradesAnalyticsController::class, 'getUpgradesOverview']);
+        Route::get('neighborhood/{id}', [UpgradesAnalyticsController::class, 'getNeighborhoodUpgradesAnalysis']);
+        Route::get('financial-efficiency', [UpgradesAnalyticsController::class, 'getFinancialEfficiencyAnalysis']);
+        Route::get('trends', [UpgradesAnalyticsController::class, 'getUpgradeTrendsAnalysis']);
+    });
 });

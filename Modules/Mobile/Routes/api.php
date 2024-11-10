@@ -28,6 +28,8 @@ Route::prefix('mobile')->group(function () {
     // auth group
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('visits/remove-image', [VisitController::class, 'removeImage']);
+        // /reports/remove-image
+        Route::post('reports/remove-image', [ReportController::class, 'removeImage']);
 
         // products
 
@@ -119,7 +121,6 @@ Route::prefix('mobile')->group(function () {
         // verify otp
         Route::post('verify-otp', [LoginController::class, 'verifyOtp']);
     });
-
 
 
     Route::post('login', [LoginController::class, 'login'])->name('login');

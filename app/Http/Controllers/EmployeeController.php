@@ -60,7 +60,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function update(Request $request)
+    public function update(Request $request, Employee $employee)
     {
         // $request->validate([
         //     'name' => 'required',
@@ -70,15 +70,28 @@ class EmployeeController extends Controller
         //     'electricity' => 'nullable|integer',
         // ]);
 
-<<<<<<< HEAD
 
         $employee->name            = $request->employee['name'];
         $employee->department      = $request->employee['department'];
         $employee->technician_info = [
-            'mechanical' => $request['mechanical'],
-            'electricity' => $request['electricity'],
->>>>>>> 1ebb111 (Maintenance Part)
+            'mechanical' => $request->employee['mechanical'],
+            'electricity' => $request->employee['electricity'],
         ];
+
+        $employee->save();
+
+        $user = User::find($employee->user_id);
+        $user->rule_category_id = $request->user['rule_category_id'];
+        $user->email = $request->user['email'];
+        $user->name = $request->user['name'];
+        $user->save();
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم تعديل البيانات بنجاح',
+        ]);
+
 
         $employee->save();
         $user = User::find($employee->user_id);
@@ -87,12 +100,14 @@ class EmployeeController extends Controller
         $user->email = $request['email'];
         $user->name = $request['name'];
         $user->save();
+    }
 
 
 
 
     function show(Employee $employee)
     {
+        return response([
             'employeeData' => $employee,
             'rules' => RuleCategory::all(),
             'user' => User::find($employee->user_id),

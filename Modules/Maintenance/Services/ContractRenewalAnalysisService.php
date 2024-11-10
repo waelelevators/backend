@@ -141,6 +141,7 @@ class ContractRenewalAnalysisService
 
     public function analyzeRenewalPatterns()
     {
+
         try {
             // تحليل التجديدات لكل عميل
             $customerRenewals = MaintenanceContractDetail::select(

@@ -17,6 +17,9 @@ class InstallationLocationDetection extends Model
         'door_sizes' => 'array',
         'user_id' => 'integer',
     ];
+    // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
+
+
     protected $with = ['city', 'region', 'neighborhood'];
 
     // protected $with = ['client', 'representatives', 'detectionBy', 'user'];
@@ -84,7 +87,6 @@ class InstallationLocationDetection extends Model
         return ElevatorTrip::where('id', $this->well_data['elevator_trips_id'])->first();
     }
 
-
     public function getRegionAttribute()
     {
         return Region::where('id', $this->location_data['region'] ?? 0)->first();
@@ -94,18 +96,15 @@ class InstallationLocationDetection extends Model
     {
         return City::where('id', $this->location_data['city'] ?? 0)->first();
     }
-    public function neighborhood()
+    public function getNeighborhoodAttribute()
     {
-        return $this->belongsTo(Neighborhood::class);
+        return Neighborhood::where('id', $this->location_data['neighborhood'] ?? 0)->first();
     }
-
-
 
     public function getFloorAttribute()
     {
         return Floor::get();
     }
-
 
     public function getFloorDataAttribute($value)
     {

@@ -34,6 +34,7 @@ class VisitsResource extends JsonResource
         ];
     }
 
+
     private function formatAddress($city, $neighborhood, $area, $contract)
     {
         $parts = [

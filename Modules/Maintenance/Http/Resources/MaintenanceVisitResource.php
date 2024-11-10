@@ -20,6 +20,7 @@ class MaintenanceVisitResource extends JsonResource
             'notes' => $this->notes,
             'test_checklist' => $this->test_checklist,
             'client_approval' => $this->client_approval,
+            'maintenance_contract' => $this->when($this->relationLoaded('maintenanceContract'), $this->maintenanceContract),
             'images' => $this->images,
             'logs' => $this->when($this->logs, $this->logs),
         ];

@@ -46,7 +46,6 @@ class AnalysisController extends Controller
 
         // how can U when ;lkdalkf
 
-
         // Determine the analysis type based on the $param value
         switch ($analysisType) {
             case 'area':
@@ -295,11 +294,11 @@ class AnalysisController extends Controller
                         'value' => count($result['data']['renewal_gaps']['normal_renewal'] ?? [])
                     ],
                     [
-                        'name' => 'تجديد متخرج',
+                        'name' => 'تجديد متاخر',
                         'value' => count($result['data']['renewal_gaps']['delayed_renewal'] ?? [])
                     ],
                     [
-                        'name' => 'تجديد متخرج جداً',
+                        'name' => 'تجديد متاخر جداً',
                         'value' => count($result['data']['renewal_gaps']['late_renewal'] ?? [])
                     ]
                 ],

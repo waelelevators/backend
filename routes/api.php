@@ -19,8 +19,6 @@ use App\Http\Controllers\SignedContractsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\contractQuotationsController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\OneColumnController;
-use App\Models\BuildingType;
 use App\Models\Client;
 use App\Models\Employee;
 use App\Models\Industry;
@@ -489,88 +487,6 @@ Route::middleware('auth:sanctum')->group(function () {
         }
     });
 
-    Route::get(
-        'clients-data',
-        function () {
-
-            $data = [];
-
-
-            $tables = [
-                "building_types",
-                "clients",
-                "employees",
-            ];
-
-
-            foreach ($tables as $table) {
-                // get name and id for each table
-                $data[$table] = DB::table($table)->get();
-            }
-
-            $regionsWithCities =  Region::whereHas(relation: 'cities.neighborhoods')->with('cities.neighborhoods')->get();
-
-            return response()->json([
-                'data' => $data,
-                'regionsWithCities' => $regionsWithCities
-            ]);
-        }
-    );
-
-    Route::get('get_elevator_data/{tableName}', [OneColumnController::class, 'index']);
-    Route::post('create_elevator_data/{tableName}', [OneColumnController::class, 'create']);
-    // Route::put('updates_elevators_data/{tableName}/{id}', [OneColumnController::class, 'update']);
-    // Route::post('update_elevator_data', function (Request $request) {
-    //     // Validate the request
-    //     $validator = Validator::make($request->all(), [
-    //         'currentType' => 'required|string',
-    //         'updatedItem.id' => 'required|integer',
-    //         'updatedItem.name' => 'required|string',
-    //         'updatedItem.need_to_internal_door' => 'nullable|string',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['error' => $validator->errors()], 422);
-    //     }
-
-    //     try {
-    //         // Assign internalDoor value
-    //         $internalDoor = $request->updatedItem['need_to_internal_door'] ?? null;
-
-    //         // Update database record
-    //         $updateData = [
-    //             'name' => $request->updatedItem['name'],
-    //         ];
-
-    //         if ($request->currentType == 'elevator_types') {
-    //             $updateData['need_to_internal_door'] = $internalDoor;
-    //         }
-
-    //         $affectedRows = DB::table($request->currentType)
-    //             ->where('id', $request->updatedItem['id'])
-    //             ->update($updateData);
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'affectedRows' => $affectedRows,
-    //             'message' => 'Data updated successfully'
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         Log::error('Error updating elevator data: ' . $e->getMessage());
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to update data',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // });
-
-    // // elevator_types
-    // Route::get('get_elevator_data/{type}', function ($type) {
-    //     return DB::table($type)->get();
-    // });
-
-
 
     Route::post('logout', [AuthController::class, 'logout']);
 
@@ -625,13 +541,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('get_elevator_data/{type}', function ($type) {
         return DB::table($type)->get();
     });
-
-
-    // Route::post('{table}/names', [OneColumnController::class, 'store']);
-    // Route::get('single/{table}', [OneColumnController::class, 'index']);
-    // Route::put('{table}/names/{id}', [OneColumnController::class, 'update']);
-    // Route::delete('{table}/names/{id}', [OneColumnController::class, 'destroy']);
-
 
 
 
@@ -778,7 +687,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::post('login', [AuthController::class, 'login']);
-
 
 Route::get('test', function () {
     return response()->json(['data' => ['message' => 'Hello, world!']]);

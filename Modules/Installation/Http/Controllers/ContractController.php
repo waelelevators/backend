@@ -686,7 +686,7 @@ class ContractController extends Controller
      * @param int $id
      * @return Renderable
      */
-    public function update(ContractUpdateRequest $request, $id)
+    public function update(ContractStoreRequest $request, $id)
     {
         $contract = Contract::findOrFail($id);
 
@@ -735,7 +735,10 @@ class ContractController extends Controller
             array($request['paymentStages']);
 
 
+
+
         return response()->json([
+            'status' => 'success',
             'message' => 'تم تعديل بيانات العقد بنجاح'
         ]);
     }
@@ -748,6 +751,7 @@ class ContractController extends Controller
     public function store(ContractUpdateRequest $request)
     {
 
+        // Check if idNumber exists for a different client
         if (!empty($request['idNumber'])) {
             $idNumberExists = Client::where('id_number', $request['idNumber'])
                 ->where('id', '!=', $request['clientId'])
@@ -795,14 +799,23 @@ class ContractController extends Controller
 
             $contract = new Contract();
 
+            $data = [
+                'region'          => $request['region'] ?? null,
+                'city'            => $request['city'] ?? null,
+                'neighborhood'    => $request['neighborhood'] ?? null,
+                'location_url'    => $request['location_url'] ?? null,
+                'lat'             => $request['lat'] ?? null,
+                'long'            => $request['long'] ?? null
+            ];
+
+            // Remove null values from the data array
+            $data = array_filter($data, function ($value) {
+                return !is_null($value);
+            });
+
             InstallationLocationDetection::where('id', $request['locationId'])
                 ->update([
-                    'city_id' => $request['city'],
-                    'region_id' => $request['region'],
-                    'neighborhood_id' => $request['neighborhood'],
-                    'location_url' => $request['location_url'],
-                    'lat' => $request['lat'],
-                    'long' => $request['long']
+                    'location_data' => $data
                 ]); //   [المنطقة - المدينة - الحي]تحديث بيانات كشف الموقع
 
             $contract->project_name                                = $request['projectName'] ?? '';
@@ -934,7 +947,7 @@ class ContractController extends Controller
 
         $model = Contract::with([
             'stage',
-        
+            'stage',
             'elevatorRoom',
             'template',
             'representatives',
@@ -951,6 +964,10 @@ class ContractController extends Controller
             'EntrancesNumber',
             'branch',
             'elevatorType',
+            'elevatorTrip',
+            'elevatorRail',
+            'elevatorRoom',
+            'elevatorWeight',
             'machineType',
             'machineLoad',
             'controlCard',

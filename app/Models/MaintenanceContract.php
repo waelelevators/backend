@@ -10,22 +10,30 @@ class MaintenanceContract extends Model
     use HasFactory;
     protected $table = 'maintenance_contracts';
     protected $fillable = [
-        'contract_number',
-        'area',
-        'city_id',
-        'neighborhood_id',
-        'latitude',
-        'longitude',
+        'installation_contract_id',
+        'maintenance_contract_id',
+        'maintenance_type',
+        'client_id',
+        'user_id',
+        'start_date',
+        'end_date',
+        'visits_count',
+        'cost',
+        'paid_amount',
+        'notes',
+        'remaining_visits',
+        'cancellation_allowance',
+        'payment_status',
+        'receipt_attachment',
+        'quotation_to_contract_date',
+        'contract_attachment',
+        'cancellation_attachment',
+        'cancellation_note',
+        'status'
     ];
 
-    public function region()
-    {
-        return $this->belongsTo(Region::class);
-    }
-    public function elevatorType()
-    {
-        return $this->belongsTo(ElevatorType::class);
-    }
+    // ahmed hmed
+
 
     public function city()
     {
@@ -35,47 +43,67 @@ class MaintenanceContract extends Model
     {
         return $this->belongsTo(Neighborhood::class);
     }
-
-    public function buildingType()
-    {
-        return $this->belongsTo(BuildingType::class);
-    }
     public function area()
     {
         return $this->belongsTo(Area::class);
     }
+
+
+    public function elevatorType()
+    {
+        return $this->belongsTo(ElevatorType::class);
+    }
+
+    // machineType
     public function machineType()
     {
-        return $this->belongsTo(MachineType::class, 'machine_type_id');
+        return $this->belongsTo(MachineType::class);
     }
-    public function machineSpeed()
-    {
-        return $this->belongsTo(MachineSpeed::class, 'machine_speed_id');
-    }
-
+    // doorSize
     public function doorSize()
     {
-        return $this->belongsTo(DoorSize::class, 'door_size_id');
+        return $this->belongsTo(DoorSize::class);
     }
 
-    public function stopCount()
+    // stopsNumber
+    public function stopsNumber()
     {
         return $this->belongsTo(StopNumber::class, 'stops_count');
     }
-
+    // controlCard
     public function controlCard()
     {
-        return $this->belongsTo(ControlCard::class, 'control_card_id');
+        return $this->belongsTo(ControlCard::class, 'control_type_id');
     }
 
+    // drive_type
     public function driveType()
     {
         return $this->belongsTo(DriveTypes::class, 'drive_type_id');
     }
+
+    // Branch
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    // region
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
+
     // contract details
     public function contractDetails()
     {
         return $this->hasMany(MaintenanceContractDetail::class, 'maintenance_contract_id');
+    }
+
+    // buildingType
+    public function buildingType()
+    {
+        return $this->belongsTo(BuildingType::class, 'building_type_id');
     }
 
 
@@ -91,9 +119,21 @@ class MaintenanceContract extends Model
         return $this->morphMany(GeneralLog::class, 'loggable');
     }
 
+    // machineSpeed
+    public function machineSpeed()
+    {
+        return $this->belongsTo(MachineSpeed::class, 'machine_speed_id');
+    }
+
     // client
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    // representatives
+    public function representatives()
+    {
+        return $this->belongsTo(Representative::class, 'representative_id');
     }
 }

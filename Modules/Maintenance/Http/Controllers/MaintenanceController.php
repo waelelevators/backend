@@ -11,31 +11,6 @@ class MaintenanceController extends Controller
 {
 
 
-    public function maintenance()
-    {
-
-        $data = [];
-
-        $tables = [
-            "elevator_types",
-            "machine_types",
-            "machine_speeds",
-            "door_sizes",
-            "stops_numbers",
-            "control_cards",
-            "drive_types",
-            "maintenance_types",
-            "branches"
-        ];
-
-
-        foreach ($tables as $table) {
-            // get name and id for each table
-            $data[$table] = DB::table($table)->get();
-        }
-
-        return response()->json(['elevator' => $data]);
-    }
     /**
      * Show the form for creating a new resource.
      * @return Renderable
@@ -45,12 +20,14 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
+            "elevator_types",
             "machine_types",
             "machine_speeds",
             "door_sizes",
             "control_cards",
             "stops_numbers",
-            'users'
+            'users',
+            'templates'
         ];
 
         $regionsWithCity =  Region::whereHas('cities.neighborhoods')->with('cities.neighborhoods')->get();
@@ -69,7 +46,6 @@ class MaintenanceController extends Controller
         $data = [];
 
         $tables = [
-         
             'malfunction_types',
             'malfunction_statuses'
         ];

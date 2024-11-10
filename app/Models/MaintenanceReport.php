@@ -27,6 +27,7 @@ class MaintenanceReport extends Model
     // problems hidden in the database
     protected $hidden = ['problems'];
     protected $casts = [
+        'images' => 'array',
         'problems' => 'array',
     ];
 
@@ -64,5 +65,17 @@ class MaintenanceReport extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // city
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    // neighborhood
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class);
     }
 }

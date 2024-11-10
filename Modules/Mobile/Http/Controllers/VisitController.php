@@ -2,7 +2,9 @@
 
 namespace Modules\Mobile\Http\Controllers;
 
+use App\Models\MaintenanceReport;
 use App\Models\MaintenanceVisit;
+use App\Service\GeneralLogService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -92,20 +94,37 @@ class VisitController extends Controller
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif',
             'visit_id' => 'required',
+            'type' => 'nullable|string',
         ]);
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $filename = time() . '.' . $image->getClientOriginalExtension();
-            $path = $image->storeAs('public/visit_images', $filename);
 
-            $visit = MaintenanceVisit::findOrFail($request->visit_id);
-            // $visit->images()->create([
-            //     'url' => Storage::url($path),
-            // ]);
-            // images is an array append the new image to the array
-            $visit->images = array_merge($visit->images ?? [], [Storage::url($path)]);
-            $visit->save();
+            if ($request->has('type') and $request->type == 'report') {
+                $path = $image->storeAs('public/visit_reports', $filename);
+                $report = MaintenanceReport::findOrFail($request->visit_id);
+                $report->images = array_merge($report->images ?? [], [Storage::url($path)]);;
+                $report->save();
+
+                GeneralLogService::log($report, 'report_image_uploaded', 'تم تعديل الصور ', [
+                    'report_id' => $report->id,
+                    'images' => $report->images,
+                    'report' => $report,
+                ]);
+            } else {
+
+                $path = $image->storeAs('public/visit_images', $filename);
+                $visit = MaintenanceVisit::findOrFail($request->visit_id);
+                $visit->images = array_merge($visit->images ?? [], [Storage::url($path)]);
+                $visit->save();
+
+                GeneralLogService::log($visit, 'report_image_uploaded', 'تم تعديل الصور ', [
+                    'visit_id' => $visit->id,
+                    'images' => $visit->images,
+                    'visit' => $visit,
+                ]);
+            }
 
             return response()->json([
                 'message' => 'Image uploaded successfully',

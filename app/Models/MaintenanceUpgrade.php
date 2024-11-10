@@ -19,6 +19,7 @@ class MaintenanceUpgrade extends Model
         'latitude',
         'longitude',
         'client_id',
+        'template_id',
         'elevator_type_id',
         'building_type_id',
         'stops_count',
