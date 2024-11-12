@@ -11,6 +11,7 @@ class Contract extends Model
 {
     use HasFactory;
 
+
     /**
      * The attributes that are mass assignable.
      *
@@ -56,22 +57,48 @@ class Contract extends Model
 
     // with client
     protected $with = [
-        'locationDetection', 'stage', 'stage', 'elevatorRoom', 'template', 'representatives',
-        'DoorSize', 'CabinRailsSize', 'PeopleLoad', 'CounterWeightRailsSize', 'innerDoorType', 'elevatorWarranty',
-        'outerDoorSpecifications', 'MachineSpeed', 'MachineWarranty', 'installments', 'EntrancesNumber', 'branch',
-        'elevatorType', 'elevatorTrip', 'elevatorRail', 'elevatorRoom', 'elevatorWeight', 'machineType',
-        'machineLoad', 'controlCard', 'outerDoorDirections', 'stopsNumbers', 'freeMaintenance', 'createdBy'
+        'locationDetection',
+        'stage',
+        'stage',
+        'elevatorRoom',
+        'template',
+        'representatives',
+        'DoorSize',
+        'CabinRailsSize',
+        'PeopleLoad',
+        'CounterWeightRailsSize',
+        'innerDoorType',
+        'elevatorWarranty',
+        'outerDoorSpecifications',
+        'MachineSpeed',
+        'MachineWarranty',
+        'installments',
+        'EntrancesNumber',
+        'branch',
+        'elevatorType',
+        'elevatorTrip',
+        'elevatorRail',
+        'elevatorRoom',
+        'elevatorWeight',
+        'machineType',
+        'machineLoad',
+        'controlCard',
+        'outerDoorDirections',
+        'stopsNumbers',
+        'freeMaintenance',
+        'createdBy'
     ];
 
     protected $appends = [
-        'city', 'region',
+        'city',
+        'region',
         'is_invoice_created',
         'remaining_cost',
         'paid_amount',
         'more_additions',
         'is_ready_to_start',
         'external_status'
-       
+
     ];
 
     public function representatives()

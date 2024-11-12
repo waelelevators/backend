@@ -41,6 +41,29 @@ use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 Route::get('maintenance-contract-logs', function () {
 
+
+    return $maintenance_contract_detail_id;
+
+
+    return MaintenanceContract::where('template_id', '!=', 0)
+        ->with('template')
+        ->get();
+
+    MaintenanceContractDetail::query()
+        ->whereRaw('DATE(end_date) < CURDATE()')
+        ->where('status', '!=', 'expired')
+        ->update(['status' => 'expired']);
+
+    $inactiveContracts = MaintenanceContractDetail::query()
+        ->where('status', 'expired')
+        ->whereNotExists(function ($query) {
+            $query->from('maintenance_contract_details as mcd')
+                ->whereColumn('mcd.maintenance_contract_id', 'maintenance_contract_details.maintenance_contract_id')
+                ->where('mcd.status', 'active');
+        })
+        ->count();
+    return $inactiveContracts;
+
     return Client::where('name', "LIKE", '%هاني%')
         // ->update(['name' => 'هاني عبد الوهاب سليمان عزالدين'])
         ->get();

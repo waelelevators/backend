@@ -15,6 +15,8 @@ class VisitsResource extends JsonResource
         $area = $contract->area ?? null;
         $city = $contract->city ?? null;
 
+
+
         return [
             'id' => $this->id,
             'clientName' => $client ? $client->name : '',

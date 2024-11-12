@@ -147,6 +147,7 @@ class ReportController extends Controller
             $upgrade = new MaintenanceUpgrade();
             $upgrade->maintenance_contract_id = $report->maintenance_contract_id;
             $upgrade->status = 'pending';
+            $upgrade->template_id = $request->template_id;
             $upgrade->city_id = $report->maintenanceContract->city_id;
             $upgrade->user_id = auth()->id();
             $upgrade->neighborhood_id = $report->maintenanceContract->neighborhood_id;
@@ -158,11 +159,11 @@ class ReportController extends Controller
             $upgrade->stops_count = $maintenanceContract->stops_count;
             $upgrade->has_window = $maintenanceContract->has_window;
             $upgrade->has_stairs = $maintenanceContract->has_stairs;
-            $upgrade->speed_id = $maintenanceContract->speed_id;
+            $upgrade->speed_id = $maintenanceContract->machine_speed_id;
             $upgrade->total = 0;
             $upgrade->tax = $report->tax ?? 0;
             $upgrade->net_price = $report->price_without_tax;
-            $upgrade->total = $report->final_price;
+            $upgrade->total = $report->final_price ?? 0;
             $upgrade->user_id = auth('sanctum')->user()->id;
             $upgrade->save();
 

@@ -14,6 +14,8 @@ class MaintenanceContractResource extends JsonResource
 
         return [
             'id'                     => $this->id,
+            'template'               => $this->template->name ?? null,
+            'template_id'               => $this->template_id,
             'contract_number'        => $this->contract_number,
             'area'                   => $this->area,
             'user_id'                => $this->user_id,

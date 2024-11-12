@@ -18,6 +18,7 @@ use App\Models\Neighborhood;
 use App\Models\Region;
 use App\Models\Representative;
 use App\Models\StopNumber;
+use App\Models\Template;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,7 @@ class MaintenanceContract extends Model
 
 
     protected $fillable = [
+        'project_name',
         'contract_number',
         'area_id',
         'user_id',
@@ -168,5 +170,12 @@ class MaintenanceContract extends Model
     public function representatives()
     {
         return $this->belongsTo(Representative::class, 'representative_id');
+    }
+
+
+    // template
+    public function template()
+    {
+        return $this->belongsTo(Template::class, 'template_id');
     }
 }

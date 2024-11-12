@@ -24,7 +24,9 @@ class PdfQuotationController extends Controller
             'DriveType'
         ])->findOrFail($id);
 
-        $Setting = Template::findOrFail(1);
+
+
+        $Setting = Template::findOrFail($quotation->template_id);
         $template = $Setting->data['contract'];
 
 

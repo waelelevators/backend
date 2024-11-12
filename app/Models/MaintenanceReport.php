@@ -11,8 +11,10 @@ use Illuminate\Support\Fluent;
 class MaintenanceReport extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'maintenance_contract_id',
+        'maintenance_contract_details_id',
         'status',
         'problems',
         'tax',
@@ -24,12 +26,12 @@ class MaintenanceReport extends Model
     ];
 
 
-    // problems hidden in the database
     protected $hidden = ['problems'];
     protected $casts = [
         'images' => 'array',
         'problems' => 'array',
     ];
+
 
     protected $appends = ['faults'];
 
@@ -45,7 +47,6 @@ class MaintenanceReport extends Model
         return $this->belongsTo(Employee::class, 'technician_id');
     }
 
-    // the problems is array of fault_id saved in database like that [1,2,3] I want to get the faults name and description
     public function getFaultsAttribute()
     {
         return Fault::whereIn('id', $this->problems ?? [])->get() ?? [];

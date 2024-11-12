@@ -8,6 +8,7 @@ use App\Models\MaintenanceContractDetail as ModelsMaintenanceContractDetail;
 use App\Service\Base64FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Modules\Maintenance\Entities\MaintenanceContract as EntitiesMaintenanceContract;
@@ -82,7 +83,7 @@ class MaintenanceContractController extends Controller
                 $query->where('name', 'LIKE', "%{$search}%");
             });
 
-// area
+            // area
 
             $q->orWhereHas('region', function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%{$search}%");
@@ -230,10 +231,24 @@ class MaintenanceContractController extends Controller
     public function getExpiredContracts()
     {
         $ex = new MaintenanceContractDetail();
-        $maintenanceContractsIds =  $ex->getExpiredContracts()->whereNotNull('maintenance_contract_id')->pluck('maintenance_contract_id');
 
-        $contracts = MaintenanceContract::whereIn('id', $maintenanceContractsIds)->get();
+        //جلب تفصيل العقود المنتهية وهي العقود التي ليس لديها عقد نشط يكوت تبع نفس
+        // $maintenanceContractsIds =  $ex->getExpiredContracts()->whereNotNull('maintenance_contract_id')->pluck('maintenance_contract_id');
 
+        // $contracts = MaintenanceContract::whereIn('id', $maintenanceContractsIds)->get();
+
+        $maintenanceContractIds  = MaintenanceContractDetail::query()
+            ->where('status', 'expired')
+            ->whereNotExists(function ($query) {
+                $query->from('maintenance_contract_details as mcd')
+                    ->whereColumn('mcd.maintenance_contract_id', 'maintenance_contract_details.maintenance_contract_id')
+                    ->where('mcd.status', 'active');
+            })
+            // paginate(10)
+            ->pluck('maintenance_contract_id');
+        // ->paginate(10);
+
+        $contracts = MaintenanceContract::whereIn('id', $maintenanceContractIds)->paginate(10);
 
         return MaintenanceContractResource::collection($contracts);
     }
@@ -241,6 +256,7 @@ class MaintenanceContractController extends Controller
 
     function renewContract(Request $request, $id)
     {
+
 
         $this->maintenanceContractService->renewContract($request->all(), $id);
         return response([
@@ -279,8 +295,15 @@ class MaintenanceContractController extends Controller
             'attachment_type' => 'required',
         ]);
 
+        // if cost less than 1 return validation error
+        if ($request->attachment_type == 'receipt_attachment' && $request->cost < 1) {
+            return response()->json([
+                'success' => 'error',
+                'message' => 'المبلغ المدفوع يجب ان يكون اكبر من صفر'
+            ], 400);
+        }
 
-        $contractDetails = MaintenanceContractDetail::findOrFail($request->maintenance_contract_id);
+        $contractDetails = MaintenanceContractDetail::find($request->maintenance_contract_id);
 
         $reminingAmount =  $contractDetails->cost - $contractDetails->paid_amount;
 
@@ -303,21 +326,18 @@ class MaintenanceContractController extends Controller
                         'message' => 'المبلغ المدفوع اكبر من المبلغ المتبقي للعقد'
                     ], 400);
                 }
+
+
                 $contractDetails->receipt_attachment  = $filePath;
-                $contractDetails->save();
+                $contractDetails->paid_amount =  (int)$contractDetails->paid_amount +  $request->cost;
 
 
-                // if remaining amount not zero add $request->const to paid_amount and payment sataus partially paid
-                if ($reminingAmount != 0) {
-
-                    $contractDetails->paid_amount += $request->const;
+                if ($reminingAmount !=   $request->cost) {
                     $contractDetails->payment_status = 'partial';
-                    $contractDetails->save();
                 } else {
-                    $contractDetails->paid_amount += $request->const;
                     $contractDetails->payment_status = 'paid';
-                    $contractDetails->save();
                 }
+                $contractDetails->save();
             }
 
             return response([

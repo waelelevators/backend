@@ -5,6 +5,7 @@ namespace Modules\Mobile\Http\Controllers;
 use App\Models\MaintenanceReport;
 use App\Models\Fault;
 use App\Models\MaintenanceContract;
+use App\Models\MaintenanceContractDetail;
 use App\Models\Product;
 use App\Models\RequiredProduct;
 use App\Service\GeneralLogService;
@@ -30,7 +31,7 @@ class ReportController extends Controller
         )
             ->orderBy('id', 'desc')
             ->where('technician_id', auth()->user()->id)
-            ->where('status', '!=', 'completed')
+            ->where('status', 'assigned')
             ->get();
 
 
@@ -126,8 +127,7 @@ class ReportController extends Controller
             return [
                 'id' => $contractor->id,
                 'customerName' => $contractor->client->name ?? 'غير معروف',
-                'address' => $contractor->city->name . ',
-                 ' . $contractor->neighborhood->name ?? 'غير معروف',
+                'address' => $contractor->city->name . ',' . $contractor->neighborhood->name ?? 'غير معروف',
                 'phone' => $contractor->client->phone ?? 'غير معروف',
                 'contractType' => $contractor->activeContract->type ?? null,
                 'startDate' => $contractor->activeContract->start_date ?? null,
@@ -136,17 +136,26 @@ class ReportController extends Controller
         });
         return ['data' => $contractors];
     }
-    // technicianReports
+
+
     public function technicianReports(Request $request)
     {
 
         $user_id = auth('sanctum')->user()->id;
+
+        $maintenance_contract_detail_id = MaintenanceContractDetail::where('maintenance_contract_id', $request->maintenance_contract_id)
+            ->latest('created_at')
+            ->first()
+            ?->id;
+
+
         MaintenanceReport::create([
             'technician_id' => $user_id,
-            'status' => 'open',
+            'status' => 'assigned',
             'technician_id' => $user_id,
             'notes' => $request->notes,
             'maintenance_contract_id' => $request->maintenance_contract_id,
+            'maintenance_contract_detail_id' => $maintenance_contract_detail_id,
         ]);
         return response()->json(['message' => 'Report created successfully']);
     }

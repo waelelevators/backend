@@ -4,35 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MaintenanceContract extends Model
 {
     use HasFactory;
     protected $table = 'maintenance_contracts';
     protected $fillable = [
-        'installation_contract_id',
-        'maintenance_contract_id',
-        'maintenance_type',
-        'client_id',
+        'project_name',
+        'contract_number',
+        'area_id',
+        'region_id',
         'user_id',
-        'start_date',
-        'end_date',
-        'visits_count',
-        'cost',
-        'paid_amount',
-        'notes',
-        'remaining_visits',
-        'cancellation_allowance',
-        'payment_status',
-        'receipt_attachment',
+        'contract_type',
+        'contract_cancellation_attachment',
+        'contract_cancellation_note',
+        'total',
+        'city_id',
+        'raigon_id',
+        'neighborhood_id',
+        'latitude',
+        'longitude',
+        'client_id',
+        'elevator_type_id',
+        'building_type_id',
+        'stops_count',
+        'has_window',
+        'has_stairs',
+        'site_images',
+        'active_contract_id',
+        'door_direction_id',
+        'control_type_id',
+        'control_card_id',
+        'door_size_id',
+        'machine_type_id',
+        'machine_speed_id',
+        'representative_id',
+        'branch_id',
+        'drive_type_id',
         'quotation_to_contract_date',
-        'contract_attachment',
-        'cancellation_attachment',
-        'cancellation_note',
-        'status'
+        'template_id'
     ];
 
-    // ahmed hmed
 
 
     public function city()
@@ -135,5 +148,11 @@ class MaintenanceContract extends Model
     public function representatives()
     {
         return $this->belongsTo(Representative::class, 'representative_id');
+    }
+
+    // template
+    function template(): BelongsTo
+    {
+        return $this->belongsTo(Template::class, 'template_id');
     }
 }
