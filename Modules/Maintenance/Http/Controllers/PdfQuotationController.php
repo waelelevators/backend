@@ -3,16 +3,16 @@
 namespace Modules\Maintenance\Http\Controllers;
 
 use App\Helpers\PdfHelper;
-use App\Models\MaintenanceContract;
 use App\Models\Template;
 use Illuminate\Routing\Controller;
-
+use Modules\Maintenance\Entities\MaintenanceContract;
 
 class PdfQuotationController extends Controller
 {
     //
     function pdf($id)
     {
+
         $quotation = MaintenanceContract::with([
             'client',
             'ElevatorType',
@@ -23,6 +23,8 @@ class PdfQuotationController extends Controller
             'ControlCard',
             'DriveType'
         ])->findOrFail($id);
+
+
 
         $Setting = Template::findOrFail(1);
         $template = $Setting->data['contract'];
@@ -52,6 +54,7 @@ class PdfQuotationController extends Controller
 
                 </tbody>
             </table>";
+
 
         $data = [
             'FIRST_NAME' => $quotation->client->name,
