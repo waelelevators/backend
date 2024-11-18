@@ -4,6 +4,7 @@ namespace Modules\Mobile\Http\Controllers;
 
 use App\Models\MaintenanceReport;
 use App\Models\MaintenanceVisit;
+use App\Service\EnhancedRouteOptimizationService;
 use App\Service\GeneralLogService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -16,17 +17,72 @@ use Illuminate\Support\Facades\Log;
 class VisitController extends Controller
 {
     protected $visitService;
+    private $routeOptimizer;
 
-    public function __construct(VisitService $visitService)
+    public function __construct(VisitService $visitService, EnhancedRouteOptimizationService $routeOptimizer)
     {
         $this->visitService = $visitService;
+
+        $this->routeOptimizer = $routeOptimizer;
     }
 
     public function index()
     {
 
-        $latitude = 25.276987;
-        $longitude = 51.501000;
+        $locations =  $this->visitService->getAllVisits();
+
+        $latitude = 22.3021;
+        $longitude = 39.0945;
+        // $locations =  $locations =  [
+        //     [
+        //         "id" => 1,
+        //         "contract_number" => "M-2024-10-08-2760",
+        //         "latitude" => 22.3021,
+        //         "longitude" => 39.0945
+        //     ],
+        //     [
+        //         "id" => 2,
+        //         "contract_number" => "M-2024-10-08-9030",
+        //         "latitude" => 24.7136,
+        //         "longitude" => 46.6753
+        //     ],
+        //     [
+        //         "id" => 3,
+        //         "contract_number" => "M-2024-10-08-7017",
+        //         "latitude" => 24.7136,
+        //         "longitude" => 46.6753
+        //     ],
+        //     [
+        //         "id" => 4,
+        //         "contract_number" => "M-2024-10-08-4104",
+        //         "latitude" => 25.0321,
+        //         "longitude" => 46.4121
+        //     ],
+        //     [
+        //         "id" => 5,
+        //         "contract_number" => "M-2024-10-08-1446",
+        //         "latitude" => 21.5432,
+        //         "longitude" => 39.8231
+        //     ],
+        //     [
+        //         "id" => 6,
+        //         "contract_number" => "M-2024-10-08-2455",
+        //         "latitude" => 23.8765,
+        //         "longitude" => 46.2342
+        //     ]
+        // ];
+
+
+
+        // $optimizedRoute = $this->routeOptimizer->optimizeRoute(
+        //     $locations,
+        //     [
+        //         'latitude' => $latitude,
+        //         'longitude' => $longitude
+        //     ]
+        // );
+
+        // return ($optimizedRoute);
         try {
             $visits = $this->visitService->getVisitsSortedByDistance($latitude, $longitude);
             return VisitResource::collection($visits);
@@ -45,6 +101,7 @@ class VisitController extends Controller
     public function show($id)
     {
         try {
+            $visit = $this->visitService->getAllVisits();
             $visit = $this->visitService->getVisitById($id);
 
             return new VisitsResource($visit);

@@ -12,6 +12,7 @@ class MaintenanceUpgrade extends Model
 
     protected $fillable = [
         'maintenance_contract_id',
+        'technician_id',
         'status',
         'city_id',
         'user_id',
@@ -34,6 +35,8 @@ class MaintenanceUpgrade extends Model
         'attachment_contract',
         'attachment_receipt',
         'rejection_reason',
+        'payment_type',
+        'payment_id',
     ];
 
     // table maintenance_upgrades
@@ -89,6 +92,10 @@ class MaintenanceUpgrade extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function technician()
+    {
+        return $this->belongsTo(Employee::class);
     }
 
 

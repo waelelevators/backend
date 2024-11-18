@@ -19,6 +19,7 @@ class VisitsResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'project_name' => $this->maintenanceContract->projec_name ?? 'اسم المشروع',
             'clientName' => $client ? $client->name : '',
             'clientPhone' => $this->formatPhoneNumber($client ? $client->phone : ''),
             'address' => $this->formatAddress($city, $neighborhood, $area, $contract),

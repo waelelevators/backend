@@ -18,11 +18,17 @@ use App\Models\MaintenanceVisit;
 use App\Models\Neighborhood;
 use App\Models\Product;
 use App\Models\User;
+use App\Service\EnhancedRouteOptimizationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Modules\Maintenance\Entities\MaintenanceContract;
 use Modules\Maintenance\Entities\MaintenanceContractDetail as EntitiesMaintenanceContractDetail;
 use Modules\Maintenance\Transformers\MaintenanceContractResource;
+
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Modules\Mobile\Http\Controllers\RouteOptimizerController;
 
 // use PDF;
 
@@ -39,10 +45,162 @@ use Modules\Maintenance\Transformers\MaintenanceContractResource;
 
 
 
+Route::get('map', [RouteOptimizerController::class, 'optimizeRoute']);
 Route::get('maintenance-contract-logs', function () {
 
+    // $contracts = MaintenanceContract::paginate(10)->map(function ($contract) {
+    //     return [
+    //         'id' => $contract->id,
+    //         'contract_number' => $contract->contract_number,
+    //         'latitude' => $contract->latitude,
+    //         'longitude' => $contract->longitude
+    //     ];
+    // })
+    //     ->toArray();
 
-    return $maintenance_contract_detail_id;
+    $locations =  [
+        [
+            "id" => 1,
+            "contract_number" => "M-2024-10-08-2760",
+            "latitude" => 22.3021,
+            "longitude" => 39.0945
+        ],
+        [
+            "id" => 2,
+            "contract_number" => "M-2024-10-08-9030",
+            "latitude" => 24.7136,
+            "longitude" => 46.6753
+        ],
+        [
+            "id" => 3,
+            "contract_number" => "M-2024-10-08-7017",
+            "latitude" => 24.7136,
+            "longitude" => 46.6753
+        ],
+        [
+            "id" => 4,
+            "contract_number" => "M-2024-10-08-4104",
+            "latitude" => 25.0321,
+            "longitude" => 46.4121
+        ],
+        [
+            "id" => 5,
+            "contract_number" => "M-2024-10-08-1446",
+            "latitude" => 21.5432,
+            "longitude" => 39.8231
+        ],
+        [
+            "id" => 6,
+            "contract_number" => "M-2024-10-08-2455",
+            "latitude" => 23.8765,
+            "longitude" => 46.2342
+        ]
+    ];
+
+    $originsStr =   '21.3761739, 39.7639038';
+
+    $destinationsStr = implode('|', array_map(function ($point) {
+        return "{$point['latitude']},{$point['longitude']}";
+    }, $locations));
+
+
+
+
+    $matrix = Http::get('https://maps.googleapis.com/maps/api/distancematrix/json', [
+        'origins' => $originsStr,
+        'destinations' => $destinationsStr,
+        'mode' => 'driving',
+        'key' => "AIzaSyDhjUlU89FeHPvu-urVVTckiGKW0rmm1D8"
+    ])->json();
+
+    // if ($matrix->successful() && $matrix['status'] === 'OK') {
+    //     return $matrix->json();
+    // }
+
+
+    $distances = [];
+    $durations = [];
+    if ($matrix) {
+
+        foreach ($matrix['rows'] as $i => $row) {
+
+            foreach ($row['elements'] as $j => $element) {
+
+                if ($element['status'] === 'OK') {
+                    $distances[$i][$j] = $element['distance']['value'];
+                    $durations[$i][$j] = $element['duration']['value'];
+                }
+            }
+        }
+    }
+
+    return  [
+        'distances' => $distances,
+        'durations' => $durations
+    ];
+    $routeOptimizer = new EnhancedRouteOptimizationService();
+
+    $optimizedRoute = $this->routeOptimizer->optimizeRoute(
+        $locations,
+        [
+            'latitude' => '21.3761739',
+            'longitude' => '39.7639038'
+        ]
+    );
+
+    return response()->json($optimizedRoute);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDhjUlU89FeHPvu-urVVTckiGKW0rmm1D8&origin=21.3761739%2C39.7639038&destinations=24.7136%2C46.6753%7C22.3021%2C39.0945%7C25.0321%2C46.4121%7C21.5432%2C39.8231%7C23.8765%2C46.2342&mode=driving&optimize=true');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    return $response;
+
+    $api_key = 'AIzaSyDhjUlU89FeHPvu-urVVTckiGKW0rmm1D8'; // استبدل bằng مفتاح واجهة برمجة التطبيقات الخاص بك
+
+    $origin = '21.3761739,39.7639038'; // الإحداثيات الجغرافية للنقطة الأصلية
+    $destinations = [
+        '24.7136,46.6753',
+        '22.3021,39.0945',
+        '25.0321,46.4121',
+        '21.5432,39.8231',
+        '23.8765,46.2342',
+    ];
+
+    $url = 'https://maps.googleapis.com/maps/api/directions/json?';
+    $params = [
+        'key' => $api_key,
+        'origin' => $origin,
+        'destinations' => implode('|', $destinations),
+        'mode' => 'driving',
+        'optimize' => 'true',
+    ];
+
+    $response = json_decode(file_get_contents($url . http_build_query($params)), true);
+
+    $routes = $response['routes'];
+    $sorted_destinations = [];
+
+    foreach ($routes as $route) {
+        $legs = $route['legs'];
+        foreach ($legs as $leg) {
+            $sorted_destinations[] = $leg['end_address'];
+        }
+    }
+
+    print_r($sorted_destinations);
+
+    return;
+    return MaintenanceContract::paginate(10)->map(function ($contract) {
+        return [
+            'id' => $contract->id,
+            'contract_number' => $contract->contract_number,
+            'latitude' => $contract->latitude,
+            'longitude' => $contract->longitude
+        ];
+    })
+        ->toArray();
 
 
     return MaintenanceContract::where('template_id', '!=', 0)
