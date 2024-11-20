@@ -9,10 +9,14 @@ class MaintenanceContractDetailResource extends JsonResource
 {
     public function toArray($request)
     {
+
+        // ahmed hmed yousif hmed
+
         return [
             'id' => $this->id,
-            'project_name' => $this->project_name,
+            'project_name' => $this->project_name  ?? 'اسم المشروع',
             'installation_contract_id' => $this->installation_contract_id,
+            'completed_visits_count' => $this->completed_visits_count,
             'maintenance_contract_id' => $this->maintenance_contract_id,
             'client' => $this->when($this->relationLoaded('client'), ($this->client)),
             'user_id' => $this->user_id,
@@ -33,7 +37,7 @@ class MaintenanceContractDetailResource extends JsonResource
             'status' => $this->status,
             'visits' => $this->when($this->relationLoaded('visits'), MaintenanceVisitResource::collection($this->visits)),
             'contract' => $this->when($this->relationLoaded('contract'), new MaintenanceContractResource($this->contract)),
-
+            'last_report' => $this->when($this->relationLoaded('lastReport'), $this->lastReport),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

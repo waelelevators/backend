@@ -38,7 +38,8 @@ class MaintenanceContractResource extends JsonResource
             'client'                 => $this->client,
             'elevatorType'           => $this->elevatorType,
             'machineType'            => $this->machineType,
-            'contracts'              => $this->contractDetails,
+            // $this->when($this->relationLoaded('contract'), new MaintenanceContractResource($this->contract))
+            'contracts'              => $this->contracts ,
             'active_contract'        => MaintenanceContractDetailResource::make($this->activeContract),
             'city'                   => $this->city,
             'neighborhood'           => $this->neighborhood,

@@ -9,8 +9,6 @@ class MaintenanceVisit extends Model
 {
     use HasFactory;
 
-    // ahmed hmed
-    // fillable
     protected $fillable = [
         'maintenance_contract_id',
         'visit_start_date',

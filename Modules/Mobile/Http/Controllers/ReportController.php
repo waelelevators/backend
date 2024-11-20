@@ -55,8 +55,8 @@ class ReportController extends Controller
                 'neighborhood' => $report->maintenanceContract->neighborhood->name ?? null,
                 'logs' => $logs ?? [],
                 'client' => [
-                    'name' => $report->maintenanceContract->client->name ?? null,
-                    'phone' => $report->maintenanceContract->client->phone ?? null,
+                    'name' => $report->maintenanceContract->client->name ?? 'غير معروف',
+                    'phone' => $report->maintenanceContract->client->phone ?? 'غير معروف',
                 ],
                 'start_date' => $report->maintenanceContract->activeContract->start_date ?? null,
                 'end_date' => $report->maintenanceContract->activeContract->end_date ?? null,
@@ -106,8 +106,8 @@ class ReportController extends Controller
             'neighborhood' => $report->maintenanceContract->neighborhood->name ?? null,
             'logs' => $logs,
             'client' => [
-                'name' => $report->maintenanceContract->client->name ?? null,
-                'phone' => $report->maintenanceContract->client->phone ?? null,
+                'name' => $report->maintenanceContract->client->name ?? 'غير معروف',
+                'phone' => $report->maintenanceContract->client->phone ?? 9665087474999,
             ],
             'start_date' => $report->maintenanceContract->activeContract->start_date ?? null,
             'end_date' => $report->maintenanceContract->activeContract->end_date ?? null,
@@ -155,7 +155,7 @@ class ReportController extends Controller
             'technician_id' => $user_id,
             'notes' => $request->notes,
             'maintenance_contract_id' => $request->maintenance_contract_id,
-            'maintenance_contract_detail_id' => $maintenance_contract_detail_id,
+            'maintenance_contract_details_id' => $maintenance_contract_detail_id,
         ]);
         return response()->json(['message' => 'Report created successfully']);
     }

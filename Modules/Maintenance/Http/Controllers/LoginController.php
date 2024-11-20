@@ -50,8 +50,8 @@ class LoginController extends Controller
             'user' => [
                 'name' => $user->name,
                 'phone' => $user->phone,
-                'level' => 'customer',
-                // 'level' => 'technician',
+                // 'level' => 'customer',
+                'level' => 'technician',
                 'completedJobs' => 10,
                 'otp' => null,
                 // 'otp' => 123456,

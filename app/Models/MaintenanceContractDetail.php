@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MaintenanceContractDetail extends Model
+class   MaintenanceContractDetail extends Model
 {
     use HasFactory;
 
@@ -110,6 +110,21 @@ class MaintenanceContractDetail extends Model
     // reports
     public function reports()
     {
-        return $this->hasMany(MaintenanceReport::class, 'maintenance_contract_detail_id');
+        return $this->hasMany(MaintenanceReport::class, 'maintenance_contract_details_id');
+    }
+
+
+    // get last active report
+    public function lastReport()
+    {
+        return $this->reports()
+            ->where('status', '!=', 'approved')
+            ->orderBy('created_at', 'desc');
+    }
+
+
+    public function getCompletedVisitsCountAttribute()
+    {
+        return $this->visits()->where('status', 'completed')->count() ?? 0;
     }
 }

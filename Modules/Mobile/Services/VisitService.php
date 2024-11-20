@@ -12,6 +12,9 @@ class VisitService
 {
     public function getAllVisits()
     {
+
+        $contracts = MaintenanceContract::paginate(10);
+        // return $contracts;
         return MaintenanceVisit::with([
             'maintenanceContract.client',
             'maintenanceContract.city',
@@ -19,7 +22,19 @@ class VisitService
             'maintenanceContract.area',
             'maintenanceContractDetail',
             'user',
-        ])->paginate(10);
+        ])
+            // where has latitude
+            // ->whereNotNull('latitude')
+            ->take(10)->get();
+        // ->map(function ($contract) {
+        //     return [
+        //         'id' => $contract->id,
+        //         'contract_number' => $contract->contract_number,
+        //         'latitude' => $contract->latitude,
+        //         'longitude' => $contract->longitude
+        //     ];
+        // })
+        // ->toArray();
     }
 
     public function getVisitById($id)
@@ -79,8 +94,8 @@ class VisitService
             $distance = $this->calculateDistance(
                 $latitude,
                 $longitude,
-                $visit->maintenanceContract->latitude,
-                $visit->maintenanceContract->longitude
+                $visit->maintenanceContract->latitude ?? 0,
+                $visit->maintenanceContract->longitude ?? 0
             );
             $visit->distance = $distance;
             return $visit;
