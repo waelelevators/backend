@@ -39,12 +39,15 @@ class MaintenanceUpgrade extends Model
     // table maintenance_upgrades
     protected $table = 'maintenance_upgrades';
 
-    protected $casts = [
-        'status' => MaintenanceUpgradeStatus::class,
-    ];
+    // protected $casts = [
+    //     'status' => MaintenanceUpgradeStatus::class,
+    // ];
 
 
-
+    public function stopsNumber()
+    {
+        return $this->belongsTo(StopNumber::class, 'stops_count');
+    }
     public function maintenanceContract()
     {
         return $this->belongsTo(MaintenanceContract::class);
@@ -91,6 +94,10 @@ class MaintenanceUpgrade extends Model
         return $this->belongsTo(User::class);
     }
 
+    function template()
+    {
+        return $this->belongsTo(Template::class, 'template_id');
+    }
 
     public function products()
     {

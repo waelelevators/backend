@@ -13,18 +13,19 @@ class PdfContractController extends Controller
     //
     function pdf($id)
     {
+
         $contract = MaintenanceContract::with([
             'client',
             'ElevatorType',
-            'machineTYPE',
-            'machineSpeed',
+            'MachineTYPE',
+            'MachineSpeed',
             'doorSize',
-            'StopCount',
+            'stopsNumber',
             'ControlCard',
             'DriveType'
         ])->findOrFail($id);
 
-        $Setting = Template::findOrFail(10);
+        $Setting = Template::findOrFail($contract->template_id);
         $template = $Setting->data['contract'];
 
         $name = optional($contract->createdBy)->name;
@@ -34,14 +35,14 @@ class PdfContractController extends Controller
         $mpdf =   PdfHelper::generateContractPDF($name, $doneBy);
 
         $payment_table = "
-      
+
             <table  class='pdf'>
                 <tbody>
                     <tr style='background:#20536b:white; text-align:center;'>
                        <td style='text-align:center;color:white' width='33.33%'>المبلغ</td>
                        <td style='text-align:center;color:white' width='33.33%'>ضريبة القيمة المضافة</td>
                        <td style='text-align:center;color:white' width='33.33%'>الاجمالي</td>
-    
+
                     </tr>
                     <tr>
                         <td style='text-align:center;color:red' width='33.33%'>{$contract->activeContract->cost}</td>
@@ -66,10 +67,8 @@ class PdfContractController extends Controller
             'CONTROL_CARD' => $contract->ControlCard->name,
             'DRIVE_TYPE' => $contract->ControlCard->name,
             'DOOR_SIZE' => $contract->doorSize->name,
+            'VISIT_NUMBERS' => $contract->visits_number,
             'PAYMENT' => $payment_table,
-
-
-            //   'VISIT_NUMBERS' => $contract->visits_number,
         ];
         // Generate the PDF
         $mpdf->WriteHTML(view(

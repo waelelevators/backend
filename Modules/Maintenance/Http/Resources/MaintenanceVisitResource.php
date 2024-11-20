@@ -11,7 +11,7 @@ class MaintenanceVisitResource extends JsonResource
         return [
             'id' => $this->id,
             'maintenance_contract_detail_id' => $this->maintenance_contract_detail_id,
-            'technician' => $this->when($this->relationLoaded('user'), $this->user),
+            'technician' => $this->when($this->relationLoaded('technician'), $this->technician),
             'user' => $this->when($this->relationLoaded('user'), $this->user),
             'visit_date' => $this->visit_date,
             'status' => $this->status,
@@ -21,7 +21,7 @@ class MaintenanceVisitResource extends JsonResource
             'test_checklist' => $this->test_checklist,
             'client_approval' => $this->client_approval,
             'maintenance_contract' => $this->when($this->relationLoaded('maintenanceContract'), $this->maintenanceContract),
-            'images' => $this->images,
+            'images' => $this->images ?? [],
             'logs' => $this->when($this->logs, $this->logs),
         ];
     }

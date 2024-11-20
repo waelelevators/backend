@@ -24,7 +24,7 @@ class MaintenanceUpgradeResource extends JsonResource
             'rejection_reason' => $this->rejection_reason,
             'stops_count' => $this->stops_count,
             'has_stairs' => $this->has_stairs,
-            'status' => $this->status->toArray(),
+            // 'status' => $this->status->toArray(),
             'city' => $this->city,
             'neighborhood' => $this->neighborhood,
             'speed' => $this->speed,
@@ -36,6 +36,9 @@ class MaintenanceUpgradeResource extends JsonResource
             'client' => $this->client,
             'products' => $this->products,
             'logs' => $this->logs,
+            'template_id' => $this->template_id,
+            'template' => $this->template,
+            'created_at' => $this->created_at
         ];
     }
 }

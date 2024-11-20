@@ -22,7 +22,7 @@
 
     <div class="container" style="direction: rtl" id="container">
 
-        <div>
+        {{-- <div>
             <div class="left">
                 <h3 style="text-align:center">
                     التاريخ :
@@ -44,7 +44,7 @@
                 </h2>
             </div>
 
-        </div>
+        </div> --}}
 
 
         <p>{!! $contractText !!}</p>

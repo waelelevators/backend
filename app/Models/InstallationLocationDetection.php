@@ -87,18 +87,18 @@ class InstallationLocationDetection extends Model
         return ElevatorTrip::where('id', $this->well_data['elevator_trips_id'])->first();
     }
 
-    public function getRegionAttribute()
+    public function region()
     {
-        return Region::where('id', $this->location_data['region'] ?? 0)->first();
+        return $this->belongsTo(Region::class);
     }
 
-    public function getCityAttribute()
+    public function city()
     {
-        return City::where('id', $this->location_data['city'] ?? 0)->first();
+        return $this->belongsTo(City::class);
     }
-    public function getNeighborhoodAttribute()
+    public function neighborhood()
     {
-        return Neighborhood::where('id', $this->location_data['neighborhood'] ?? 0)->first();
+        return $this->belongsTo(Neighborhood::class);
     }
 
     public function getFloorAttribute()

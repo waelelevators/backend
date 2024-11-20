@@ -15,6 +15,7 @@ class MaintenanceContractStoreRequest extends FormRequest
     {
         return [
             // 'contract_number' => 'required|unique:maintenance_contracts,contract_number',
+            'project_name' => 'required',
             'area_id' => 'exists:areas,id',
             'contract_type' => 'in:contract,draft',
             'total' => 'numeric',
@@ -35,6 +36,7 @@ class MaintenanceContractStoreRequest extends FormRequest
             // 'visits_count' => 'required|integer',
             // 'cost' => 'required|numeric',
             'notes' => 'nullable|string',
+            'template_id' => 'required',
             'cancellation_allowance' => 'nullable|numeric',
             'receipt_attachment' => 'nullable|file|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif|max:2048',
             'contract_attachment' => 'nullable|file|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif|max:2048',

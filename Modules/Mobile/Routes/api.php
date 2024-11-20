@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use App\Models\Fault;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Maintenance\Http\Controllers\LoginController;
 use Modules\Mobile\Http\Controllers\AuthController;
+use Modules\Mobile\Http\Controllers\CustomerController as ControllersCustomerController;
 use Modules\Mobile\Http\Controllers\VisitController;
 use Modules\Mobile\Http\Controllers\ReportController;
 
@@ -120,6 +122,14 @@ Route::prefix('mobile')->group(function () {
         Route::post('resend-otp', [LoginController::class, 'otp']);
         // verify otp
         Route::post('verify-otp', [LoginController::class, 'verifyOtp']);
+
+
+        // customers group
+        Route::group(['prefix' => 'customer'], function () {
+
+            Route::get('contracts', [ControllersCustomerController::class, 'index']);
+            Route::get('contracts/{id}', [ControllersCustomerController::class, 'show']);
+        });
     });
 
 

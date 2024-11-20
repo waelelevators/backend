@@ -21,6 +21,7 @@ class MaintenanceContractDetail extends Model
         'end_date',
         'visits_count',
         'cost',
+        'paid_amount',
         'notes',
         'remaining_visits',
         'cancellation_allowance',
@@ -98,5 +99,17 @@ class MaintenanceContractDetail extends Model
     {
         $today = Carbon::today();
         return $this->where('end_date', '<', $today)->where('remaining_visits', '<', 1)->get();
+    }
+
+    // contract
+    public function contract()
+    {
+        return $this->belongsTo(MaintenanceContract::class, 'maintenance_contract_id');
+    }
+
+    // reports
+    public function reports()
+    {
+        return $this->hasMany(MaintenanceReport::class, 'maintenance_contract_detail_id');
     }
 }

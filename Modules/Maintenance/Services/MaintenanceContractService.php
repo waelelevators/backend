@@ -55,12 +55,11 @@ class MaintenanceContractService
         ]));
 
 
-        $contract_number = $this->contractCode($data['maintenance_type'] ?? 1, $data['branch_id']) ?? '';
 
         $contractData['contract_type']              = $data['isDraft'] ? 'draft' : 'contract';
-        $contractData['contract_number']            = $contract_number;
         $contractData['user_id']                    = $user_id;
         $contractData['template_id']                = $data['template_id'];
+        $contractData['project_name']               = $data['project_name'];
         $contractData['control_card_id']            = $data['control_card_id'];
         $contractData['elevator_type_id']           = $data['elevator_type_id'];
         $contractData['total']                      = $data['cost'] ?? 0;
@@ -89,13 +88,16 @@ class MaintenanceContractService
             $detailData['client_id'] = $data['client_id'];
             $detailData['user_id'] = $contract->user_id;
             $detailData['remaining_visits'] = $data['visits_count'] ?? 12;
-            $detailData['maintenance_type'] = $this->maintenance_type[($data['maintenance_type'] ?? 1) - 1] ?? 'free';
+            $detailData['maintenance_type'] = $this->maintenance_types[$data['maintenance_type'] - 1];
             $detailData['start_date'] = $data['start_date'];
             $detailData['end_date'] = $data['end_date'];
             $detailData['cost'] = $data['cost'];
             $detailData['visits_count'] = $data['visits_count'];
+
+
+
             $detail = $this->maintenanceContractDetailRepository->create($detailData);
-            $contract->update(['active_contract_id' => $detail->id]);
+            $contract->update(['active_contract_id' => $detail->id, 'contract_number' => $this->contractCode($data['maintenance_type'], $data['branch_id']) ?? '',]);
             $this->createVisits($detail);
             $this->generalLogService::log($detail, 'create', 'Contract detail created', ['data' => $detailData, 'user_id' => 1]);
             return $contract->load('contractDetail');
@@ -136,10 +138,17 @@ class MaintenanceContractService
         $data['quotation_to_contract_date'] = now();
 
 
-        $contract->update(['contract_type' => 'contract']);
+
+        $contract->update([
+            'contract_type' => 'contract',
+            'quotation_to_contract_date' => now(),
+            'contract_number' => $this->contractCode($data['maintenance_type'], $data['branch_id']) ?? '',
+        ]);
 
         // create contract detail
         $contractDetail = $this->createContractDetail($contract, $data);
+
+        $contract->update(['active_contract_id' => $contractDetail->id]);
 
         // create visits
         $this->createVisits([
@@ -224,7 +233,7 @@ class MaintenanceContractService
         $detailData = [
             'installation_contract_id'   => $data['installation_contract_id'] ?? $contract->installation_contract_id ?? null,
             'maintenance_contract_id'    => $data['maintenance_contract_id'] ?? $contract->maintenance_contract_id ?? null,
-            'maintenance_type'           => $data['maintenance_type'] ?? $contract->maintenance_type ?? null,
+            'maintenance_type'           => $contract->maintenance_type ?? null,
             'client_id'                  => $data['client_id'] ?? $contract->client_id ?? null,
             'start_date'                 => $data['start_date'] ?? $contract->start_date ?? null,
             'end_date'                   => $data['end_date'] ?? $contract->end_date ?? null,
@@ -254,17 +263,17 @@ class MaintenanceContractService
             ]);
 
 
-            $contract = MaintenanceContractDetail::findOrFail($data['contract_id']);
+            $contract = MaintenanceContractDetail::find($data['contract_id']);
 
-            $contract_data = [];
 
-            $contract_data['cancellation_attachment'] = $attchment;
-            $contract_data['cancellation_note'] = $data['note'] ?? '';
-            $contract_data['cancellation_allowance'] = $data['allowance'] ?? 0;
-            $contract_data['status'] = 'expired';
+            $contract->cancellation_attachment = $attchment;
+            $contract->cancellation_note = $data['note'] ?? '';
+            $contract->cancellation_allowance =  0;
+            $contract->status = 'expired';
+            $contract->save();
 
-            $contract->update($contract_data);
-            $this->generalLogService::log($contract, 'cancel', 'Contract cancelled', ['contract' => $contract, 'data' => $contract_data, 'user_id' => auth('sanctum')->user()->id]);
+
+            $this->generalLogService::log($contract, 'cancel', 'Contract cancelled', ['contract' => $contract, 'user_id' => auth('sanctum')->user()->id]);
             return $contract;
         } catch (\Throwable $th) {
             throw $th;
@@ -274,13 +283,14 @@ class MaintenanceContractService
 
 
     // renewContract($request->all(), $id)
-    public function renewContract($id, $data)
+    public function renewContract($data, $id)
     {
 
         $user_id = auth('sanctum')->user()->id;
 
         // جب لبيانات من قااعده البيانات
-        $contract = MaintenanceContract::with('activeContract')->findOrFail($id);
+        $contract = MaintenanceContract::with('activeContract')->where('id', $id)->first();
+
         $activeContract = MaintenanceContractDetail::find($contract->active_contract_id);
 
 
@@ -306,8 +316,12 @@ class MaintenanceContractService
             'status' => 'active',
         ]);
 
-        unset($contractDetails['id'], $contractDetails['created_at'], $contractDetails['updated_at']);
-
+        unset($newData['id']);
+        unset($newData['created_at']);
+        unset($newData['updated_at']);
+        unset($newData['payment_status']);
+        unset($newData['cancellation_note']);
+        unset($newData['cancellation_attachment']);
 
         $contractDetail = new MaintenanceContractDetail();
         $newContractDetail = $contractDetail->create($newData);

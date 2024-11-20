@@ -3,7 +3,9 @@
 return [
     'Institute Name' => 'مؤسسة وائل للمصاعد',
     'Tax Number' => '301202774400003',
-
+    'Statement' => 'البيان',
+    'Quantity' => 'الكمية',
+    'Price' => 'السعر',
     "Elevator Type" => "نوع المصعد",
     "Stopping Number" => "عدد الوقفات",
     "Elevator Trip" => "مشوار المصعد",
@@ -40,8 +42,10 @@ return [
     'Item Value' => 'القيمة',
     'Right Shoulder' => 'مقاس الكتف الايمن',
     'Left Shoulder' => 'مقاس الكتف الايسر',
+    'Total' => 'اجمالي السعر',
     'Door Size' => 'فتحة الباب',
     'Well Height' => 'ارتفاع البئر',
+    'SPARE PART' => 'قطع غيار',
     'Last Floor Height' => 'ارتفاع الطابق الأخير',
     'Floor Height' => 'ارتفاع الدور',
     'Well Width' => 'عرض البئر',

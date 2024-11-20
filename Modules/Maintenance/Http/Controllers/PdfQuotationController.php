@@ -26,7 +26,8 @@ class PdfQuotationController extends Controller
 
 
 
-        $Setting = Template::findOrFail(1);
+       
+        $Setting = Template::findOrFail($quotation->template_id);
         $template = $Setting->data['contract'];
 
 

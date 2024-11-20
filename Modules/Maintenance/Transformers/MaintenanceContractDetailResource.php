@@ -11,8 +11,10 @@ class MaintenanceContractDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'project_name' => $this->project_name,
             'installation_contract_id' => $this->installation_contract_id,
-            'customer_id' => $this->customer_id,
+            'maintenance_contract_id' => $this->maintenance_contract_id,
+            'client' => $this->when($this->relationLoaded('client'), ($this->client)),
             'user_id' => $this->user_id,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
@@ -30,6 +32,8 @@ class MaintenanceContractDetailResource extends JsonResource
             'maintenance_type' => $this->maintenance_type,
             'status' => $this->status,
             'visits' => $this->when($this->relationLoaded('visits'), MaintenanceVisitResource::collection($this->visits)),
+            'contract' => $this->when($this->relationLoaded('contract'), new MaintenanceContractResource($this->contract)),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

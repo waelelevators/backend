@@ -26,6 +26,10 @@ class MaintenanceContractDetail extends Model
         'status'
     ];
 
+    protected $cast = [
+        'paid_amount' => 'float'
+    ];
+
     public function contract()
     {
         return $this->belongsTo(MaintenanceContract::class, 'installation_contract_id');
