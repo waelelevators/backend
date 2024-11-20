@@ -206,6 +206,11 @@ Route::prefix('mobile')->group(function () {
                 ];
             });
         });
+
+
+
+        // include crm routes
+        include 'crm_api.php';
     });
 
 
